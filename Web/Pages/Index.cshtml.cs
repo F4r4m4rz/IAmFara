@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IAmFara.Core.DynamicAddin.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -12,9 +13,14 @@ namespace IAmFara.Web.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, IServiceProvider provider, IEnumerable<IFeatureAddin> addins)
         {
             _logger = logger;
+
+            foreach (var item in addins)
+            {
+                item.Instance(provider);
+            }
         }
 
         public void OnGet()

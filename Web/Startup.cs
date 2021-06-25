@@ -22,6 +22,8 @@ namespace IAmFara.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddIAmFaraServicesAsync(Configuration, "/Users/faramarzbodaghi/Library/Mobile Documents/com~apple~CloudDocs/Projects/IAmFara/TestAddin/bin/Debug/net5.0").Wait();
+
             services.AddRazorPages();
         }
 
