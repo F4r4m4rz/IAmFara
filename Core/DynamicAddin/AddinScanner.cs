@@ -36,6 +36,7 @@ namespace IAmFara.Core.DynamicAddin
             // Loop through files and load assemblies
             foreach (var assemblyFile in assemblyFiles)
             {
+                // check if view assembly exists
                 var assemblyRaw = await File.ReadAllBytesAsync(assemblyFile);
                 var assembly = Assembly.Load(assemblyRaw);
                 Load(assembly);

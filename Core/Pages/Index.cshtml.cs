@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace IAmFara.Web.Pages
+namespace IAmFara.Core.Pages
 {
     public class IndexModel : PageModel
     {
@@ -16,11 +16,6 @@ namespace IAmFara.Web.Pages
         public IndexModel(ILogger<IndexModel> logger, IServiceProvider provider, IEnumerable<IFeatureAddin> addins)
         {
             _logger = logger;
-
-            foreach (var item in addins)
-            {
-                item.Instance(provider);
-            }
         }
 
         public void OnGet()

@@ -5,21 +5,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TestAddin
 {
-    public class TestAddin : IFeatureAddin
+    public class NewAddin :IFeatureAddin
     {
-        public TestAddin()
+        public NewAddin()
         {
-
         }
 
-        public string Name => nameof(TestAddin);
+        public string Name => "Fara Addin";
 
         public string Route => "";
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<MyClassConfig>(configuration.GetSection("MyClass"));
-            services.AddScoped<MyClass>();
+
         }
     }
 }

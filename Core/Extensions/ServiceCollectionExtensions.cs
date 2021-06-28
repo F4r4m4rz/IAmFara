@@ -20,7 +20,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var addinStorage = await scanner.Scan();
                 services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
             }
-            
+
+            services.AddRazorPages();
+
             return services;
         }
     }

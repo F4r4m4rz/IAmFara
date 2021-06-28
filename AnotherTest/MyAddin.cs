@@ -3,23 +3,21 @@ using IAmFara.Core.DynamicAddin.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TestAddin
+namespace AnotherTest
 {
-    public class TestAddin : IFeatureAddin
+    public class MyAddin : IFeatureAddin
     {
-        public TestAddin()
+        public MyAddin()
         {
-
         }
 
-        public string Name => nameof(TestAddin);
+        public string Name => "My addin";
 
-        public string Route => "";
+        public string Route => "MyAddin";
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<MyClassConfig>(configuration.GetSection("MyClass"));
-            services.AddScoped<MyClass>();
+
         }
     }
 }

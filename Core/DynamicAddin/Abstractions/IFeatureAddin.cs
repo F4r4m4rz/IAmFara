@@ -8,7 +8,8 @@ namespace IAmFara.Core.DynamicAddin.Abstractions
     {
         string Name { get; }
 
+        string Route { get; }
+
         void RegisterServices(IServiceCollection services, IConfiguration configuration);
-        void Instance(IServiceProvider provider);
     }
 }
