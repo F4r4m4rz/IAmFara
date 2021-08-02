@@ -15,7 +15,7 @@
                 @foreach (var addin in Addins)
                 {
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/MyAddin" >@addin.Name</a>
+                        <a class="nav-link text-dark" asp-area="" asp-page=@addin.Route >@addin.Name</a>
                     </li>
                 }
 

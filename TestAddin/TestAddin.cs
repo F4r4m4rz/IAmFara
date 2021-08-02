@@ -14,7 +14,7 @@ namespace TestAddin
 
         public string Name => nameof(TestAddin);
 
-        public string Route => "";
+        public string Route => "Index";
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {

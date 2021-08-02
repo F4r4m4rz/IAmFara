@@ -13,15 +13,18 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public async static Task<IServiceCollection> AddIAmFaraServicesAsync(this IServiceCollection services, IConfiguration configuration, string addinsPath = null)
         {
+            var mvcBuilder = services.AddMvc();
+
+            // Add AddinLogs
+            services.AddSingleton<IAddinLogs, AddinLogs>();
+
             // Load dynamic addins
             if (addinsPath != null)
             {
-                var scanner = new AddinScanner(addinsPath, services, configuration);
+                var scanner = new AddinScanner(addinsPath, services, configuration, mvcBuilder);
                 var addinStorage = await scanner.Scan();
                 services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
             }
-
-            services.AddRazorPages();
 
             return services;
         }

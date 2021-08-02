@@ -13,7 +13,7 @@ namespace TestAddin
 
         public string Name => "Fara Addin";
 
-        public string Route => "";
+        public string Route => "Index";
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
