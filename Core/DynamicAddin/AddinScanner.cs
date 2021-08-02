@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using IAmFara.Core.DynamicAddin.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace IAmFara.Core.DynamicAddin
 {
@@ -19,15 +20,21 @@ namespace IAmFara.Core.DynamicAddin
                               IServiceCollection services,
                               IConfiguration configuration)
         {
-            _path = path;
+            _path = Path.Combine(path, "Features");
             _storage = new AddinStorage(services, configuration);
         }
 
         internal async Task<AddinStorage> Scan()
         {
-            // Get all assemblies which matches "*.IAmFaraAddin*.dll"
-            var assemblyFiles = Directory.EnumerateFiles(_path, "*.IAmFaraAddin*.dll", SearchOption.TopDirectoryOnly);
-            await Load(assemblyFiles);
+            // Get all assemblies which matches from features folder
+            if (Directory.Exists(_path))
+            {
+                var assemblyFiles = Directory.EnumerateFiles(_path, "*.dll", SearchOption.TopDirectoryOnly);
+                await Load(assemblyFiles);
+            }
+            else
+                AddinLogs.LogWarning("Feature folder could not be found ...");
+
             return _storage;
         }
 
@@ -56,7 +63,15 @@ namespace IAmFara.Core.DynamicAddin
             // Loop through addins and load them
             foreach (var addin in addins)
             {
-                Load(addin);
+                try
+                {
+                    Load(addin);
+                    AddinLogs.LogInformation($"Addin successfully registered: {addin}");
+                }
+                catch (Exception ex)
+                {
+                    AddinLogs.LogError($"Failed to register {addin}\n{ex}");
+                }
             }
         }
 

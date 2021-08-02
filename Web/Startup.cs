@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace IAmFara.Web
 {
@@ -23,9 +24,8 @@ namespace IAmFara.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIAmFaraServicesAsync(Configuration, "/Users/faramarzbodaghi/Library/Mobile Documents/com~apple~CloudDocs/Projects/IAmFara/Web/bin/Debug/net5.0").Wait();
-
-            //services.AddRazorPages();
+            services.AddLogging();
+            services.AddIAmFaraServicesAsync(Configuration, AppDomain.CurrentDomain.BaseDirectory).Wait();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
