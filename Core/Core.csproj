@@ -3,22 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AssemblyName>IAmFara.Core</AssemblyName>
+    <RootNamespace>IAmFara.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="TestPages\**" />
-    <Content Remove="TestPages\**" />
-    <EmbeddedResource Remove="TestPages\**" />
-    <None Remove="TestPages\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  
-
-
-  <ItemGroup>
-    <None Remove="TestPages\" />
   </ItemGroup>
 </Project>
