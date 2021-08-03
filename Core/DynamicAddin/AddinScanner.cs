@@ -33,7 +33,7 @@ namespace IAmFara.Core.DynamicAddin
             // Get all assemblies which matches from features folder
             if (Directory.Exists(_path))
             {
-                var assemblyFiles = Directory.EnumerateFiles(_path, "*.dll", SearchOption.TopDirectoryOnly);
+                var assemblyFiles = Directory.EnumerateFiles(_path, "*.dll", SearchOption.AllDirectories);
                 await Load(assemblyFiles);
             }
             else

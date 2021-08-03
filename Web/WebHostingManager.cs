@@ -42,14 +42,14 @@ namespace IAmFara.Web
             }
         }
 
-        private void FeatureWatcher_FeaturesCountChanged(object sender, EventArgs e)
+        private async void FeatureWatcher_FeaturesCountChanged(object sender, EventArgs e)
         {
+            await ShutdownHost();
             _ = StartNewHost();
         }
 
         public async Task StartNewHost()
         {
-            await ShutdownHost();
             _host = CreateNewHostBuilder().Build().LogAddinLogs();
             await _host.RunAsync();
         }
