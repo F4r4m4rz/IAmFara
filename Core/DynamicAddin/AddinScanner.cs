@@ -55,22 +55,22 @@ namespace IAmFara.Core.DynamicAddin
             // Loop through files and load assemblies
             foreach (var assemblyFile in assemblyFiles)
             {
-                var assembly = Assembly.LoadFrom(assemblyFile);
+                var assemblyRaw = File.ReadAllBytes(assemblyFile);
+                var assembly = Assembly.Load(assemblyRaw);
 
                 if (_seenAssemblies.Contains(assembly))
                 {
                     continue;
                 }
 
-                PopulateApplicationPartManager(_mvcBuilder.PartManager, assembly);
-
+                PopulateApplicationPartManager(_mvcBuilder.PartManager, assembly, Path.GetDirectoryName(assemblyFile));
                 Load(assembly);
             }
         }
 
-        private void PopulateApplicationPartManager(ApplicationPartManager manager, Assembly myAssembly)
+        private void PopulateApplicationPartManager(ApplicationPartManager manager, Assembly myAssembly, string assemblyDirectory)
         {
-            var assemblies = GetApplicationPartAssemblies(myAssembly);
+            var assemblies = GetApplicationPartAssemblies(myAssembly, assemblyDirectory);
 
             foreach (var assembly in assemblies)
             {
@@ -90,28 +90,27 @@ namespace IAmFara.Core.DynamicAddin
             }
         }
 
-        private static IEnumerable<Assembly> GetApplicationPartAssemblies(Assembly assembly)
+        private IEnumerable<Assembly> GetApplicationPartAssemblies(Assembly assembly, string assemblyDirectory)
         {
-            var entryAssembly = assembly;
-
+            var x = assembly.GetCustomAttributes<ApplicationPartAttribute>();
             // Use ApplicationPartAttribute to get the closure of direct or transitive dependencies
             // that reference MVC.
-            var assembliesFromAttributes = entryAssembly.GetCustomAttributes<ApplicationPartAttribute>()
+            var assembliesFromAttributes = assembly.GetCustomAttributes<ApplicationPartAttribute>()
                 .Select(name => Assembly.Load(name.AssemblyName))
                 .OrderBy(assembly => assembly.FullName, StringComparer.Ordinal)
-                .SelectMany(GetAssemblyClosure);
+                .SelectMany(assembly => GetAssemblyClosure(assembly, assemblyDirectory));
 
             // The SDK will not include the entry assembly as an application part. We'll explicitly list it
             // and have it appear before all other assemblies \ ApplicationParts.
-            return GetAssemblyClosure(entryAssembly)
+            return GetAssemblyClosure(assembly, assemblyDirectory)
                 .Concat(assembliesFromAttributes);
         }
 
-        private static IEnumerable<Assembly> GetAssemblyClosure(Assembly assembly)
+        private IEnumerable<Assembly> GetAssemblyClosure(Assembly assembly, string assemblyDirectory)
         {
             yield return assembly;
 
-            var relatedAssemblies = GetRelatedAssemblies(assembly, throwOnError: false)
+            var relatedAssemblies = GetRelatedAssemblies(assembly, assemblyDirectory, throwOnError: false)
                 .OrderBy(assembly => assembly.FullName, StringComparer.Ordinal);
 
             foreach (var relatedAssembly in relatedAssemblies)
@@ -120,7 +119,7 @@ namespace IAmFara.Core.DynamicAddin
             }
         }
 
-        private static IReadOnlyList<Assembly> GetRelatedAssemblies(Assembly assembly, bool throwOnError)
+        private IReadOnlyList<Assembly> GetRelatedAssemblies(Assembly assembly, string assemblyDirectory, bool throwOnError)
         {
             if (assembly == null)
             {
@@ -128,11 +127,12 @@ namespace IAmFara.Core.DynamicAddin
             }
 
             var loadContext = AssemblyLoadContext.GetLoadContext(assembly) ?? AssemblyLoadContext.Default;
-            return GetRelatedAssemblies(assembly, throwOnError, File.Exists, new AssemblyLoadContextWrapper(loadContext));
+            return GetRelatedAssemblies(assembly, assemblyDirectory, throwOnError, File.Exists, new AssemblyLoadContextWrapper(loadContext));
         }
 
-        private static IReadOnlyList<Assembly> GetRelatedAssemblies(
-            Assembly assembly,
+        private IReadOnlyList<Assembly> GetRelatedAssemblies(
+            Assembly assembly, 
+            string assemblyDirectory,
             bool throwOnError,
             Func<string, bool> fileExists,
             AssemblyLoadContextWrapper assemblyLoadContext)
@@ -156,10 +156,6 @@ namespace IAmFara.Core.DynamicAddin
             }
 
             var assemblyName = assembly.GetName().Name;
-            // Assembly.Location may be null for a single-file exe. In this case, attempt to look for related parts in the app's base directory
-            var assemblyDirectory = string.IsNullOrEmpty(assembly.Location) ?
-                AppContext.BaseDirectory :
-                Path.GetDirectoryName(assembly.Location);
 
             if (string.IsNullOrEmpty(assemblyDirectory))
             {
@@ -174,7 +170,8 @@ namespace IAmFara.Core.DynamicAddin
                 var relatedAssemblyLocation = Path.Combine(assemblyDirectory, attribute.AssemblyFileName + ".dll");
                 if (fileExists(relatedAssemblyLocation))
                 {
-                    relatedAssembly = assemblyLoadContext.LoadFromAssemblyPath(relatedAssemblyLocation);
+                    var relatedAssemblyRaw = File.ReadAllBytes(relatedAssemblyLocation);
+                    relatedAssembly = assemblyLoadContext.LoadFromBytes(relatedAssemblyRaw);
                 }
                 else
                 {
@@ -241,6 +238,14 @@ namespace IAmFara.Core.DynamicAddin
 
             public virtual Assembly LoadFromAssemblyPath(string assemblyPath)
                 => _loadContext.LoadFromAssemblyPath(assemblyPath);
+
+            public virtual Assembly LoadFromBytes(byte[] bytes)
+            {
+                using (MemoryStream stream = new MemoryStream(bytes))
+                {
+                    return _loadContext.LoadFromStream(stream);
+                }
+            }
         }
     }
 }
