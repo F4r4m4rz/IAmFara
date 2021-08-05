@@ -6,14 +6,24 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IAmFara.Core.DynamicAddin.Abstractions;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using IAmFara.Core;
+using System.IO;
+using System.Runtime.Loader;
+using IAmFara.Core.Extensions.Helpers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public async static Task<IServiceCollection> AddIAmFaraServicesAsync(this IServiceCollection services, IConfiguration configuration, string addinsPath = null)
+        public static IServiceCollection AddIAmFaraServicesAsync(this IServiceCollection services, IConfiguration configuration, string addinsPath = null)
         {
-            var mvcBuilder = services.AddMvc();
+            var mvcBuilder = services.AddRazorPages();
 
             // Add AddinLogs
             services.AddSingleton<IAddinLogs, AddinLogs>();
@@ -22,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (addinsPath != null)
             {
                 var scanner = new AddinScanner(addinsPath, services, configuration, mvcBuilder);
-                var addinStorage = await scanner.Scan();
+                var addinStorage = scanner.Scan();
                 services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
             }
 

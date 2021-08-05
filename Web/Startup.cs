@@ -27,7 +27,7 @@ namespace IAmFara.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging();
-            services.AddIAmFaraServicesAsync(Configuration, AppDomain.CurrentDomain.BaseDirectory).Wait();
+            services.AddIAmFaraServicesAsync(Configuration, AppDomain.CurrentDomain.BaseDirectory);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
