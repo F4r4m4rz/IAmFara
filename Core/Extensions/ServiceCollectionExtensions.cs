@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using IAmFara.Core;
 using System.IO;
 using System.Runtime.Loader;
-using IAmFara.Core.Extensions.Helpers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

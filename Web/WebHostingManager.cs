@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,18 +13,22 @@ namespace IAmFara.Web
     public class WebHostingManager : IHostedService
     {
         private readonly ProgramArguments _args;
+        private readonly ILogger<WebHostingManager> _logger;
+        private readonly FeaturesWatcher _featuresWatcher;
         private IHost _host;
         private readonly EventWaitHandle _waitHandle = new AutoResetEvent(false);
 
-        public WebHostingManager(ProgramArguments args)
+        public WebHostingManager(ProgramArguments args, ILogger<WebHostingManager> logger, FeaturesWatcher featuresWatcher)
         {
             _args = args;
+            _logger = logger;
+            _featuresWatcher = featuresWatcher;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var featureWatcher = new FeaturesWatcher(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Features"));
-            featureWatcher.FeaturesCountChanged += FeatureWatcher_FeaturesCountChanged;
+            _featuresWatcher.Initialize(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Features"));
+            _featuresWatcher.FeaturesCountChanged += FeatureWatcher_FeaturesCountChanged;
             _ = StartNewHost();
 
             return Task.CompletedTask;

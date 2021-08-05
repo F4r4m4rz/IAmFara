@@ -14,10 +14,6 @@ namespace IAmFara.Web
 {
     public class Program
     {
-        private static string _path;
-        private static int _featuresCount;
-        private static Timer _timer;
-
         public async static Task Main(string[] args)
         {
             await CreateHostBuilder(args)
@@ -30,6 +26,7 @@ namespace IAmFara.Web
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((builderContext, services) =>
                 {
+                    services.AddSingleton<FeaturesWatcher>();
                     services.AddScoped<ProgramArguments>(programArgs => new ProgramArguments(args));
                     services.AddHostedService<WebHostingManager>();
                 });
