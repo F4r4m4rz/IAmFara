@@ -9,11 +9,16 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+	<!--This part should be added to handle runtime loading of dependencies-->
+	<ItemGroup>
+		<AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApplicationParts.RelatedAssemblyAttribute">
+			<_Parameter1>MyRazorLibraryBacking</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\MyRazorLibraryBacking\MyRazorLibraryBacking.csproj" />
   </ItemGroup>
   
-
-
 </Project>
