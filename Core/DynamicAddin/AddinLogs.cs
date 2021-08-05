@@ -10,7 +10,7 @@ namespace IAmFara.Core.DynamicAddin
         void Log();
     }
 
-    public class AddinLogs : IAddinLogs
+    internal class AddinLogs : IAddinLogs
     {
         private static IList<AddinLogEntry> _logEntries;
         private readonly ILogger<AddinLogs> _logger;
@@ -41,6 +41,11 @@ namespace IAmFara.Core.DynamicAddin
                 Message = message
             };
             _logEntries.Add(entry);
+        }
+
+        public static void Reset()
+        {
+            _logEntries.Clear();
         }
 
         internal static void LogDebug(string message)

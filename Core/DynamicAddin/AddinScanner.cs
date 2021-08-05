@@ -36,6 +36,8 @@ namespace IAmFara.Core.DynamicAddin
 
         internal AddinStorage Scan()
         {
+            AddinLogs.Reset();
+
             // Get all assemblies from features folder
             if (Directory.Exists(_path))
             {
@@ -210,7 +212,7 @@ namespace IAmFara.Core.DynamicAddin
                 try
                 {
                     Load(addin);
-                    AddinLogs.LogInformation($"Addin successfully registered: {addin}");
+                    AddinLogs.LogInformation($"Addin library successfully registered: {addin}");
                 }
                 catch (Exception ex)
                 {

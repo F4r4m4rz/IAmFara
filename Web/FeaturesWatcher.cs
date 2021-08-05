@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,17 +10,28 @@ namespace IAmFara.Web
 {
     public class FeaturesWatcher
     {
-        private readonly string _root;
+        private string _root;
         private int _featuresCount;
-        private readonly Timer _timer;
+        private Timer _timer;
+        private readonly ILogger<FeaturesWatcher> _logger;
 
         public event EventHandler FeaturesCountChanged;
 
-        public FeaturesWatcher(string root)
+        public FeaturesWatcher(ILogger<FeaturesWatcher> logger)
         {
-            _root = root;
-            _featuresCount = Scan();
-            _timer = new Timer(Watch, null, 1000, 0);
+            _logger = logger;
+        }
+
+        public void Initialize(string root)
+        {
+            if (Directory.Exists(root))
+            {
+                _root = root;
+                _featuresCount = Scan();
+                _timer = new Timer(Watch, null, 1000, 0);
+            }
+            else
+                _logger.LogError("Feature folder could not be found");
         }
 
         private int Scan()

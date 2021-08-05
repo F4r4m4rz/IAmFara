@@ -14,10 +14,11 @@ namespace Microsoft.AspNetCore.Builder
 
             foreach (var path in additionalStaticFilePaths)
             {
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider = new PhysicalFileProvider(path)
-                });
+                if (Directory.Exists(path))
+                    app.UseStaticFiles(new StaticFileOptions
+                    {
+                        FileProvider = new PhysicalFileProvider(path)
+                    });
             }
 
             app.UseRouting();

@@ -17,7 +17,7 @@ namespace AnotherTest
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddRazorPages();
+
         }
     }
 }
