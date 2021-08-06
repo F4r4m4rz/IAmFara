@@ -20,20 +20,18 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddIAmFaraServicesAsync(this IServiceCollection services, IConfiguration configuration, string addinsPath = null)
+        public static IServiceCollection AddIAmFaraServicesAsync(this IServiceCollection services, IConfiguration configuration)
         {
-            var mvcBuilder = services.AddRazorPages();
+            var mvcBuilder = services.AddMvc();
 
             // Add AddinLogs
             services.AddSingleton<IAddinLogs, AddinLogs>();
 
             // Load dynamic addins
-            if (addinsPath != null)
-            {
-                var scanner = new AddinScanner(addinsPath, services, configuration, mvcBuilder);
-                var addinStorage = scanner.Scan();
-                services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
-            }
+            var addinsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+            var scanner = new AddinScanner(addinsPath, services, configuration, mvcBuilder);
+            var addinStorage = scanner.Scan();
+            services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
 
             return services;
         }
