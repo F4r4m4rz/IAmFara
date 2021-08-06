@@ -9,8 +9,6 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'IAmFara.Web' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Web' " />
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>

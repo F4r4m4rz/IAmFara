@@ -5,6 +5,11 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>IAmFara.Core</AssemblyName>
     <RootNamespace>IAmFara.Core</RootNamespace>
+	<PackageId>IAmFara.Core</PackageId>
+	<Version>0.0.1</Version>
+	<Authors>Faramarz Bodaghi</Authors>
+	<Company>IAmFara</Company>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
