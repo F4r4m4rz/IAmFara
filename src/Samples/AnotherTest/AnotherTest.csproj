@@ -15,7 +15,10 @@
   <ItemGroup>
     <None Remove="Pages\" />
   </ItemGroup>
+  
+
+
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <PackageReference Include="IAmFara.Core" Version="0.0.1" />
   </ItemGroup>
 </Project>

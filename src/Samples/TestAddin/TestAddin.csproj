@@ -5,7 +5,7 @@
     <AssemblyName>TestAddin.IAmFaraAddin</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="IAmFara.Core" Version="0.0.1" />
+	</ItemGroup>
 </Project>
