@@ -3,24 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IAmFara.Core.DynamicAddin
+namespace IAmFara.Core.Dynamic
 {
-    public interface IAddinLogs
+    public interface ICacheLogging
     {
         void Log();
     }
 
-    internal class AddinLogs : IAddinLogs
+    internal class CacheLogging : ICacheLogging
     {
         private static IList<AddinLogEntry> _logEntries;
-        private readonly ILogger<AddinLogs> _logger;
+        private readonly ILogger<CacheLogging> _logger;
 
-        static AddinLogs()
+        static CacheLogging()
         {
             _logEntries = new List<AddinLogEntry>();
         }
 
-        public AddinLogs(ILogger<AddinLogs> logger)
+        public CacheLogging(ILogger<CacheLogging> logger)
         {
             _logger = logger;
         }

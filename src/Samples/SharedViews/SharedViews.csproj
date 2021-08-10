@@ -12,7 +12,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="IAmFara.Core" Version="0.0.1" />
+		<PackageReference Include="IAmFara.Core" />
 	</ItemGroup>
   
 

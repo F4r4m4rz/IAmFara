@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IAmFara.Core.DynamicAddin.Abstractions;
+using IAmFara.Core.Dynamic.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ namespace IAmFara.Pages.SharedViews
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger, IServiceProvider provider, IEnumerable<IFeatureAddin> addins)
+        public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
         }
