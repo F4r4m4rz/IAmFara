@@ -1,11 +1,11 @@
 ﻿using System;
-using IAmFara.Core.DynamicAddin;
+using IAmFara.Core.Dynamic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using IAmFara.Core.DynamicAddin.Abstractions;
+using IAmFara.Core.Dynamic.Abstractions;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Hosting;
@@ -25,13 +25,16 @@ namespace Microsoft.Extensions.DependencyInjection
             var mvcBuilder = services.AddMvc();
 
             // Add AddinLogs
-            services.AddSingleton<IAddinLogs, AddinLogs>();
+            services.AddSingleton<ICacheLogging, CacheLogging>();
 
             // Load dynamic addins
             var addinsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-            var scanner = new AddinScanner(addinsPath, services, configuration, mvcBuilder);
+            var scanner = new PluginScanner(addinsPath, services, configuration, mvcBuilder);
             var addinStorage = scanner.Scan();
-            services.AddSingleton<IEnumerable<IFeatureAddin>>(addinStorage.GetRegisteredAddins());
+            services.AddSingleton<IEnumerable<IPlugin>>(addinStorage.GetRegisteredPlugins());
+            services.AddSingleton<IEnumerable<IFeature>>(addinStorage.GetRegisteredFeatures());
+            services.AddSingleton<IEnumerable<IPage>>(addinStorage.GetRegisteredPages());
+            services.AddSingleton<IEnumerable<INavBarItem>>(addinStorage.GetRegisteredNavBarItems());
 
             return services;
         }

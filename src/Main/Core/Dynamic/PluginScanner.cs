@@ -5,38 +5,38 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-using IAmFara.Core.DynamicAddin.Abstractions;
+using IAmFara.Core.Dynamic.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
-namespace IAmFara.Core.DynamicAddin
+namespace IAmFara.Core.Dynamic
 {
-    public class AddinScanner
+    public class PluginScanner
     {
         private readonly string _path;
-        private readonly AddinStorage _storage;
+        private readonly PluginStorage _storage;
         private readonly IServiceCollection _services;
         private readonly IMvcBuilder _mvcBuilder;
-        private readonly HashSet<Assembly> _seenAssemblies;
+        private readonly HashSet<string> _seenAssemblies;
 
-        internal AddinScanner(string path,
+        internal PluginScanner(string path,
                               IServiceCollection services,
                               IConfiguration configuration,
                               IMvcBuilder mvcBuilder)
         {
             _path = Path.Combine(path, "Features");
-            _storage = new AddinStorage(services, configuration);
+            _storage = new PluginStorage(services, configuration);
             _services = services;
             _mvcBuilder = mvcBuilder;
-            _seenAssemblies = new HashSet<Assembly>();
+            _seenAssemblies = new HashSet<string>();
         }
 
-        internal AddinStorage Scan()
+        internal PluginStorage Scan()
         {
-            AddinLogs.Reset();
+            CacheLogging.Reset();
 
             // Get all assemblies from features folder
             if (Directory.Exists(_path))
@@ -45,7 +45,7 @@ namespace IAmFara.Core.DynamicAddin
                 Load(assemblyFiles);
             }
             else
-                AddinLogs.LogWarning("Feature folder could not be found ...");
+                CacheLogging.LogWarning("Feature folder could not be found ...");
 
             return _storage;
         }
@@ -58,10 +58,10 @@ namespace IAmFara.Core.DynamicAddin
                 var assemblyRaw = File.ReadAllBytes(assemblyFile);
                 var assembly = Assembly.Load(assemblyRaw);
 
-                if (_seenAssemblies.Contains(assembly))
-                {
-                    continue;
-                }
+                //if (_seenAssemblies.Contains(assembly.FullName))
+                //{
+                //    continue;
+                //}
 
                 PopulateApplicationPartManager(_mvcBuilder.PartManager, assembly, Path.GetDirectoryName(assemblyFile));
                 Load(assembly);
@@ -74,7 +74,7 @@ namespace IAmFara.Core.DynamicAddin
 
             foreach (var assembly in assemblies)
             {
-                if (!_seenAssemblies.Add(assembly))
+                if (!_seenAssemblies.Add(assembly.FullName))
                 {
                     // "assemblies" may contain duplicate values, but we want unique ApplicationPart instances.
                     // Note that we prefer using a HashSet over Distinct since the latter isn't
@@ -196,32 +196,40 @@ namespace IAmFara.Core.DynamicAddin
         private void Load(Assembly assembly)
         {
             // Find all types which implements IFeatureAddin
-            var addins = assembly.GetExportedTypes()
-                                 .Where(type => type.GetInterface(nameof(IFeatureAddin)) != null);
-            Load(addins);
+            try
+            {
+                var plugins = assembly.GetExportedTypes()
+                                 .Where(type => type.GetInterface(nameof(IPlugin)) != null);
+
+                Load(plugins);
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
-        private void Load(IEnumerable<Type> addins)
+        private void Load(IEnumerable<Type> plugins)
         {
             // Loop through addins and load them
-            foreach (var addin in addins)
+            foreach (var plugin in plugins)
             {
                 try
                 {
-                    Load(addin);
-                    AddinLogs.LogInformation($"Addin library successfully registered: {addin}");
+                    Load(plugin);
+                    CacheLogging.LogInformation($"Addin library successfully registered: {plugin}");
                 }
                 catch (Exception ex)
                 {
-                    AddinLogs.LogError($"Failed to register {addin}\n{ex}");
+                    CacheLogging.LogError($"Failed to register {plugin}\n{ex}");
                 }
             }
         }
 
-        private void Load(Type addin)
+        private void Load(Type plugin)
         {
-            var instance = Activator.CreateInstance(addin) as IFeatureAddin;
-            _storage.RegisterAddin(instance);
+            var instance = Activator.CreateInstance(plugin) as IPlugin;
+            _storage.RegisterPlugin(instance);
         }
 
         internal class AssemblyLoadContextWrapper

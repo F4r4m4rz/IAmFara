@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>AnotherTest.IAmFaraAddin</AssemblyName>
   </PropertyGroup>
@@ -9,8 +9,12 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-  
 
+	<ItemGroup>
+		<AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApplicationParts.RelatedAssemblyAttribute">
+			<_Parameter1>IAmFara.SharedViews</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
 
   <ItemGroup>
     <None Remove="Pages\" />
@@ -19,6 +23,6 @@
 
 
   <ItemGroup>
-    <PackageReference Include="IAmFara.Core" Version="0.0.1" />
+    <PackageReference Include="IAmFara.Core" Version="0.0.6" />
   </ItemGroup>
 </Project>

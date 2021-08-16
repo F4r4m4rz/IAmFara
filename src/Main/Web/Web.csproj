@@ -9,6 +9,6 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'IAmFara.Web' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Web' " />
   <ItemGroup>
-    <PackageReference Include="IAmFara.Core" Version="0.0.1" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>

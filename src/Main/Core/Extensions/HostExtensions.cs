@@ -1,4 +1,4 @@
-﻿using IAmFara.Core.DynamicAddin;
+﻿using IAmFara.Core.Dynamic;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.Hosting
     {
         public static IHost LogAddinLogs(this IHost host)
         {
-            var addinLogs = host.Services.GetRequiredService<IAddinLogs>();
+            var addinLogs = host.Services.GetRequiredService<ICacheLogging>();
             addinLogs.Log();
 
             return host;
