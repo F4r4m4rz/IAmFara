@@ -1,4 +1,5 @@
-﻿using IAmFara.Core.Dynamic.Abstractions;
+﻿using AnotherTest.Data;
+using IAmFara.Core.Dynamic.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -33,11 +34,11 @@ namespace AnotherTest
     {
         public string Name => "Razor page";
 
-        public string Route => "MyRazor";
+        public string Route => "Index";
 
         public void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
-
+            services.AddSingleton<INewsRepository, InMemoryNews>();
         }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

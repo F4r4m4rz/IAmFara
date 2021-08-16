@@ -42,7 +42,8 @@ namespace IAmFara.Web
                 app.UseExceptionHandler("/Error");
             }
 
-            app.IAmFaraConfiguration(new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets") });
+            app.IAmFaraConfiguration(new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets"),
+                                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WWWROOT") });
         }
     }
 }

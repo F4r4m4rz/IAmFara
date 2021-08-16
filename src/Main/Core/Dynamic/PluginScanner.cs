@@ -20,7 +20,7 @@ namespace IAmFara.Core.Dynamic
         private readonly PluginStorage _storage;
         private readonly IServiceCollection _services;
         private readonly IMvcBuilder _mvcBuilder;
-        private readonly HashSet<Assembly> _seenAssemblies;
+        private readonly HashSet<string> _seenAssemblies;
 
         internal PluginScanner(string path,
                               IServiceCollection services,
@@ -31,7 +31,7 @@ namespace IAmFara.Core.Dynamic
             _storage = new PluginStorage(services, configuration);
             _services = services;
             _mvcBuilder = mvcBuilder;
-            _seenAssemblies = new HashSet<Assembly>();
+            _seenAssemblies = new HashSet<string>();
         }
 
         internal PluginStorage Scan()
@@ -58,10 +58,10 @@ namespace IAmFara.Core.Dynamic
                 var assemblyRaw = File.ReadAllBytes(assemblyFile);
                 var assembly = Assembly.Load(assemblyRaw);
 
-                if (_seenAssemblies.Contains(assembly))
-                {
-                    continue;
-                }
+                //if (_seenAssemblies.Contains(assembly.FullName))
+                //{
+                //    continue;
+                //}
 
                 PopulateApplicationPartManager(_mvcBuilder.PartManager, assembly, Path.GetDirectoryName(assemblyFile));
                 Load(assembly);
@@ -74,7 +74,7 @@ namespace IAmFara.Core.Dynamic
 
             foreach (var assembly in assemblies)
             {
-                if (!_seenAssemblies.Add(assembly))
+                if (!_seenAssemblies.Add(assembly.FullName))
                 {
                     // "assemblies" may contain duplicate values, but we want unique ApplicationPart instances.
                     // Note that we prefer using a HashSet over Distinct since the latter isn't
@@ -196,9 +196,17 @@ namespace IAmFara.Core.Dynamic
         private void Load(Assembly assembly)
         {
             // Find all types which implements IFeatureAddin
-            var plugins = assembly.GetExportedTypes()
+            try
+            {
+                var plugins = assembly.GetExportedTypes()
                                  .Where(type => type.GetInterface(nameof(IPlugin)) != null);
-            Load(plugins);
+
+                Load(plugins);
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         private void Load(IEnumerable<Type> plugins)
