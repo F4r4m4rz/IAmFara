@@ -92,7 +92,6 @@ namespace IAmFara.Core.Dynamic
 
         private IEnumerable<Assembly> GetApplicationPartAssemblies(Assembly assembly, string assemblyDirectory)
         {
-            var x = assembly.GetCustomAttributes<ApplicationPartAttribute>();
             // Use ApplicationPartAttribute to get the closure of direct or transitive dependencies
             // that reference MVC.
             var assembliesFromAttributes = assembly.GetCustomAttributes<ApplicationPartAttribute>()

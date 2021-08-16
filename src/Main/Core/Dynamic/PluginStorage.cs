@@ -25,7 +25,6 @@ namespace IAmFara.Core.Dynamic
         {
             addin.RegisterServices(_services, _configuration);
             _plugins.Add(addin);
-            var x = GetRegisteredNavBarItems();
         }
 
         internal IReadOnlyCollection<IPlugin> GetRegisteredPlugins() => new ReadOnlyCollection<IPlugin>(_plugins);
