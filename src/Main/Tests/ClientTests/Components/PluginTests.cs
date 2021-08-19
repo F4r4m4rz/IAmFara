@@ -21,12 +21,15 @@ namespace IAmFara.ClientTests.Components
         private readonly IConfiguration _configuration;
         private readonly TestContext _context;
         private bool _assembliesAreLoaded = false;
+        private List<IPlugin> PluginsInstances;
 
         public PluginTests(ILogger<PluginTests> logger, IConfiguration configuration, TestContext context)
         {
             _logger = logger;
             _configuration = configuration;
             _context = context;
+
+            PluginsInstances = new List<IPlugin>();
         }
 
         private void LoadAssemblies(bool throwException)
@@ -114,6 +117,22 @@ namespace IAmFara.ClientTests.Components
                 Assert.AreEqual(_context.ExpectedPluginCount, _context.Plugins.Count());
             else
                 Assert.AreNotEqual(0, _context.Plugins.Count());
+        }
+
+        public void CanInstantiatePlugins()
+        {
+            foreach (var plugin in _context.Plugins)
+            {
+
+            }
+        }
+
+        public void PluginAreValid()
+        {
+            foreach (var plugin in _context.Plugins)
+            {
+
+            }
         }
     }
 }
