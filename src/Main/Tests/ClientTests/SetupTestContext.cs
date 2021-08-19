@@ -18,15 +18,15 @@ namespace IAmFara.ClientTests
         {
             // Setup IoC
             var host = Host.CreateDefaultBuilder()
-                                   .ConfigureAppConfiguration(builder =>
-                                   {
-                                       builder.AddJsonFile("AppSettings.json");
-                                   })
-                                   .ConfigureServices(services =>
-                                   {
-                                       ConfigureInternalServices(services, assembliesCount, pluginCount);
-                                   })
-                                   .Build();
+                           .ConfigureAppConfiguration(builder =>
+                           {
+                               builder.AddJsonFile("AppSettings.json");
+                           })
+                           .ConfigureServices(services =>
+                           {
+                               ConfigureInternalServices(services, assembliesCount, pluginCount);
+                           })
+                           .Build();
             await host.StartAsync();
 
             var testRunning = host.Services.GetRequiredService<TestContext>() ??
