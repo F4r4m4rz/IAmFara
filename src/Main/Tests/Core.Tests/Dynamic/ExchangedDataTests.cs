@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Tests.Dynamic
+namespace IAmFara.Core.Tests.Dynamic
 {
     public class ExchangedDataTests
     {

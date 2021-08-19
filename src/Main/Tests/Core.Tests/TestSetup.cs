@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Tests
+namespace IAmFara.Core.Tests
 {
     [SetUpFixture]
     public class TestSetup
@@ -13,7 +13,7 @@ namespace Core.Tests
         [OneTimeSetUp]
         public void OnTimeSetup()
         {
-
+            // Get all referenced
         }
     }
 }
