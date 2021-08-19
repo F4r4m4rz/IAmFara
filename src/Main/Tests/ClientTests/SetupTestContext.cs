@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace IAmFara.ClientTests
 {
-    public class SetupTests
+    public class SetupTestContext
     {
         public static async Task OnTimeSetup(int? assembliesCount = null, int? pluginCount = null)
         {
