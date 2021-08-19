@@ -18,8 +18,6 @@ namespace IAmFara.ClientTests
     {
         private readonly ILogger<TestContext> _logger;
         private readonly IServiceProvider _services;
-        public static int? _expectedPluginsCount;
-        public static int? _expectedPluginsAssemblyCount;
         private static TestContext lifetimeInstance;
 
         public TestContext(ILogger<TestContext> logger, IServiceProvider services)
