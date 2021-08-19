@@ -46,7 +46,6 @@ namespace IAmFara.ClientTests
                 testContext.LazyInitialize(assembliesCount, pluginCount);
                 return testContext;
             });
-            services.AddSingleton<GlobalTests>();
             services.AddSingleton<PluginTests>();
         }
     }

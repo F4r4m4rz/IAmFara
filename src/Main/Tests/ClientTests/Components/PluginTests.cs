@@ -17,12 +17,12 @@ namespace IAmFara.ClientTests.Components
 {
     internal class PluginTests
     {
-        private readonly ILogger<GlobalTests> _logger;
+        private readonly ILogger<PluginTests> _logger;
         private readonly IConfiguration _configuration;
         private readonly TestContext _context;
         private bool _assembliesAreLoaded = false;
 
-        public PluginTests(ILogger<GlobalTests> logger, IConfiguration configuration, TestContext context)
+        public PluginTests(ILogger<PluginTests> logger, IConfiguration configuration, TestContext context)
         {
             _logger = logger;
             _configuration = configuration;
