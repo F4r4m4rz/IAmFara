@@ -38,5 +38,17 @@ namespace IAmFara.ClientTests
         {
             _pluginTests.AllPluginsAreDiscovered();
         }
+
+        [Test, Order(4)]
+        public virtual void CanInstansiteAllPlugins()
+        {
+            _pluginTests.CanInstansiateAllPlugins();
+        }
+
+        [Test, Order(5)]
+        public virtual void AllPluginsAreValid()
+        {
+            _pluginTests.AllPluginsAreValid();
+        }
     }
 }

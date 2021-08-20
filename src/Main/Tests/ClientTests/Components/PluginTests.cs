@@ -1,4 +1,4 @@
-﻿using IAmFara.ClientTests.Utilities.Exceptions;
+﻿using IAmFara.ClientTests.Exceptions;
 using IAmFara.Core.Dynamic.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +20,14 @@ namespace IAmFara.ClientTests.Components
         private readonly ILogger<PluginTests> _logger;
         private readonly IConfiguration _configuration;
         private readonly TestContext _context;
-        private bool _assembliesAreLoaded = false;
         private List<IPlugin> PluginsInstances;
+
+        // Progress flags
+        private bool _assembliesAreLoaded = false;
+        private bool _pluginsAreDiscovered = false;
+        private bool _pluginsAreInstanciated = false;
+        private bool _pluginsAreValidated = false;
+        private bool _servicesAreRegistered = false;
 
         public PluginTests(ILogger<PluginTests> logger, IConfiguration configuration, TestContext context)
         {
@@ -32,8 +38,12 @@ namespace IAmFara.ClientTests.Components
             PluginsInstances = new List<IPlugin>();
         }
 
+        #region Helpers
         private void LoadAssemblies(bool throwException)
         {
+            if (_assembliesAreLoaded)
+                return;
+
             var exceptions = new List<AssemblyLoadException>();
             var assemblyFiles = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.AllDirectories);
             foreach (var assemblyFile in assemblyFiles)
@@ -44,21 +54,28 @@ namespace IAmFara.ClientTests.Components
                 }
                 catch (Exception ex)
                 {
-                    var message = $"Unable to load assembly: {assemblyFile}";
-                    _logger.LogWarning(message, ex);
-                    exceptions.Add(new AssemblyLoadException(message, ex));
+                    exceptions.Add(new AssemblyLoadException($"Unable to load assembly: {assemblyFile}", ex));
                 }
             }
 
             // Loading is finished
             _assembliesAreLoaded = true;
 
-            if (throwException && exceptions.Count != 0)
-                throw new AssemblyLoadException("Failed to load one or more assemblies", exceptions);
+            if (exceptions.Count != 0)
+            {
+                var ex = new AssemblyLoadException("Failed to load one or more assemblies", exceptions);
+                ex.LogPretty(_logger);
+                if (throwException)
+                    throw ex;
+            }
         }
 
         private void DiscoverPlugins()
         {
+            if (_pluginsAreDiscovered)
+                return;
+
+            LoadAssemblies(false);
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(assembly =>
                 {
@@ -66,7 +83,6 @@ namespace IAmFara.ClientTests.Components
                     if (plugins?.Count() != 0)
                     {
                         _context.Plugins.AddRange(plugins);
-                        _logger?.LogInformation($"Plugin assembly loaded: {assembly.FullName}");
                         return true;
                     }
                     else
@@ -74,21 +90,89 @@ namespace IAmFara.ClientTests.Components
                 });
 
             _context.PluginAssemblies.AddRange(assemblies);
+
+            _pluginsAreDiscovered = true;
+        }
+
+        public void InstansiatePlugins(bool throwException)
+        {
+            if (_pluginsAreInstanciated)
+                return;
+
+            DiscoverPlugins();
+            var exceptions = new List<PluginInstansiationException>();
+            foreach (var plugin in _context.Plugins)
+            {
+                try
+                {
+                    var instance = Activator.CreateInstance(plugin) as IPlugin;
+                    PluginsInstances.Add(instance);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(new PluginInstansiationException(plugin, ex));
+                }
+            }
+
+            if (exceptions.Count() != 0)
+            {
+                var ex = new PluginInstansiationException(exceptions);
+                ex.LogPretty(_logger);
+                if (throwException)
+                    throw ex;
+            }
+
+            _pluginsAreInstanciated = true;
+        }
+
+        public void ValidatePlugins(bool throwException)
+        {
+            if (_pluginsAreValidated)
+                return;
+
+            InstansiatePlugins(false);
+            var exceptions = new List<PluginNotValidException>();
+            foreach (var plugin in PluginsInstances)
+            {
+                try
+                {
+                    Validator.ValidateObject(plugin, null, true);
+                }
+                catch (ValidationException ex)
+                {
+                    exceptions.Add(new PluginNotValidException(plugin, ex));
+                }
+            }
+
+            if (exceptions.Count() != 0)
+            {
+                var ex = new PluginNotValidException(exceptions);
+                ex.LogPretty(_logger);
+                if (throwException)
+                    throw ex;
+            }
+
+            _pluginsAreValidated = true;
         }
 
         private void CreateServiceProvider(IConfiguration configuration)
         {
+            if (_servicesAreRegistered)
+                return;
+
+            InstansiatePlugins(false);
             var serviceCollection = new ServiceCollection();
-            foreach (var plugin in _context.Plugins)
+            foreach (var plugin in PluginsInstances)
             {
-                var instance = Activator.CreateInstance(plugin) as IPlugin;
-                var validationResults = instance.Validate(new ValidationContext(this));
-                if (validationResults.All(vr => vr?.Equals(ValidationResult.Success) ?? true))
-                    instance.RegisterServices(serviceCollection, configuration);
+                plugin.RegisterServices(serviceCollection, configuration);
             }
             _context.PluginServices = serviceCollection.BuildServiceProvider();
-        }
 
+            _servicesAreRegistered = true;
+        }
+        #endregion
+
+        #region Tests
         public void AssembliesCanLoadSmoothly()
         {
             var testDelegate = new TestDelegate(() => LoadAssemblies(true));
@@ -97,9 +181,6 @@ namespace IAmFara.ClientTests.Components
 
         public void AllPluginAssembliesAreLoaded()
         {
-            if (!_assembliesAreLoaded)
-                LoadAssemblies(false);
-
             var testDelegate = new TestDelegate(() => DiscoverPlugins());
 
             Assert.DoesNotThrow(testDelegate);
@@ -110,8 +191,9 @@ namespace IAmFara.ClientTests.Components
 
         public void AllPluginsAreDiscovered()
         {
-            if (!_assembliesAreLoaded)
-                LoadAssemblies(false);
+            var testDelegate = new TestDelegate(() => DiscoverPlugins());
+
+            Assert.DoesNotThrow(testDelegate);
 
             if (_context.ExpectedPluginCount.HasValue)
                 Assert.AreEqual(_context.ExpectedPluginCount, _context.Plugins.Count());
@@ -119,20 +201,24 @@ namespace IAmFara.ClientTests.Components
                 Assert.AreNotEqual(0, _context.Plugins.Count());
         }
 
-        public void CanInstantiatePlugins()
+        public void CanInstansiateAllPlugins()
         {
-            foreach (var plugin in _context.Plugins)
-            {
+            var testDelegate = new TestDelegate(() => InstansiatePlugins(true));
 
-            }
+            Assert.DoesNotThrow(testDelegate);
+
+            if (_context.ExpectedPluginCount.HasValue)
+                Assert.AreEqual(_context.ExpectedPluginCount, _context.Plugins.Count());
+            else
+                Assert.AreNotEqual(0, _context.Plugins.Count());
         }
 
-        public void PluginAreValid()
+        public void AllPluginsAreValid()
         {
-            foreach (var plugin in _context.Plugins)
-            {
+            var testDelegate = new TestDelegate(() => ValidatePlugins(true));
 
-            }
+            Assert.DoesNotThrow(testDelegate);
         }
+        #endregion
     }
 }
