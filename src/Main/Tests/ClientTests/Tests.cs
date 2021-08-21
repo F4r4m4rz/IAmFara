@@ -50,5 +50,11 @@ namespace IAmFara.ClientTests
         {
             _pluginTests.AllPluginsAreValid();
         }
+
+        [Test, Order(6)]
+        public virtual void SuccessfullyRegisteredPluginServices()
+        {
+            _pluginTests.SuccessfullyRegisteredPluginServices();
+        }
     }
 }

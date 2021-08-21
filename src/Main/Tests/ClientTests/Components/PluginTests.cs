@@ -136,7 +136,7 @@ namespace IAmFara.ClientTests.Components
             {
                 try
                 {
-                    Validator.ValidateObject(plugin, null, true);
+                    Validator.ValidateObject(plugin, new ValidationContext(plugin), true);
                 }
                 catch (ValidationException ex)
                 {
@@ -155,7 +155,7 @@ namespace IAmFara.ClientTests.Components
             _pluginsAreValidated = true;
         }
 
-        private void CreateServiceProvider(IConfiguration configuration)
+        private void CreateServiceProvider()
         {
             if (_servicesAreRegistered)
                 return;
@@ -164,7 +164,7 @@ namespace IAmFara.ClientTests.Components
             var serviceCollection = new ServiceCollection();
             foreach (var plugin in PluginsInstances)
             {
-                plugin.RegisterServices(serviceCollection, configuration);
+                plugin.RegisterServices(serviceCollection, _configuration);
             }
             _context.PluginServices = serviceCollection.BuildServiceProvider();
 
@@ -216,6 +216,13 @@ namespace IAmFara.ClientTests.Components
         public void AllPluginsAreValid()
         {
             var testDelegate = new TestDelegate(() => ValidatePlugins(true));
+
+            Assert.DoesNotThrow(testDelegate);
+        }
+
+        public void SuccessfullyRegisteredPluginServices()
+        {
+            var testDelegate = new TestDelegate(() => CreateServiceProvider());
 
             Assert.DoesNotThrow(testDelegate);
         }

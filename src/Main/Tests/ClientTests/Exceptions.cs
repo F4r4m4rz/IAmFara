@@ -112,4 +112,12 @@ namespace IAmFara.ClientTests.Exceptions
             base.LogPretty(logger, ValidattionExceptions);
         }
     }
+
+    public class PluginServiceRegistrationException : ClientTestBaseException
+    {
+        public override void LogPretty(ILogger logger)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
