@@ -19,10 +19,10 @@
   <ItemGroup>
     <None Remove="Pages\" />
   </ItemGroup>
-  
-
 
   <ItemGroup>
-    <PackageReference Include="IAmFara.Core" Version="0.0.6" />
+    <Reference Include="IAmFara.Core">
+      <HintPath>..\..\Main\Core\bin\Debug\net5.0\IAmFara.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
