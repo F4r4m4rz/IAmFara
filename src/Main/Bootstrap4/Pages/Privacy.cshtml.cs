@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace IAmFara.Pages.SharedViews
+namespace IAmFara.Bootstrap4
 {
     public class PrivacyModel : PageModel
     {

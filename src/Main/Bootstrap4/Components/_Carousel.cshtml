@@ -1,4 +1,4 @@
-﻿@using IAmFara.SharedViews.Models.Shared
+﻿@using IAmFara.Bootstrap4.ComponentModels
 @using IAmFara.Core.Dynamic
 @model IEnumerable<ExchangedData>
 @{
@@ -21,7 +21,10 @@
                 <img src="~/@ConvertedModel.ElementAt(i).Image" class="d-block w-100" alt="...">
                 <div class="carousel-caption d-none d-md-block">
                     <h5>@ConvertedModel.ElementAt(i).Title</h5>
-                    <p>@ConvertedModel.ElementAt(i).Summary</p>
+                    @if (!string.IsNullOrWhiteSpace(@ConvertedModel.ElementAt(i).Summary))
+                    {
+                        <p>@ConvertedModel.ElementAt(i).Summary</p>
+                    }
                 </div>
             </div>
         }

@@ -24,4 +24,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Components\" />
+    <None Remove="ComponentModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\" />
+    <Folder Include="ComponentModels\" />
+  </ItemGroup>
 </Project>

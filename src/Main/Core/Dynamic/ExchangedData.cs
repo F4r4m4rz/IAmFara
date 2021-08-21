@@ -25,7 +25,7 @@ namespace IAmFara.Core.Dynamic
             }
         }
 
-        public T Cast<T>() where T: ExchangedData, new()
+        public virtual T Cast<T>() where T: ExchangedData, new()
         {
             var type = typeof(T);
             var targetObj = new T();

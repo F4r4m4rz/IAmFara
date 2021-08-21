@@ -1,0 +1,30 @@
+﻿@using IAmFara.Bootstrap4.ComponentModels
+@using IAmFara.Core.Dynamic
+@model ExchangedData
+@{
+    var ConvertedModel = Model.Cast<AlertDataModel>();
+    var alertExtraClass = ConvertedModel.HasDismiss ? "alert-dismissible fade show" : "";
+}
+
+<div class="alert @ConvertedModel.AlertBootstrapClass @alertExtraClass" role="alert">
+    @if (!string.IsNullOrWhiteSpace(ConvertedModel.Header))
+    {
+        <h4 class="alert-heading">@ConvertedModel.Header</h4>
+    }
+
+    <p>@ConvertedModel.Content</p>
+
+    @if (!string.IsNullOrWhiteSpace(ConvertedModel.AdditionalContent))
+    {
+        <hr>
+        <p class="mb-0">@ConvertedModel.AdditionalContent</p>
+    }
+
+
+    @if (ConvertedModel.HasDismiss)
+    {
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    }
+</div>
