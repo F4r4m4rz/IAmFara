@@ -1,4 +1,5 @@
 ﻿using IAmFara.Core.Dynamic;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,5 +18,13 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string Title { get; set; }
 
         public string Summary { get; set; }
+    }
+
+    public class CarouselViewComponent : ViewComponent
+    {
+        public IViewComponentResult Invoke(IEnumerable<ExchangedData> slides)
+        {
+            return View(slides);
+        }
     }
 }

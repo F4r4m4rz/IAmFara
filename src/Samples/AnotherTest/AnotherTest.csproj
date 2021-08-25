@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="IAmFara.Bootstrap4">
+      <HintPath>..\..\Main\Bootstrap4\bin\Debug\net5.0\IAmFara.Bootstrap4.dll</HintPath>
+    </Reference>
     <Reference Include="IAmFara.Core">
       <HintPath>..\..\Main\Core\bin\Debug\net5.0\IAmFara.Core.dll</HintPath>
     </Reference>

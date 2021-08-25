@@ -22,9 +22,9 @@ namespace IAmFara.Bootstrap4.ComponentModels
 
     public class AlertDataModel : ExchangedData
     {
-        internal string AlertBootstrapClass => AlertType.GetDescription();
+        public string AlertBootstrapClass => AlertType.GetDescription();
 
-        internal AlertType AlertType => (AlertType)AlertTypeInt;
+        public AlertType AlertType => (AlertType)AlertTypeInt;
 
         public int AlertTypeInt { get; set; } = 1;
 

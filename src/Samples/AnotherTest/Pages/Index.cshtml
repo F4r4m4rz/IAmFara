@@ -4,5 +4,5 @@
 }
 
 <div>
-    @await Html.PartialAsync(@".\Shared\_Carousel.cshtml", Model.CarouselDataModels)
+    <vc:carousel slides=@Model.CarouselDataModels></vc:carousel>
 </div>
