@@ -25,7 +25,7 @@ namespace IAmFara.Core.Dynamic
             }
         }
 
-        public virtual T Cast<T>() where T: ExchangedData, new()
+        public virtual T Cast<T>(Type componentType = null) where T: ExchangedData, new()
         {
             var type = typeof(T);
             var targetObj = new T();
@@ -33,7 +33,7 @@ namespace IAmFara.Core.Dynamic
             foreach (var prop in properties)
             {
                 // First get property by its attribute
-                if (!prop.SetValueFlaggedProperty<T>(targetObj, this[prop.Name]))
+                if (componentType == null || !prop.SetValueFlaggedProperty<T>(targetObj, this[prop.Name], componentType))
                 {
                     // Get property by its name
                     type.GetProperty(prop.Name)?.SetValue(targetObj, this[prop.Name]);

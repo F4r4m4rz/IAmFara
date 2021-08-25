@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using IAmFara.Core.Dynamic;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IAmFara.Bootstrap4.ComponentModels
 {
@@ -36,5 +37,13 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string AdditionalContent { get; set; }
 
         public bool HasDismiss { get; set; } = false;
+    }
+
+    public class Alert : ViewComponent
+    {
+        public IViewComponentResult Invoke(ExchangedData model)
+        {
+            return View(model);
+        }
     }
 }

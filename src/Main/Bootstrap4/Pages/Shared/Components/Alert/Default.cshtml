@@ -2,7 +2,7 @@
 @using IAmFara.Core.Dynamic
 @model ExchangedData
 @{
-    var ConvertedModel = Model.Cast<AlertDataModel>();
+    var ConvertedModel = Model.Cast<AlertDataModel>(typeof(Alert));
     var alertExtraClass = ConvertedModel.HasDismiss ? "alert-dismissible fade show" : "";
 }
 

@@ -20,7 +20,7 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string Summary { get; set; }
     }
 
-    public class CarouselViewComponent : ViewComponent
+    public class Carousel : ViewComponent
     {
         public IViewComponentResult Invoke(IEnumerable<ExchangedData> slides)
         {

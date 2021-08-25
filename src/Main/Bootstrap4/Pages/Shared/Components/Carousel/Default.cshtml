@@ -2,7 +2,7 @@
 @using IAmFara.Core.Dynamic
 @model IEnumerable<ExchangedData>
 @{
-    var ConvertedModel = Model.CastExchangedData<CarouselDataModel>();
+    var ConvertedModel = Model.CastExchangedData<CarouselDataModel>(typeof(Carousel));
 }
 
 <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">

@@ -11,17 +11,19 @@ namespace IAmFara.Core.Tests.Dynamic
 {
     public class ExchangedDataTests
     {
+        public class TestComponent { }
+
         public class SourceType : ExchangedData
         {
             public int IntProp { get; set; }
             public string StringProp { get; set; }
             public object ObjectProp { get; set; }
 
-            [ExchangedDataPropertyAttribute(PropertyName = "IntAttributeTest")]
+            [ExchangedDataPropertyAttribute(PropertyName = "IntAttributeTest", ComponentType = typeof(TestComponent))]
             public int IntPropWithAttribute { get; set; }
-            [ExchangedDataPropertyAttribute(PropertyName = "StringAttributeTest")]
+            [ExchangedDataPropertyAttribute(PropertyName = "StringAttributeTest", ComponentTypeName = nameof(TestComponent))]
             public string StringPropWithAttribute { get; set; }
-            [ExchangedDataPropertyAttribute(PropertyName = "ObjectAttributeTest")]
+            [ExchangedDataPropertyAttribute(PropertyName = "ObjectAttributeTest", ComponentTypeName = "TestComponent")]
             public object ObjectPropWithAttribute { get; set; }
 
             public object SourceNotMappedProperty { get; set; }
@@ -73,7 +75,7 @@ namespace IAmFara.Core.Tests.Dynamic
             };
 
             // Test
-            var target = source.Cast<TargetType>();
+            var target = source.Cast<TargetType>(typeof(TestComponent));
 
             // Assert
             Assert.AreEqual(source.IntPropWithAttribute, target.IntAttributeTest);
@@ -98,7 +100,7 @@ namespace IAmFara.Core.Tests.Dynamic
             };
 
             // Test
-            var target = source.Cast<TargetType>();
+            var target = source.Cast<TargetType>(typeof(TestComponent));
 
             // Assert
             Assert.AreEqual(source.IntProp, target.IntProp);

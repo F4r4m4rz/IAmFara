@@ -12,7 +12,8 @@ namespace AnotherTest.Data
         public string Title { get; set; }
         public string Image { get; set; }
 
-        [ExchangedDataProperty(PropertyName = "Summary")]
+        [ExchangedDataProperty(PropertyName = "Summary", ComponentTypeName = "Carousel")]
+        [ExchangedDataProperty(PropertyName = "Content", ComponentTypeName = "Alert")]
         public string Body { get; set; }
         public DateTime DatePublished { get; set; }
         public string Author { get; set; }
