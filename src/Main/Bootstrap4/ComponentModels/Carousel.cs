@@ -33,8 +33,6 @@ namespace IAmFara.Bootstrap4.ComponentModels
 
         public string Summary { get; set; }
 
-        public List<IComponentDataModel> NestedComponents { get; set; } = new List<IComponentDataModel>();
-
         public string GetBootstrapClass() => string.Empty;
 
         public string GetComponentName() => CarouselComponentConstants.ComponentTypeName;

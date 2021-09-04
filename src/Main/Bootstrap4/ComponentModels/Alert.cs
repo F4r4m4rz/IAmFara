@@ -33,7 +33,6 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string AdditionalContent { get; set; }
 
         public bool HasDismiss { get; set; } = false;
-        public List<IComponentDataModel> NestedComponents { get; set; } = new List<IComponentDataModel>();
 
         public string GetBootstrapClass() => "alert-" + BootstrapColor.GetDescription();
 

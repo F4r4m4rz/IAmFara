@@ -30,7 +30,6 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string Content { get; set; }
         public string Href { get; set; }
         public bool IsPill { get; set; } = false;
-        public List<IComponentDataModel> NestedComponents { get; set; }
 
         public string GetBootstrapClass() => "badge-" + BootstrapColor.GetDescription();
 

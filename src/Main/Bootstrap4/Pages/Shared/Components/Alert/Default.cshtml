@@ -20,11 +20,6 @@
         <p class="mb-0">@convertedModel.AdditionalContent</p>
     }
 
-    @foreach (var component in convertedModel.NestedComponents)
-    {
-        @await Component.InvokeAsync(component.GetComponentName(), component);
-    }
-
     @if (convertedModel.HasDismiss)
     {
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
