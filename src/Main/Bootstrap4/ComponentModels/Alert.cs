@@ -21,9 +21,9 @@ namespace IAmFara.Bootstrap4.ComponentModels
         }
     }
 
-    public class AlertDataModel : ExchangedData, IComponentDataModel
+    public class AlertDataModel : ComponentDataModel
     {
-        public BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
+        internal override BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
 
         public string Header { get; set; }
 
@@ -34,9 +34,9 @@ namespace IAmFara.Bootstrap4.ComponentModels
 
         public bool HasDismiss { get; set; } = false;
 
-        public string GetBootstrapClass() => "alert-" + BootstrapColor.GetDescription();
+        internal override string GetBootstrapClass() => "alert-" + BootstrapColor.GetDescription();
 
-        public string GetComponentName() => AlertComponantConstants.ComponentTypeName;
+        internal override string GetComponentName() => AlertComponantConstants.ComponentTypeName;
     }
 
     public class Alert : ViewComponent

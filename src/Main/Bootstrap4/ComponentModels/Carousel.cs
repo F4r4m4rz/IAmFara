@@ -21,9 +21,9 @@ namespace IAmFara.Bootstrap4.ComponentModels
         }
     }
 
-    public class CarouselDataModel : ExchangedData, IComponentDataModel
+    public class CarouselDataModel : ComponentDataModel
     {
-        public BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
+        internal override BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
 
         [Required]
         public string Image { get; set; }
@@ -33,9 +33,9 @@ namespace IAmFara.Bootstrap4.ComponentModels
 
         public string Summary { get; set; }
 
-        public string GetBootstrapClass() => string.Empty;
+        internal override string GetBootstrapClass() => string.Empty;
 
-        public string GetComponentName() => CarouselComponentConstants.ComponentTypeName;
+        internal override string GetComponentName() => CarouselComponentConstants.ComponentTypeName;
     }
 
     public class Carousel : ViewComponent

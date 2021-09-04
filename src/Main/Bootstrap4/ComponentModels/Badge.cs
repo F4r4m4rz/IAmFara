@@ -22,18 +22,18 @@ namespace IAmFara.Bootstrap4.ComponentModels
         }
     }
 
-    public class BadgeDataModel : ExchangedData, IComponentDataModel
+    public class BadgeDataModel : ComponentDataModel
     {
-        public BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
+        internal override BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
 
         [Required]
         public string Content { get; set; }
         public string Href { get; set; }
         public bool IsPill { get; set; } = false;
 
-        public string GetBootstrapClass() => "badge-" + BootstrapColor.GetDescription();
+        internal override string GetBootstrapClass() => "badge-" + BootstrapColor.GetDescription();
 
-        public string GetComponentName() => BadgeComponentConstants.ComponentTypeName;
+        internal override string GetComponentName() => BadgeComponentConstants.ComponentTypeName;
     }
 
     public class Badge : ViewComponent

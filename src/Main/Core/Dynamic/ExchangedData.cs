@@ -20,7 +20,7 @@ namespace IAmFara.Core.Dynamic
         {
             get
             {
-                var property = GetType().GetProperty(key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                var property = GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance);
                 return property.GetValue(this);
             }
         }
@@ -33,7 +33,7 @@ namespace IAmFara.Core.Dynamic
             foreach (var prop in properties)
             {
                 // First get property by its attribute
-                if (componentType == null || !prop.SetValueFlaggedProperty<T>(targetObj, this[prop.Name], componentType))
+                if (componentType == null || !prop.SetValueFlaggedProperty(targetObj, this[prop.Name], componentType))
                 {
                     // Get property by its name
                     type.GetProperty(prop.Name)?.SetValue(targetObj, this[prop.Name]);
