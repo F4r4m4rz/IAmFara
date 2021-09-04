@@ -1,4 +1,6 @@
-﻿using IAmFara.Core.Dynamic;
+﻿using IAmFara.Bootstrap4;
+using IAmFara.Bootstrap4.ComponentModels;
+using IAmFara.Core.Dynamic;
 using IAmFara.Core.Dynamic.Attributes;
 using System;
 using System.Collections.Generic;
@@ -12,10 +14,15 @@ namespace AnotherTest.Data
         public string Title { get; set; }
         public string Image { get; set; }
 
-        [ExchangedDataProperty(PropertyName = "Summary", ComponentTypeName = "Carousel")]
-        [ExchangedDataProperty(PropertyName = "Content", ComponentTypeName = "Alert")]
+        [ExchangedDataProperty(PropertyName = CarouselComponentConstants.Properties.Summary, ComponentTypeName = CarouselComponentConstants.ComponentTypeName)]
+        [ExchangedDataProperty(PropertyName = AlertComponantConstants.Properties.Content, ComponentTypeName = AlertComponantConstants.ComponentTypeName)]
         public string Body { get; set; }
         public DateTime DatePublished { get; set; }
         public string Author { get; set; }
+
+        public BootstrapColors BootstrapColor => BootstrapColors.Danger;
+
+        [ExchangedDataProperty(PropertyName = AlertComponantConstants.Properties.HasDismiss, ComponentTypeName = AlertComponantConstants.ComponentTypeName)]
+        public bool HasDismiss => true;
     }
 }

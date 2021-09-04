@@ -1,9 +1,15 @@
 ﻿@page
+@using IAmFara.Bootstrap4.ComponentModels
 @model IAmFara.AnotherTest.Pages.IndexModel
 @{
+    var badgeModel = new BadgeDataModel { BootstrapColor = Bootstrap4.BootstrapColors.Secondary, Content = "Hello" };
+
+    var alertModel = Model.CarouselDataModels.First().Cast<AlertDataModel>(typeof(Alert));
+    alertModel.NestedComponents.Add(badgeModel);
 }
 
 <div>
-    <vc:alert model=@Model.CarouselDataModels.First() ></vc:alert>
-    <vc:carousel slides=@Model.CarouselDataModels></vc:carousel>
+    @*<vc:badge  model=@badgeModel></vc:badge>*@
+    <vc:alert model=@alertModel ></vc:alert>
+    <vc:carousel model=@Model.CarouselDataModels></vc:carousel>
 </div>

@@ -9,8 +9,22 @@ using System.Threading.Tasks;
 
 namespace IAmFara.Bootstrap4.ComponentModels
 {
-    public class CarouselDataModel : ExchangedData
+    public static class CarouselComponentConstants
     {
+        public const string ComponentTypeName = nameof(Carousel);
+
+        public static class Properties
+        {
+            public const string Image = nameof(CarouselDataModel.Image);
+            public const string Title = nameof(CarouselDataModel.Title);
+            public const string Summary = nameof(CarouselDataModel.Summary);
+        }
+    }
+
+    public class CarouselDataModel : ExchangedData, IComponentDataModel
+    {
+        public BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
+
         [Required]
         public string Image { get; set; }
 
@@ -18,13 +32,19 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string Title { get; set; }
 
         public string Summary { get; set; }
+
+        public List<IComponentDataModel> NestedComponents { get; set; } = new List<IComponentDataModel>();
+
+        public string GetBootstrapClass() => string.Empty;
+
+        public string GetComponentName() => CarouselComponentConstants.ComponentTypeName;
     }
 
     public class Carousel : ViewComponent
     {
-        public IViewComponentResult Invoke(IEnumerable<ExchangedData> slides)
+        public IViewComponentResult Invoke(IEnumerable<ExchangedData> model)
         {
-            return View(slides);
+            return View(model);
         }
     }
 }

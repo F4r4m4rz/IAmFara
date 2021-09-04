@@ -2,7 +2,7 @@
 @using IAmFara.Core.Dynamic
 @model IEnumerable<ExchangedData>
 @{
-    var ConvertedModel = Model.CastExchangedData<CarouselDataModel>(typeof(Carousel));
+    var convertedModel = Model.CastExchangedData<CarouselDataModel>(typeof(Carousel));
 }
 
 <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
@@ -12,18 +12,18 @@
         <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
     </ol>
     <div class="carousel-inner">
-        @for (int i = 0; i < ConvertedModel.Count(); i++)
+        @for (int i = 0; i < convertedModel.Count(); i++)
         {
             string active = string.Empty;
             if (i == 0) active = "active";
 
             <div class="carousel-item @active">
-                <img src="~/@ConvertedModel.ElementAt(i).Image" class="d-block w-100" alt="...">
+                <img src="~/@convertedModel.ElementAt(i).Image" class="d-block w-100" alt="...">
                 <div class="carousel-caption d-none d-md-block">
-                    <h5>@ConvertedModel.ElementAt(i).Title</h5>
-                    @if (!string.IsNullOrWhiteSpace(@ConvertedModel.ElementAt(i).Summary))
+                    <h5>@convertedModel.ElementAt(i).Title</h5>
+                    @if (!string.IsNullOrWhiteSpace(convertedModel.ElementAt(i).Summary))
                     {
-                        <p>@ConvertedModel.ElementAt(i).Summary</p>
+                        <p>@convertedModel.ElementAt(i).Summary</p>
                     }
                 </div>
             </div>

@@ -19,9 +19,9 @@ namespace IAmFara.Core.Tests.Dynamic
             public string StringProp { get; set; }
             public object ObjectProp { get; set; }
 
-            [ExchangedDataPropertyAttribute(PropertyName = "IntAttributeTest", ComponentType = typeof(TestComponent))]
+            [ExchangedDataPropertyAttribute(PropertyName = "IntAttributeTest", ComponentTypeName = "TestComponent")]
             public int IntPropWithAttribute { get; set; }
-            [ExchangedDataPropertyAttribute(PropertyName = "StringAttributeTest", ComponentTypeName = nameof(TestComponent))]
+            [ExchangedDataPropertyAttribute(PropertyName = "StringAttributeTest", ComponentTypeName = "TestComponent")]
             public string StringPropWithAttribute { get; set; }
             [ExchangedDataPropertyAttribute(PropertyName = "ObjectAttributeTest", ComponentTypeName = "TestComponent")]
             public object ObjectPropWithAttribute { get; set; }

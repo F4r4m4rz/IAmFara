@@ -14,9 +14,9 @@ namespace System.Reflection
             attribute = property.GetCustomAttributes<ExchangedDataPropertyAttribute>()
                 .FirstOrDefault(att =>
                 {
-                    // Check Type
+                    // Check type
                     if (att.ComponentType != null)
-                        return att.ComponentType == componentType;
+                        return att.ComponentType.Equals(componentType);
 
                     // Check type name
                     if (!string.IsNullOrWhiteSpace(att.ComponentTypeName))

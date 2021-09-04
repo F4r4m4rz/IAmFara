@@ -1,0 +1,14 @@
+﻿@using IAmFara.Bootstrap4.ComponentModels
+@using IAmFara.Core.Dynamic
+@model ExchangedData
+@{
+    var convertedModel = Model.Cast<BadgeDataModel>(typeof(Badge));
+    var isLink = !string.IsNullOrWhiteSpace(convertedModel.Href);
+    var additionalClass = convertedModel.IsPill ? "badge-pill" : string.Empty;
+
+    var htmlTag = "span";
+    if (isLink)
+        htmlTag = "a";
+}
+
+<@htmlTag class="badge @additionalClass @convertedModel.GetBootstrapClass()">@convertedModel.Content</@htmlTag>

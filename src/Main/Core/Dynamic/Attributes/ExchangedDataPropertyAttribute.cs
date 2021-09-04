@@ -8,6 +8,7 @@ namespace IAmFara.Core.Dynamic.Attributes
     public class ExchangedDataPropertyAttribute : Attribute
     {
         public string PropertyName { get; set; }
+        public Type ComponentType { get; set; }
         public string ComponentTypeName { get; set; }
     }
 }

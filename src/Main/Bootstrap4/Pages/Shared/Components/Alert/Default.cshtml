@@ -2,26 +2,30 @@
 @using IAmFara.Core.Dynamic
 @model ExchangedData
 @{
-    var ConvertedModel = Model.Cast<AlertDataModel>(typeof(Alert));
-    var alertExtraClass = ConvertedModel.HasDismiss ? "alert-dismissible fade show" : "";
+    var convertedModel = Model.Cast<AlertDataModel>(typeof(Alert));
+    var alertExtraClass = convertedModel.HasDismiss ? "alert-dismissible fade show" : "";
 }
 
-<div class="alert @ConvertedModel.AlertBootstrapClass @alertExtraClass" role="alert">
-    @if (!string.IsNullOrWhiteSpace(ConvertedModel.Header))
+<div class="alert @convertedModel.GetBootstrapClass() @alertExtraClass" role="alert">
+    @if (!string.IsNullOrWhiteSpace(convertedModel.Header))
     {
-        <h4 class="alert-heading">@ConvertedModel.Header</h4>
+        <h4 class="alert-heading">@convertedModel.Header</h4>
     }
 
-    <p>@ConvertedModel.Content</p>
+    <p>@convertedModel.Content</p>
 
-    @if (!string.IsNullOrWhiteSpace(ConvertedModel.AdditionalContent))
+    @if (!string.IsNullOrWhiteSpace(convertedModel.AdditionalContent))
     {
         <hr>
-        <p class="mb-0">@ConvertedModel.AdditionalContent</p>
+        <p class="mb-0">@convertedModel.AdditionalContent</p>
     }
 
+    @foreach (var component in convertedModel.NestedComponents)
+    {
+        @await Component.InvokeAsync(component.GetComponentName(), component);
+    }
 
-    @if (ConvertedModel.HasDismiss)
+    @if (convertedModel.HasDismiss)
     {
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>

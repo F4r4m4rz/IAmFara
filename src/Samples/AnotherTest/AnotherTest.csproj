@@ -12,7 +12,7 @@
 
 	<ItemGroup>
 		<AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApplicationParts.RelatedAssemblyAttribute">
-			<_Parameter1>IAmFara.SharedViews</_Parameter1>
+			<_Parameter1>IAmFara.Bootstrap4</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
 

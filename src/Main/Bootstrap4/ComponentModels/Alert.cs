@@ -1,33 +1,29 @@
-﻿using System;
+﻿using IAmFara.Core.Dynamic;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using IAmFara.Core.Dynamic;
-using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IAmFara.Bootstrap4.ComponentModels
 {
-    public enum AlertType
+    public static class AlertComponantConstants
     {
-        [Description("alert-success")]
-        Success = 1,
+        public const string ComponentTypeName = nameof(Alert);
 
-        [Description("alert-info")]
-        Info = 2,
-
-        [Description("alert-warning")]
-        Warning = 3,
-
-        [Description("alert-info")]
-        Error = 4
+        public static class Properties
+        {
+            public const string Header = nameof(AlertDataModel.Header);
+            public const string Content = nameof(AlertDataModel.Content);
+            public const string AdditionalContent = nameof(AlertDataModel.AdditionalContent);
+            public const string HasDismiss = nameof(AlertDataModel.HasDismiss);
+        }
     }
 
-    public class AlertDataModel : ExchangedData
+    public class AlertDataModel : ExchangedData, IComponentDataModel
     {
-        public string AlertBootstrapClass => AlertType.GetDescription();
-
-        public AlertType AlertType => (AlertType)AlertTypeInt;
-
-        public int AlertTypeInt { get; set; } = 1;
+        public BootstrapColors BootstrapColor { get; set; } = BootstrapColors.Primary;
 
         public string Header { get; set; }
 
@@ -37,6 +33,11 @@ namespace IAmFara.Bootstrap4.ComponentModels
         public string AdditionalContent { get; set; }
 
         public bool HasDismiss { get; set; } = false;
+        public List<IComponentDataModel> NestedComponents { get; set; } = new List<IComponentDataModel>();
+
+        public string GetBootstrapClass() => "alert-" + BootstrapColor.GetDescription();
+
+        public string GetComponentName() => AlertComponantConstants.ComponentTypeName;
     }
 
     public class Alert : ViewComponent
