@@ -27,5 +27,9 @@
   <ItemGroup>
     <None Remove="Components\" />
     <None Remove="ComponentModels\" />
+    <None Remove="Pages\Shared\Components\Breadcrump\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\Shared\Components\Breadcrump\" />
   </ItemGroup>
 </Project>

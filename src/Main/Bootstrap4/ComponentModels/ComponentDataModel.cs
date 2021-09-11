@@ -9,7 +9,7 @@ namespace IAmFara.Bootstrap4.ComponentModels
 {
     public abstract class ComponentDataModel : ExchangedData
     {
-        internal abstract BootstrapColors BootstrapColor { get; set; }
+        public abstract BootstrapColors BootstrapColor { get; set; }
         internal abstract string GetBootstrapClass();
         internal abstract string GetComponentName();
     }
