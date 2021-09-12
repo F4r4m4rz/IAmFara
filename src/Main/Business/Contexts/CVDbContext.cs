@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using IAmFara.Domain.CV;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace IAmFara.Business.Contexts
     {
         public CVDbContext(DbContextOptions<CVDbContext> options) : base(options)
         {
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

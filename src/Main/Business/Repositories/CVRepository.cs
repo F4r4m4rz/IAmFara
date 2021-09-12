@@ -8,7 +8,17 @@ using Microsoft.Extensions.Logging;
 
 namespace IAmFara.Business.Repositories
 {
-    public class CVRepository
+    public interface ICVRepository
+    {
+        Task AddAsync<T>(T item);
+        Task<List<T>> GetAllAsync<T>() where T : class, ICVItem;
+        Task<T> GetAsync<T>() where T : class, ICVItem;
+        Task<CV> GetCVAsync();
+        Task RemoveAsync<T>(T removed);
+        Task UpdateAsync<T>(T updated);
+    }
+
+    public class CVRepository : ICVRepository
     {
         private readonly ILogger<CVRepository> _logger;
         private readonly DbContext _context;
@@ -46,7 +56,7 @@ namespace IAmFara.Business.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public Task<List<T>> GetAllAsync<T>() where T: class, ICVItem
+        public Task<List<T>> GetAllAsync<T>() where T : class, ICVItem
         {
             return _context.Set<T>()
                 .AsNoTracking()

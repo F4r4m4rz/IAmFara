@@ -1,0 +1,20 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div>
+    <h2>@Model.CV.Introduction.Title</h2>
+    <h4>@Model.CV.Introduction.Intro</h4>
+    <ul>
+        @foreach (var item in Model.CV.Interests)
+        {
+            <li>@item.Title</li>
+        }
+    </ul>
+</div>
+
+<form asp-page-handler="AddInterest" method="post">
+    <button>Add</button>
+</form>

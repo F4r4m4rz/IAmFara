@@ -16,6 +16,7 @@
     <None Remove="Repositories\" />
     <None Remove="Contexts\" />
     <None Remove="Microsoft.EntityFrameworkCore.SqlServer" />
+    <None Remove="Microsoft.EntityFrameworkCore.InMemory" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Repositories\" />
