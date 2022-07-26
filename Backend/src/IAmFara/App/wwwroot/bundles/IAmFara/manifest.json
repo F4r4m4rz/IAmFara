@@ -1,0 +1,7 @@
+{
+  "src/index.tsx": {
+    "file": "app.es.js",
+    "src": "src/index.tsx",
+    "isEntry": true
+  }
+}
