@@ -19,3 +19,27 @@
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: small;
 }
+
+@media screen and (max-width: 1300px) {
+    .introduction-text {
+        font-size: large;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .introduction-text {
+        font-size: medium;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .introduction-text {
+        font-size: small;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .introduction-text {
+        font-size: x-small;
+    }
+}

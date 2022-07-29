@@ -1,11 +1,12 @@
 import React from "react";
+import { Col, Row } from "react-bootstrap";
 import "./style.css";
 
 export function IntroText() {
 
     return(
-        <div className="row justify-content-center">
-            <div className="introduction-text col-10 border-bottom border-3 border-secondary mt-5 mb-5 pb-3">
+        <Row className="justify-content-center">
+            <Col lg="10" className="introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3">
                 <p>I am a self-learned full-stack developer with focus on .NET and react.</p>
                 <p>My jurney as a developer started with developing plug-ins for engineering software such as PDMS, E3D, Tekla NavisWorks and etc. 
                     This start awakened my joy and deep interest in developing even more application with higher complexity and therfore led me into learning C# and .NET.
@@ -20,7 +21,7 @@ export function IntroText() {
                     This is just a begining. This webpage is ment to be used more and more to publish my experiences and help others who are new in the business to grow
                     as fast as possible. 
                 </p>
-            </div>
-        </div>
+            </Col>
+        </Row>
     )
 }
