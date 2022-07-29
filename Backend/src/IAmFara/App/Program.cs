@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore;
 
 namespace Api
 {
@@ -6,7 +5,16 @@ namespace Api
     {
         public static void Main(string[] args)
         {
-            WebHost.CreateDefaultBuilder<Startup>(args).Build().Run();
+            var builder = WebApplication.CreateBuilder(args);
+
+            var startup = new Startup(builder.Configuration);
+            startup.ConfigureServices(builder.Services);
+
+            var app = builder.Build();
+
+            startup.Configure(app, app.Environment);
+
+            app.Run();
         }
     }
 }
