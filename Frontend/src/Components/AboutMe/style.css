@@ -1,10 +1,21 @@
 .about-me {
-    display: flex;
-    justify-content: center;
+    display: inline-block;
 }
 
 .introduction-text {
     width: 75%;
+    justify-self: right;
+    text-align:justify;
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: larger;
+}
+
+.skill-title {
+    font-family:sans-serif;
+    font-size: large;
+    font-weight: bold;
+}
+.skill-description {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: small;
 }

@@ -8,11 +8,13 @@ import { Protofolio } from "./Protofolio/Protofolio";
 export function Content() {
     
     return(
-        <Switch>
-            <Route exact path="/" component={AboutMe}></Route>
-            <Route path="/protofolio" component={Protofolio}></Route>
-            <Route path="/contact" component={ContactForm}></Route>
-            <Route path="/gallery" component={Gallery}></Route>
-        </Switch>
+        <div className="container bg-primary">
+            <Switch>
+                <Route exact path="/" component={AboutMe}></Route>
+                <Route path="/protofolio" component={Protofolio}></Route>
+                <Route path="/contact" component={ContactForm}></Route>
+                <Route path="/gallery" component={Gallery}></Route>
+            </Switch>
+        </div>
     )
 }

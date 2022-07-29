@@ -1,4 +1,5 @@
 import React from "react";
+import Skill from "./Skill";
 
 var staticSkills = [
     {title: "C#", description: "somthing", rate: 5},
@@ -10,8 +11,8 @@ var staticSkills = [
 
 const SkillList = () => {
     return (
-        <div>
-            
+        <div  className="skill-list container row">
+            {staticSkills.map((skill, i) => <Skill key={i} title={skill.title} description={skill.description} rate={skill.rate} />)}
         </div>
     );
 }

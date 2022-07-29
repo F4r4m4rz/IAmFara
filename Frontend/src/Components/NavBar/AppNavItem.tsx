@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./NavBar.css";
 
 type NavItemProps = {
+    collapsed: boolean;
     active: () => boolean;
     href: string;
     title: string;
@@ -10,14 +11,10 @@ type NavItemProps = {
     last?: boolean;
 }
 
-export function NavItem(props: NavItemProps) {
-    const onClick = () => {
-        props.onClick();
-    }
-
+export function AppNavItem(props: NavItemProps) {
     return (
-        <li className={"nav-item" + (props.active() ? " active" : "") + (props.last ? " last" : "")}>
-            <Link to={props.href} onClick={onClick}>
+        <li className={`${!props.collapsed ? `app-nav-item app-nav-item-md nav-item ${(props.last ? " last" : "")}` : ""} `}>
+            <Link className={"nav-link" + (props.active() ? " active" : "")} to={props.href} onClick={props.onClick}>
                 {props.title}
             </Link>
         </li>

@@ -1073,7 +1073,7 @@
     "core-js-pure" "^3.20.2"
     "regenerator-runtime" "^0.13.4"
 
-"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.4", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.0", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.4", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.0", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   "integrity" "sha1-tPz85V2z0uXggNJJD2CKO59Af0o="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@babel/runtime/-/runtime-7.18.9.tgz"
   "version" "7.18.9"
@@ -2416,6 +2416,40 @@
     "schema-utils" "^3.0.0"
     "source-map" "^0.7.3"
 
+"@popperjs/core@^2.11.5":
+  "integrity" "sha1-21oRv2a9qzlWlxlVWw924TjXvWQ="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@popperjs/core/-/core-2.11.5.tgz"
+  "version" "2.11.5"
+
+"@react-aria/ssr@^3.2.0":
+  "integrity" "sha1-Jegdrwx6JwpKiRFZ2NmEV45FEtg="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@react-aria/ssr/-/ssr-3.3.0.tgz"
+  "version" "3.3.0"
+  dependencies:
+    "@babel/runtime" "^7.6.2"
+
+"@restart/hooks@^0.4.6", "@restart/hooks@^0.4.7":
+  "integrity" "sha1-15ymRywBzgQ4n8c9SnmvG14zzTk="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@restart/hooks/-/hooks-0.4.7.tgz"
+  "version" "0.4.7"
+  dependencies:
+    "dequal" "^2.0.2"
+
+"@restart/ui@^1.2.0":
+  "integrity" "sha1-rha+JhKMwgXvt+C/k9HzTesf4RY="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@restart/ui/-/ui-1.3.1.tgz"
+  "version" "1.3.1"
+  dependencies:
+    "@babel/runtime" "^7.18.3"
+    "@popperjs/core" "^2.11.5"
+    "@react-aria/ssr" "^3.2.0"
+    "@restart/hooks" "^0.4.7"
+    "@types/warning" "^3.0.0"
+    "dequal" "^2.0.2"
+    "dom-helpers" "^5.2.0"
+    "uncontrollable" "^7.2.1"
+    "warning" "^4.0.3"
+
 "@rollup/plugin-babel@^5.2.0":
   "integrity" "sha1-BLwGCPSqSy5LGuvyhDRND2j9ooM="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@rollup/plugin-babel/-/plugin-babel-5.3.1.tgz"
@@ -2925,7 +2959,14 @@
     "@types/history" "^4.7.11"
     "@types/react" "*"
 
-"@types/react@*":
+"@types/react-transition-group@^4.4.4":
+  "integrity" "sha1-quINz3c8WqJ11bn3zbymOKvF5BY="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@types/react-transition-group/-/react-transition-group-4.4.5.tgz"
+  "version" "4.4.5"
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*", "@types/react@>=16.14.8", "@types/react@>=16.9.11":
   "integrity" "sha1-01VkTCaDLcJ/Pmy/DE9GA/xKt/4="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@types/react/-/react-18.0.15.tgz"
   "version" "18.0.15"
@@ -2989,6 +3030,11 @@
   "integrity" "sha1-/CWtmUO8rBHM64Fo208nXg5y51Y="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@types/trusted-types/-/trusted-types-2.0.2.tgz"
   "version" "2.0.2"
+
+"@types/warning@^3.0.0":
+  "integrity" "sha1-DSUBJorY+ZYrdA04fEZU9fjiPlI="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/@types/warning/-/warning-3.0.0.tgz"
+  "version" "3.0.0"
 
 "@types/ws@^8.5.1":
   "integrity" "sha1-fSWh/77NPE8tNQaNCyg8A3ADJ00="
@@ -5032,6 +5078,11 @@
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/deprecation/-/deprecation-2.3.1.tgz"
   "version" "2.3.1"
 
+"dequal@^2.0.2":
+  "integrity" "sha1-JkQhTxmX057Q7g7OcjNUkKesZ74="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/dequal/-/dequal-2.0.3.tgz"
+  "version" "2.0.3"
+
 "destroy@1.2.0":
   "integrity" "sha1-SANzVQmti+VSk0xn32FPlOZvoBU="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/destroy/-/destroy-1.2.0.tgz"
@@ -5151,6 +5202,14 @@
   "version" "0.2.0"
   dependencies:
     "utila" "~0.4"
+
+"dom-helpers@^5.0.1", "dom-helpers@^5.2.0", "dom-helpers@^5.2.1":
+  "integrity" "sha1-2UAFNrK/giWtmP4FLgKUUaxA6QI="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/dom-helpers/-/dom-helpers-5.2.1.tgz"
+  "version" "5.2.1"
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    "csstype" "^3.0.2"
 
 "dom-serializer@^1.0.1":
   "integrity" "sha1-3l1Bsa6ikCFdxFptrorc8dMuLTA="
@@ -6788,6 +6847,13 @@
     "has" "^1.0.3"
     "side-channel" "^1.0.4"
 
+"invariant@^2.2.4":
+  "integrity" "sha1-YQ88ksk1nOHbYW5TgAjSP/NRWOY="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/invariant/-/invariant-2.2.4.tgz"
+  "version" "2.2.4"
+  dependencies:
+    "loose-envify" "^1.0.0"
+
 "ip@^2.0.0":
   "integrity" "sha1-TPSrGC/uIxTHXt4SdvjIC0eZNto="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/ip/-/ip-2.0.0.tgz"
@@ -8014,7 +8080,7 @@
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/lodash/-/lodash-4.17.21.tgz"
   "version" "4.17.21"
 
-"loose-envify@^1.1.0", "loose-envify@^1.2.0", "loose-envify@^1.3.1", "loose-envify@^1.4.0":
+"loose-envify@^1.0.0", "loose-envify@^1.1.0", "loose-envify@^1.2.0", "loose-envify@^1.3.1", "loose-envify@^1.4.0":
   "integrity" "sha1-ce5R+nvkyuwaY4OffmgtgTLTDK8="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/loose-envify/-/loose-envify-1.4.0.tgz"
   "version" "1.4.0"
@@ -9826,6 +9892,14 @@
   dependencies:
     "read" "1"
 
+"prop-types-extra@^1.1.0":
+  "integrity" "sha1-WMO3TL+7ldMEYll1qi8ISDKaAQs="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/prop-types-extra/-/prop-types-extra-1.1.1.tgz"
+  "version" "1.1.1"
+  dependencies:
+    "react-is" "^16.3.2"
+    "warning" "^4.0.0"
+
 "prop-types@^15.0.0", "prop-types@^15.6.2", "prop-types@^15.8.1":
   "integrity" "sha1-Z9h78aaU9IQ1zzMsJK8QIUoxQLU="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/prop-types/-/prop-types-15.8.1.tgz"
@@ -10325,6 +10399,24 @@
     "regenerator-runtime" "^0.13.9"
     "whatwg-fetch" "^3.6.2"
 
+"react-bootstrap@^2.4.0":
+  "integrity" "sha1-mb+WVuLnojrhrhNdGP1a18NEtBY="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-bootstrap/-/react-bootstrap-2.4.0.tgz"
+  "version" "2.4.0"
+  dependencies:
+    "@babel/runtime" "^7.17.2"
+    "@restart/hooks" "^0.4.6"
+    "@restart/ui" "^1.2.0"
+    "@types/react-transition-group" "^4.4.4"
+    "classnames" "^2.3.1"
+    "dom-helpers" "^5.2.1"
+    "invariant" "^2.2.4"
+    "prop-types" "^15.8.1"
+    "prop-types-extra" "^1.1.0"
+    "react-transition-group" "^4.4.2"
+    "uncontrollable" "^7.2.1"
+    "warning" "^4.0.3"
+
 "react-dev-utils@^12.0.1":
   "integrity" "sha1-upLttKHzeb1GzNa81Oe8OY3zPnM="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-dev-utils/-/react-dev-utils-12.0.1.tgz"
@@ -10355,7 +10447,7 @@
     "strip-ansi" "^6.0.1"
     "text-table" "^0.2.0"
 
-"react-dom@*", "react-dom@^18.0.0", "react-dom@^18.2.0", "react-dom@>=16.0.0", "react-dom@>=16.11.0", "react-dom@>=16.9.0":
+"react-dom@*", "react-dom@^18.0.0", "react-dom@^18.2.0", "react-dom@>=16.0.0", "react-dom@>=16.11.0", "react-dom@>=16.14.0", "react-dom@>=16.6.0", "react-dom@>=16.9.0":
   "integrity" "sha1-IqrzhwjbJnTtmtoiTKSqcI2CHj0="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-dom/-/react-dom-18.2.0.tgz"
   "version" "18.2.0"
@@ -10368,7 +10460,7 @@
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-error-overlay/-/react-error-overlay-6.0.11.tgz"
   "version" "6.0.11"
 
-"react-is@^16.12.0", "react-is@^16.13.1", "react-is@^16.6.0", "react-is@^16.7.0":
+"react-is@^16.12.0", "react-is@^16.13.1", "react-is@^16.3.2", "react-is@^16.6.0", "react-is@^16.7.0":
   "integrity" "sha1-eJcppNw23imZ3BVt1sHZwYzqVqQ="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-is/-/react-is-16.13.1.tgz"
   "version" "16.13.1"
@@ -10382,6 +10474,11 @@
   "integrity" "sha1-GZQx7qqi4J+GQn77tPFHPttHYJs="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-is/-/react-is-18.2.0.tgz"
   "version" "18.2.0"
+
+"react-lifecycles-compat@^3.0.4":
+  "integrity" "sha1-TxonOv38jzSIqMUWv9p4+HI1I2I="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz"
+  "version" "3.0.4"
 
 "react-refresh@^0.11.0", "react-refresh@>=0.10.0 <1.0.0":
   "integrity" "sha1-dxmLlEcz8PHxqQ55HeRUH58HQEY="
@@ -10477,7 +10574,17 @@
   optionalDependencies:
     "fsevents" "^2.3.2"
 
-"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^18.0.0", "react@^18.2.0", "react@>= 16", "react@>=15", "react@>=16.0.0", "react@>=16.11.0", "react@>=16.9.0":
+"react-transition-group@^4.4.2":
+  "integrity" "sha1-i1mlbwnO17VcvVPDZ2i5IokNVHA="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react-transition-group/-/react-transition-group-4.4.2.tgz"
+  "version" "4.4.2"
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    "dom-helpers" "^5.0.1"
+    "loose-envify" "^1.4.0"
+    "prop-types" "^15.6.2"
+
+"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0", "react@^18.0.0", "react@^18.2.0", "react@>= 16", "react@>=0.14.0", "react@>=15", "react@>=15.0.0", "react@>=16.0.0", "react@>=16.11.0", "react@>=16.14.0", "react@>=16.6.0", "react@>=16.8.0", "react@>=16.9.0":
   "integrity" "sha1-VVvZhZKIMlX6AN4U8RUakXtdd9U="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/react/-/react-18.2.0.tgz"
   "version" "18.2.0"
@@ -12160,6 +12267,16 @@
     "has-symbols" "^1.0.3"
     "which-boxed-primitive" "^1.0.2"
 
+"uncontrollable@^7.2.1":
+  "integrity" "sha1-H6cLoMV6FNX3iQXVM89jkW3HVzg="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/uncontrollable/-/uncontrollable-7.2.1.tgz"
+  "version" "7.2.1"
+  dependencies:
+    "@babel/runtime" "^7.6.3"
+    "@types/react" ">=16.9.11"
+    "invariant" "^2.2.4"
+    "react-lifecycles-compat" "^3.0.4"
+
 "unicode-canonical-property-names-ecmascript@^2.0.0":
   "integrity" "sha1-MBrNxSVjFnDTn2FG4Od/9rvevdw="
   "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/unicode-canonical-property-names-ecmascript/-/unicode-canonical-property-names-ecmascript-2.0.0.tgz"
@@ -12376,6 +12493,13 @@
   "version" "1.0.8"
   dependencies:
     "makeerror" "1.0.12"
+
+"warning@^4.0.0", "warning@^4.0.3":
+  "integrity" "sha1-Fungd+uKhtavfWSqHgX9hbRnjKM="
+  "resolved" "https://pkgs.dev.azure.com/DNVGL-MARITIME/_packaging/NPS/npm/registry/warning/-/warning-4.0.3.tgz"
+  "version" "4.0.3"
+  dependencies:
+    "loose-envify" "^1.0.0"
 
 "watchpack@^2.4.0":
   "integrity" "sha1-+jMDI3SWLHgRP5PH8vtMVMmGKl0="
