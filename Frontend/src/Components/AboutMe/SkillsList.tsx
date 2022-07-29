@@ -1,4 +1,5 @@
 import React from "react";
+import { Col, Container, Row } from "react-bootstrap";
 import Skill from "./Skill";
 
 var staticSkills = [
@@ -11,9 +12,12 @@ var staticSkills = [
 
 const SkillList = () => {
     return (
-        <div  className="skill-list container row">
-            {staticSkills.map((skill, i) => <Skill key={i} title={skill.title} description={skill.description} rate={skill.rate} />)}
-        </div>
+        <Col lg="10">
+            <Row  className="skill-list">
+                {staticSkills.map((skill, i) => <Skill key={i} title={skill.title} description={skill.description} rate={skill.rate} />)}
+            </Row>
+        </Col>
+        
     );
 }
 
