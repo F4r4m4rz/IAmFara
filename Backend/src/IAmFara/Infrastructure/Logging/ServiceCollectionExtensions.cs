@@ -23,6 +23,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.AddSingleton<ILoggerProvider, DbLoggingProvider>();
             });
 
+            services.AddScoped<ICorelationIdAccessor, CorelationIdAccessor>();
+
             return services;
         }
     }

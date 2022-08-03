@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model
 {
-    internal class IntroductionTextModel
+    public class IntroductionTextModel
     {
         public int Id { get; set; }
         public string? Text { get; set; }

@@ -1,4 +1,22 @@
-export type IntroductionText = {
+export type AppEntityName = "IntroductionText" | "Skill";
+
+export type IntroductionTextDto = {
+    id: number;
+    createdOn: string;
     text: string;
-    updatedOn: string;
+    lastUpdatedOn: string;
+}
+
+export enum SkillRateDto {
+    beginner = 1,
+    someExperience = 2,
+    businessExperience = 3,
+    expert = 4,
+    master = 5
+}
+
+export type SkillDto = {
+    title: string,
+    description: string,
+    rate: number 
 }

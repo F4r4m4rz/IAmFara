@@ -1,4 +1,5 @@
 ﻿using Data;
+using Infrastructure.Logging;
 
 namespace Api
 {
@@ -13,14 +14,18 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
             services.AddMvc();
-            services.AddDbLogger(_configuration);
+            //services.AddDbLogger(_configuration);
             services.AddDependencies(_configuration);
+            services.AddHttpContextAccessor();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
+        { 
+            app.UseCors(builder => builder.AllowAnyOrigin());
+
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();

@@ -11,6 +11,10 @@
     margin-left: -30px;;
 }
 
+.app-nav-bar {
+    border-bottom: solid;
+}
+
 .app-nav-list {
     font-weight: bold;
     font-family:Arial, Helvetica, sans-serif;

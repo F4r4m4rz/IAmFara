@@ -9,7 +9,7 @@ type NavBarProps = {
 
 export function AppNavBar(props: NavBarProps) {
     return (
-        <Navbar bg="white" expand="lg">
+        <Navbar bg="white" expand="lg" className="app-nav-bar">
             <Container fluid>
                 <Navbar.Brand>
                     <Container>

@@ -1,20 +1,8 @@
 import React from "react";
+import { SkillDto } from "../../contractTypes";
 
-export enum SkillRate {
-    beginner = 1,
-    someExperience = 2,
-    businessExperience = 3,
-    expert = 4,
-    master = 5
-}
 
-type SkillProps = {
-    title: string;
-    description?: string;
-    rate: SkillRate;
-}
-
-const Skill = (props: SkillProps) => {
+const Skill = (props: SkillDto) => {
     
     return (
         <div className="col-lg-6">

@@ -10,10 +10,12 @@ namespace Infrastructure.Logging
     internal class DbLogger : ILogger
     {
         private readonly LoggingDbContext _context;
+        private readonly Guid _corelationId;
 
-        public DbLogger(LoggingDbContext context)
+        public DbLogger(LoggingDbContext context, Guid corelationId)
         {
             _context = context;
+            _corelationId = corelationId;
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -45,7 +47,8 @@ namespace Infrastructure.Logging
                 ExceptionStackTrace = exception?.StackTrace,
                 LogLevel = logLevel.ToString(),
                 Message = !String.IsNullOrWhiteSpace(message) ? message : "",
-                ThreadId = threadId
+                ThreadId = threadId,
+                CorelationId = _corelationId
             };
 
             _context.Add(record);

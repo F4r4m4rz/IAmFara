@@ -12,6 +12,7 @@ namespace Infrastructure.Logging
         public string? LogLevel { get; set; }
         public int ThreadId { get; set; }
         public string? EventId { get; set; }
+        public Guid? CorelationId { get; set; }
         public string? Message { get; set; }
         public string? ExceptionMessage { get; set; }
         public string? ExceptionStackTrace { get; set; }
