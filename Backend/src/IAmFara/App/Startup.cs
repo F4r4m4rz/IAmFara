@@ -14,10 +14,11 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
             services.AddMvc();
-            //services.AddDbLogger(_configuration);
+
+            services.AddDbLogger(_configuration);
+
             services.AddDependencies(_configuration);
             services.AddHttpContextAccessor();
         }
@@ -25,6 +26,8 @@ namespace Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         { 
             app.UseCors(builder => builder.AllowAnyOrigin());
+
+            app.UserCorelationId();
 
             app.UseHttpsRedirection();
 

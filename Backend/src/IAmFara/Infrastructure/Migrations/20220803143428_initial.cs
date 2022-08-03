@@ -18,6 +18,7 @@ namespace Infrastructure.Migrations
                     LogLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ThreadId = table.Column<int>(type: "int", nullable: false),
                     EventId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CorelationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExceptionMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),

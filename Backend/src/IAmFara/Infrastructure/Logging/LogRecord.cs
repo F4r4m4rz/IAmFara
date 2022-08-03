@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Logging
 {
-    internal class LogRecord
+    public class LogRecord
     {
         public int Id { get; set; }
         public string? LogLevel { get; set; }
         public int ThreadId { get; set; }
         public string? EventId { get; set; }
+        public string? Category { get; set; }
         public Guid? CorelationId { get; set; }
         public string? Message { get; set; }
         public string? ExceptionMessage { get; set; }

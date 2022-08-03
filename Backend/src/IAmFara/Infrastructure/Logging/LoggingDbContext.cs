@@ -32,14 +32,11 @@ namespace Infrastructure.Logging
     {
         private readonly string? _conStr;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public LoggingDbContext(string conStr)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             _conStr = conStr;
-        }
-
-        public LoggingDbContext(DbContextOptions<LoggingDbContext> options) : base(options)
-        {
-
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

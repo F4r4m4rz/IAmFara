@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Logging;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -14,18 +16,25 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddDbLogger(this IServiceCollection services, IConfiguration config)
         {
-            var connectionString = config.GetConnectionString("LoggingDbContext");
-            services.AddDbContext<LoggingDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddSingleton<ILoggingDbContextFactory>(sp => new LoggingDbContextFactory(connectionString));
+            IConfiguration loggingSection = config.GetSection(DbLoggerConfig._section);
 
+            var connectionString = config.GetConnectionString("LoggingDbContext");
+            services.AddSingleton<LoggingDbContext>(_ => new LoggingDbContext(connectionString));
+            
             services.AddLogging(builder =>
             {
-                builder.Services.AddSingleton<ILoggerProvider, DbLoggingProvider>();
+                builder.Services.Configure<DbLoggerConfig>(loggingSection);
+                builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DbLoggingProvider>());
             });
 
             services.AddScoped<ICorelationIdAccessor, CorelationIdAccessor>();
 
             return services;
+        }
+
+        public static IApplicationBuilder UserCorelationId(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<CorelationIdGeneratorMiddleware>();
         }
     }
 }

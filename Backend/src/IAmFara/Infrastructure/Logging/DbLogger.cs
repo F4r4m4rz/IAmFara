@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,14 +11,16 @@ namespace Infrastructure.Logging
 {
     internal class DbLogger : ILogger
     {
-        private readonly LoggingDbContext _context;
-        private readonly Guid _corelationId;
+        private readonly string _categoryName;
+        private readonly DbLoggingProvider _provider;
 
-        public DbLogger(LoggingDbContext context, Guid corelationId)
+        public DbLogger(string categoryName, [NotNull]  DbLoggingProvider provider)
         {
-            _context = context;
-            _corelationId = corelationId;
+            _categoryName = categoryName;
+            _provider = provider;
         }
+
+        public static Guid CorelationId { get; internal set; }
 
         public IDisposable BeginScope<TState>(TState state)
         {
@@ -25,7 +29,14 @@ namespace Infrastructure.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return logLevel != LogLevel.None;
+            var levelKey = _provider.Config.LogLevel.Keys.FirstOrDefault(k => _categoryName.Contains(k));
+            if (levelKey is null)
+            {
+                var defaultLevel = _provider.Config.LogLevel["Default"];
+                return logLevel >= defaultLevel;
+            }
+
+            return logLevel >= _provider.Config.LogLevel[levelKey];
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
@@ -45,14 +56,15 @@ namespace Infrastructure.Logging
                 EventId = eventId.ToString(),
                 ExceptionMessage = exception?.Message,
                 ExceptionStackTrace = exception?.StackTrace,
+                Category = _categoryName,
                 LogLevel = logLevel.ToString(),
                 Message = !String.IsNullOrWhiteSpace(message) ? message : "",
                 ThreadId = threadId,
-                CorelationId = _corelationId
+                CorelationId = CorelationId
             };
 
-            _context.Add(record);
-            _context.SaveChanges();
+            _provider.DbContext.Add(record);
+            _provider.DbContext.SaveChanges();
         }
     }
 }
