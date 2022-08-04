@@ -9,6 +9,7 @@ export function AboutMe() {
     return(
         <Row className="about-me justify-content-center">
             <IntroText />
+            <SkillList />
         </Row>
     )
 }

@@ -3,7 +3,6 @@ import { Col } from "react-bootstrap";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { IntroductionTextDto } from "../../contractTypes";
-import { EntityMeta, EntityState, IEntityMeta } from "../../utils/GenericReducer";
 import { AppState } from "../../utils/Store";
 
 function IntroText(props: Props) {

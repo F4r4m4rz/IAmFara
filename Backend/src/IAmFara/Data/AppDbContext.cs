@@ -16,5 +16,6 @@ namespace Data
         }
 
         public DbSet<IntroductionTextModel> IntroTexts { get; set; }
+        public DbSet<SkillModel> Skills { get; set; }
     }
 }

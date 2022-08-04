@@ -16,7 +16,8 @@ export enum SkillRateDto {
 }
 
 export type SkillDto = {
+    id: number,
     title: string,
     description: string,
-    rate: number 
+    rate: SkillRateDto 
 }

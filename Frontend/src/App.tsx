@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Switch, Route, useRouteMatch } from 'react-rou
 import { Content } from "./Components/Content";
 import { AppNavBar } from "./Components/NavBar/AppNavBar";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { IAppState } from "./utils/AppState";
-import { AnyAction, Store } from "redux";
+import { Store } from "redux";
 import { Provider } from "react-redux";
+import { AppState } from "./utils/Store";
 
 function useWindowsSize() {
     const [windowSize, setWindowSize] = useState([0,0]);
@@ -22,7 +22,7 @@ function useWindowsSize() {
     return windowSize;
 }
 
-const App = ({ store }: { store: Store<IAppState>}) => {
+const App = ({ store }: { store: Store<AppState>}) => {
     const [width, height] = useWindowsSize();
     const collapsed = width < 1000 ? true : false;
     

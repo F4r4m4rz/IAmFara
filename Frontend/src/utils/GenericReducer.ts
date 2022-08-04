@@ -9,8 +9,6 @@ export interface IDataUpdated<AppEntityName> {
         data: any
     }
 }
-
-export type EntityState<T> = {[entityKey: string]: IEntityMeta<T> };
 export interface IEntityMeta<T> {
     data: T
 }
@@ -24,8 +22,8 @@ export class EntityMeta<T> implements IEntityMeta<T> {
 
 export function GenericReducer<TEntity>(
     name: AppEntityName, 
-    baseReducer?: Reducer<EntityMeta<TEntity>, Action<string>>
-    ) : Reducer<EntityMeta<TEntity>, AnyAction> {
+    baseReducer?: Reducer<IEntityMeta<TEntity>, Action<string>>
+    ) : Reducer<IEntityMeta<TEntity>, AnyAction> {
     return (state = new EntityMeta<TEntity>(), action) => {
         switch (action.type) {
             case "DATA_UPDATED": {
