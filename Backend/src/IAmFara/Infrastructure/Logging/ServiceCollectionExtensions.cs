@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var connectionString = config.GetConnectionString("LoggingDbContext");
             services.AddSingleton<LoggingDbContext>(_ => new LoggingDbContext(connectionString));
+            services.AddSingleton<ILoggingDbContextFactory, LoggingDbContextFactory>(_ => new LoggingDbContextFactory(connectionString));
             
             services.AddLogging(builder =>
             {
@@ -27,14 +28,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DbLoggingProvider>());
             });
 
-            services.AddScoped<ICorelationIdAccessor, CorelationIdAccessor>();
+            services.AddSingleton<ICorrelationIdAccessor, CorrelationIdAccessor>();
 
             return services;
         }
 
         public static IApplicationBuilder UserCorelationId(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<CorelationIdGeneratorMiddleware>();
+            return builder.UseMiddleware<CorrelationIdGeneratorMiddleware>();
         }
     }
 }

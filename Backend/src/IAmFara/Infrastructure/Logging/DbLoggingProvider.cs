@@ -20,19 +20,22 @@ namespace Infrastructure.Logging
 
     internal class DbLoggingProvider : ILoggerProvider
     {
-        private readonly LoggingDbContext _loggingDb;
         private IDisposable _onChangConfig;
         private readonly ConcurrentDictionary<string, DbLogger> _loggers = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ILoggingDbContextFactory _dbContextFactory;
+        private readonly ICorrelationIdAccessor _correlationIdAccessor;
 
-        public DbLoggingProvider(LoggingDbContext loggingDb, IOptionsMonitor<DbLoggerConfig> options)
+        public DbLoggingProvider(ILoggingDbContextFactory dbContextFactory, ICorrelationIdAccessor correlationIdAccessor, IOptionsMonitor<DbLoggerConfig> options)
         {
-            _loggingDb = loggingDb;
             Config = options.CurrentValue;
             _onChangConfig = options.OnChange(updaedConfig => Config = updaedConfig);
+            _dbContextFactory = dbContextFactory;
+            _correlationIdAccessor = correlationIdAccessor;
         }
 
         internal DbLoggerConfig Config { get; private set; }
-        internal LoggingDbContext DbContext => _loggingDb;
+        internal LoggingDbContext DbContext => _dbContextFactory.GetInstance();
+        internal Guid? CorrelationId => _correlationIdAccessor.CorelationId?.CorelationId;
 
         public ILogger CreateLogger(string categoryName)
         {

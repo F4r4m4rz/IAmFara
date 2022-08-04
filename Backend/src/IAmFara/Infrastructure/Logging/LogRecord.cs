@@ -14,6 +14,7 @@ namespace Infrastructure.Logging
         public string? EventId { get; set; }
         public string? Category { get; set; }
         public Guid? CorelationId { get; set; }
+        public DateTime Time { get; set; }
         public string? Message { get; set; }
         public string? ExceptionMessage { get; set; }
         public string? ExceptionStackTrace { get; set; }

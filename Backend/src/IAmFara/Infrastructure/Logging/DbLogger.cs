@@ -20,8 +20,6 @@ namespace Infrastructure.Logging
             _provider = provider;
         }
 
-        public static Guid CorelationId { get; internal set; }
-
         public IDisposable BeginScope<TState>(TState state)
         {
             return null!;
@@ -60,11 +58,16 @@ namespace Infrastructure.Logging
                 LogLevel = logLevel.ToString(),
                 Message = !String.IsNullOrWhiteSpace(message) ? message : "",
                 ThreadId = threadId,
-                CorelationId = CorelationId
+                CorelationId = _provider.CorrelationId,
+                Time = DateTime.UtcNow,
             };
 
-            _provider.DbContext.Add(record);
-            _provider.DbContext.SaveChanges();
+            using (var context = _provider.DbContext)
+            {
+                context.Add(record);
+                context.SaveChanges();
+            }
+            
         }
     }
 }
