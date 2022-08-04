@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,7 +13,7 @@ namespace Infrastructure.Logging
 {
     class DbLoggerConfig
     {
-        public const string _section = "DbLogger";
+        public const string _section = "Logging";
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public Dictionary<string, LogLevel> LogLevel { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -22,10 +23,10 @@ namespace Infrastructure.Logging
     {
         private IDisposable _onChangConfig;
         private readonly ConcurrentDictionary<string, DbLogger> _loggers = new(StringComparer.OrdinalIgnoreCase);
-        private readonly ILoggingDbContextFactory _dbContextFactory;
+        private readonly IAppDbContextFactory _dbContextFactory;
         private readonly ICorrelationIdAccessor _correlationIdAccessor;
 
-        public DbLoggingProvider(ILoggingDbContextFactory dbContextFactory, ICorrelationIdAccessor correlationIdAccessor, IOptionsMonitor<DbLoggerConfig> options)
+        public DbLoggingProvider(IAppDbContextFactory dbContextFactory, ICorrelationIdAccessor correlationIdAccessor, IOptionsMonitor<DbLoggerConfig> options)
         {
             Config = options.CurrentValue;
             _onChangConfig = options.OnChange(updaedConfig => Config = updaedConfig);
@@ -34,7 +35,7 @@ namespace Infrastructure.Logging
         }
 
         internal DbLoggerConfig Config { get; private set; }
-        internal LoggingDbContext DbContext => _dbContextFactory.GetInstance();
+        internal AppDbContext DbContext => _dbContextFactory.CreateContext();
         internal Guid? CorrelationId => _correlationIdAccessor.CorelationId?.CorelationId;
 
         public ILogger CreateLogger(string categoryName)

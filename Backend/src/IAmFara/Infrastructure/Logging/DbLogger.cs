@@ -67,7 +67,6 @@ namespace Infrastructure.Logging
                 context.Add(record);
                 context.SaveChanges();
             }
-            
         }
     }
 }

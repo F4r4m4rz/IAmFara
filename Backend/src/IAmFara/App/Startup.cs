@@ -17,9 +17,8 @@ namespace Api
             services.AddControllers();
             services.AddMvc();
 
-            services.AddDbLogger(_configuration);
+            services.AddAppDependencies(_configuration);
 
-            services.AddDependencies(_configuration);
             services.AddHttpContextAccessor();
         }
 
