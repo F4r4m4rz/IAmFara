@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddScoped<IIntroductionTextRepository, InMemoryIntroTextRepository>();
             services.AddScoped<ISkillsRepository, InMemorySkillsRepository>();
+            services.AddScoped<IAppUserRepository, InMemoryAppUserRepository>();
 
             return services;
         }

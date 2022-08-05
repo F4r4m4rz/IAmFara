@@ -11,6 +11,8 @@ import { getStore } from "./utils/Store";
         apiServiceInstance.dispatch = store.dispatch;
     }
     
+    store.dispatch({type: "AUTHENTICATE" });
+    
     const root = createRoot(document.getElementById("root")!);
     root.render(
     <BrowserRouter>

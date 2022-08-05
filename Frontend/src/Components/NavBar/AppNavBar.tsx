@@ -2,12 +2,10 @@ import React, { useLayoutEffect, useState } from "react";
 import "./NavBar.css";
 import AppNavList from "./AppNavList";
 import {Button, Container, Nav, Navbar, Row} from 'react-bootstrap';
+import { connect, ConnectedProps } from "react-redux";
+import { AppState } from "../../utils/Store";
 
-type NavBarProps = {
-    collapsed: boolean;
-}
-
-export function AppNavBar(props: NavBarProps) {
+function AppNavBar(props: Props) {
     return (
         <Navbar bg="white" expand="lg" className="app-nav-bar">
             <Container fluid>
@@ -24,8 +22,24 @@ export function AppNavBar(props: NavBarProps) {
                 {props.collapsed && (
                     <Navbar.Toggle className="ms-auto me-3" aria-controls="basic-navbar-nav" />
                 )}
-                <AppNavList collapsed={props.collapsed} />
+                <AppNavList collapsed={props.collapsed} currentUser={props.currentUser.data} />
             </Container>
         </Navbar>
     );
 }
+
+type ExternalProps = {
+    collapsed: boolean
+}
+
+const connector = connect(
+    (state: AppState, p: ExternalProps) => {
+        return {
+            currentUser: state.currentUser
+        }
+    }
+)
+
+type Props = ConnectedProps<typeof connector> & ExternalProps;
+
+export const AppNavBarComponent = connector(AppNavBar);

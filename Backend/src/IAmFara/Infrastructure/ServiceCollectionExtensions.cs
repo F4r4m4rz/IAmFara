@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddDbContextInfrastructure(config)
                     .AddLoggingInfrastructure(config)
+                    .AddAuthenticationIfrastructure()
                     .AddRepositories();
              
             return services;

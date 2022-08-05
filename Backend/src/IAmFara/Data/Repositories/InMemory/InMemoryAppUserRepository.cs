@@ -28,14 +28,13 @@ namespace Data.Repositories.InMemory
             {
                 Email = "bob@email.com",
                 FirstName = "Bob",
-                CreatedOn = DateTime.Now,
+                Password = "MGcYc5JnwviZZQj6kN5YxA==:BIad+yrJlLfIoHJL4ZDfUIPq1WVkJHcrNJxjveyt1lo="
             };
 
             var user2 = new AppUser
             {
                 Email = "john@email.com",
                 FirstName = "John",
-                CreatedOn = DateTime.Now,
             };
 
             _database.Add(user1);
@@ -45,6 +44,12 @@ namespace Data.Repositories.InMemory
         public AppUser? GetUser(string email)
         {
             return _database.FirstOrDefault(x => x.Email == email);
+        }
+
+        public AppUser AddUser(AppUser user)
+        {
+            _database.Add(user);
+            return user;
         }
     }
 }

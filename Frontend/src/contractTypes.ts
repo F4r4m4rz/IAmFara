@@ -21,3 +21,21 @@ export type SkillDto = {
     description: string,
     rate: SkillRateDto 
 }
+
+export type SignUpDto = {
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string
+}
+
+export type SignInDto = {
+    email: string,
+    password: string
+}
+
+export type SecurityUser = {
+    email: string,
+    firstName: string,
+    lastName: string
+}

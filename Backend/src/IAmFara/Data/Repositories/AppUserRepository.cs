@@ -10,5 +10,6 @@ namespace Data.Repositories
     public interface IAppUserRepository
     {
         AppUser? GetUser(string email);
+        AppUser AddUser(AppUser user);
     }
 }

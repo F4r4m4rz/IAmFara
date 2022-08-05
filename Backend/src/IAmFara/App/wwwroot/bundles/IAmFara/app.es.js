@@ -439,7 +439,7 @@ function _inheritsLoose(subClass, superClass) {
   _setPrototypeOf(subClass, superClass);
 }
 
-var propTypes$1 = {exports: {}};
+var propTypes$3 = {exports: {}};
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -524,10 +524,10 @@ var factoryWithThrowingShims = function() {
 {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  propTypes$1.exports = factoryWithThrowingShims();
+  propTypes$3.exports = factoryWithThrowingShims();
 }
 
-var PropTypes = propTypes$1.exports;
+var PropTypes = propTypes$3.exports;
 
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -2686,7 +2686,7 @@ function noop$2() {}
  * The public API for rendering the first <Route> that matches.
  */
 
-var Switch = /*#__PURE__*/function (_React$Component) {
+var Switch$2 = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Switch, _React$Component);
 
   function Switch() {
@@ -3945,7 +3945,7 @@ const collapseStyles = {
   [ENTERING]: 'collapsing',
   [ENTERED]: 'collapse show'
 };
-const defaultProps$c = {
+const defaultProps$d = {
   in: false,
   timeout: 300,
   mountOnEnter: false,
@@ -4006,7 +4006,7 @@ const Collapse = /*#__PURE__*/React.forwardRef(({
 }); // @ts-ignore
 
 // @ts-ignore
-Collapse.defaultProps = defaultProps$c;
+Collapse.defaultProps = defaultProps$d;
 var Collapse$1 = Collapse;
 
 /**
@@ -4249,7 +4249,7 @@ const Anchor = /*#__PURE__*/react.exports.forwardRef((_ref, ref) => {
 });
 Anchor.displayName = 'Anchor';
 
-const defaultProps$b = {
+const defaultProps$c = {
   in: false,
   timeout: 300,
   mountOnEnter: false,
@@ -4281,11 +4281,11 @@ const Fade = /*#__PURE__*/react.exports.forwardRef(({
     })
   });
 });
-Fade.defaultProps = defaultProps$b;
+Fade.defaultProps = defaultProps$c;
 Fade.displayName = 'Fade';
 var Fade$1 = Fade;
 
-const propTypes = {
+const propTypes$2 = {
   'aria-label': PropTypes.string,
   onClick: PropTypes.func,
 
@@ -4296,7 +4296,7 @@ const propTypes = {
    */
   variant: PropTypes.oneOf(['white'])
 };
-const defaultProps$a = {
+const defaultProps$b = {
   'aria-label': 'Close'
 };
 const CloseButton = /*#__PURE__*/react.exports.forwardRef(({
@@ -4310,8 +4310,8 @@ const CloseButton = /*#__PURE__*/react.exports.forwardRef(({
   ...props
 }));
 CloseButton.displayName = 'CloseButton';
-CloseButton.propTypes = propTypes;
-CloseButton.defaultProps = defaultProps$a;
+CloseButton.propTypes = propTypes$2;
+CloseButton.defaultProps = defaultProps$b;
 var CloseButton$1 = CloseButton;
 
 var divWithClassName = (className => /*#__PURE__*/react.exports.forwardRef((p, ref) => /*#__PURE__*/jsxRuntime.exports.jsx("div", { ...p,
@@ -4352,7 +4352,7 @@ function createWithBsPrefix(prefix, {
   return BsComponent;
 }
 
-const defaultProps$9 = {
+const defaultProps$a = {
   variant: 'primary',
   active: false,
   disabled: false
@@ -4381,7 +4381,7 @@ const Button = /*#__PURE__*/react.exports.forwardRef(({
   });
 });
 Button.displayName = 'Button';
-Button.defaultProps = defaultProps$9;
+Button.defaultProps = defaultProps$a;
 var Button$1 = Button;
 
 const context$1 = /*#__PURE__*/react.exports.createContext(null);
@@ -4415,6 +4415,16 @@ function useWillUnmount(fn) {
       return onUnmount.current();
     };
   }, []);
+}
+
+/**
+ * Finds whether a component's `children` prop includes a React element of the
+ * specified type.
+ */
+
+
+function hasChildOfType(children, type) {
+  return react.exports.Children.toArray(children).some(child => /*#__PURE__*/react.exports.isValidElement(child) && child.type === type);
 }
 
 function useCol({
@@ -4564,6 +4574,391 @@ function useWindow() {
 const context = /*#__PURE__*/react.exports.createContext(null);
 context.displayName = 'NavbarContext';
 var NavbarContext = context;
+
+const propTypes$1 = {
+  /**
+   * Specify whether the feedback is for valid or invalid fields
+   *
+   * @type {('valid'|'invalid')}
+   */
+  type: PropTypes.string,
+
+  /** Display feedback as a tooltip. */
+  tooltip: PropTypes.bool,
+  as: PropTypes.elementType
+};
+const Feedback = /*#__PURE__*/react.exports.forwardRef( // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+({
+  as: Component = 'div',
+  className,
+  type = 'valid',
+  tooltip = false,
+  ...props
+}, ref) => /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+  ref: ref,
+  className: classNames(className, `${type}-${tooltip ? 'tooltip' : 'feedback'}`)
+}));
+Feedback.displayName = 'Feedback';
+Feedback.propTypes = propTypes$1;
+var Feedback$1 = Feedback;
+
+const FormContext = /*#__PURE__*/react.exports.createContext({});
+var FormContext$1 = FormContext;
+
+const FormCheckInput = /*#__PURE__*/react.exports.forwardRef(({
+  id,
+  bsPrefix,
+  className,
+  type = 'checkbox',
+  isValid = false,
+  isInvalid = false,
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as: Component = 'input',
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-check-input');
+  return /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+    ref: ref,
+    type: type,
+    id: id || controlId,
+    className: classNames(className, bsPrefix, isValid && 'is-valid', isInvalid && 'is-invalid')
+  });
+});
+FormCheckInput.displayName = 'FormCheckInput';
+var FormCheckInput$1 = FormCheckInput;
+
+const FormCheckLabel = /*#__PURE__*/react.exports.forwardRef(({
+  bsPrefix,
+  className,
+  htmlFor,
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-check-label');
+  return /*#__PURE__*/jsxRuntime.exports.jsx("label", { ...props,
+    ref: ref,
+    htmlFor: htmlFor || controlId,
+    className: classNames(className, bsPrefix)
+  });
+});
+FormCheckLabel.displayName = 'FormCheckLabel';
+var FormCheckLabel$1 = FormCheckLabel;
+
+const FormCheck = /*#__PURE__*/react.exports.forwardRef(({
+  id,
+  bsPrefix,
+  bsSwitchPrefix,
+  inline = false,
+  disabled = false,
+  isValid = false,
+  isInvalid = false,
+  feedbackTooltip = false,
+  feedback,
+  feedbackType,
+  className,
+  style,
+  title = '',
+  type = 'checkbox',
+  label,
+  children,
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as = 'input',
+  ...props
+}, ref) => {
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-check');
+  bsSwitchPrefix = useBootstrapPrefix(bsSwitchPrefix, 'form-switch');
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  const innerFormContext = react.exports.useMemo(() => ({
+    controlId: id || controlId
+  }), [controlId, id]);
+  const hasLabel = !children && label != null && label !== false || hasChildOfType(children, FormCheckLabel$1);
+
+  const input = /*#__PURE__*/jsxRuntime.exports.jsx(FormCheckInput$1, { ...props,
+    type: type === 'switch' ? 'checkbox' : type,
+    ref: ref,
+    isValid: isValid,
+    isInvalid: isInvalid,
+    disabled: disabled,
+    as: as
+  });
+
+  return /*#__PURE__*/jsxRuntime.exports.jsx(FormContext$1.Provider, {
+    value: innerFormContext,
+    children: /*#__PURE__*/jsxRuntime.exports.jsx("div", {
+      style: style,
+      className: classNames(className, hasLabel && bsPrefix, inline && `${bsPrefix}-inline`, type === 'switch' && bsSwitchPrefix),
+      children: children || /*#__PURE__*/jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, {
+        children: [input, hasLabel && /*#__PURE__*/jsxRuntime.exports.jsx(FormCheckLabel$1, {
+          title: title,
+          children: label
+        }), feedback && /*#__PURE__*/jsxRuntime.exports.jsx(Feedback$1, {
+          type: feedbackType,
+          tooltip: feedbackTooltip,
+          children: feedback
+        })]
+      })
+    })
+  });
+});
+FormCheck.displayName = 'FormCheck';
+var FormCheck$1 = Object.assign(FormCheck, {
+  Input: FormCheckInput$1,
+  Label: FormCheckLabel$1
+});
+
+const FormControl = /*#__PURE__*/react.exports.forwardRef(({
+  bsPrefix,
+  type,
+  size,
+  htmlSize,
+  id,
+  className,
+  isValid = false,
+  isInvalid = false,
+  plaintext,
+  readOnly,
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as: Component = 'input',
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-control');
+  let classes;
+
+  if (plaintext) {
+    classes = {
+      [`${bsPrefix}-plaintext`]: true
+    };
+  } else {
+    classes = {
+      [bsPrefix]: true,
+      [`${bsPrefix}-${size}`]: size
+    };
+  }
+  return /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+    type: type,
+    size: htmlSize,
+    ref: ref,
+    readOnly: readOnly,
+    id: id || controlId,
+    className: classNames(className, classes, isValid && `is-valid`, isInvalid && `is-invalid`, type === 'color' && `${bsPrefix}-color`)
+  });
+});
+FormControl.displayName = 'FormControl';
+var FormControl$1 = Object.assign(FormControl, {
+  Feedback: Feedback$1
+});
+
+var FormFloating = createWithBsPrefix('form-floating');
+
+const FormGroup = /*#__PURE__*/react.exports.forwardRef(({
+  controlId,
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as: Component = 'div',
+  ...props
+}, ref) => {
+  const context = react.exports.useMemo(() => ({
+    controlId
+  }), [controlId]);
+  return /*#__PURE__*/jsxRuntime.exports.jsx(FormContext$1.Provider, {
+    value: context,
+    children: /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+      ref: ref
+    })
+  });
+});
+FormGroup.displayName = 'FormGroup';
+var FormGroup$1 = FormGroup;
+
+const defaultProps$9 = {
+  column: false,
+  visuallyHidden: false
+};
+const FormLabel = /*#__PURE__*/react.exports.forwardRef(({
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as: Component = 'label',
+  bsPrefix,
+  column,
+  visuallyHidden,
+  className,
+  htmlFor,
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-label');
+  let columnClass = 'col-form-label';
+  if (typeof column === 'string') columnClass = `${columnClass} ${columnClass}-${column}`;
+  const classes = classNames(className, bsPrefix, visuallyHidden && 'visually-hidden', column && columnClass);
+  htmlFor = htmlFor || controlId;
+  if (column) return /*#__PURE__*/jsxRuntime.exports.jsx(Col$1, {
+    ref: ref,
+    as: "label",
+    className: classes,
+    htmlFor: htmlFor,
+    ...props
+  });
+  return (
+    /*#__PURE__*/
+    // eslint-disable-next-line jsx-a11y/label-has-for, jsx-a11y/label-has-associated-control
+    jsxRuntime.exports.jsx(Component, {
+      ref: ref,
+      className: classes,
+      htmlFor: htmlFor,
+      ...props
+    })
+  );
+});
+FormLabel.displayName = 'FormLabel';
+FormLabel.defaultProps = defaultProps$9;
+var FormLabel$1 = FormLabel;
+
+const FormRange = /*#__PURE__*/react.exports.forwardRef(({
+  bsPrefix,
+  className,
+  id,
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-range');
+  return /*#__PURE__*/jsxRuntime.exports.jsx("input", { ...props,
+    type: "range",
+    ref: ref,
+    className: classNames(className, bsPrefix),
+    id: id || controlId
+  });
+});
+FormRange.displayName = 'FormRange';
+var FormRange$1 = FormRange;
+
+const FormSelect = /*#__PURE__*/react.exports.forwardRef(({
+  bsPrefix,
+  size,
+  htmlSize,
+  className,
+  isValid = false,
+  isInvalid = false,
+  id,
+  ...props
+}, ref) => {
+  const {
+    controlId
+  } = react.exports.useContext(FormContext$1);
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-select');
+  return /*#__PURE__*/jsxRuntime.exports.jsx("select", { ...props,
+    size: htmlSize,
+    ref: ref,
+    className: classNames(className, bsPrefix, size && `${bsPrefix}-${size}`, isValid && `is-valid`, isInvalid && `is-invalid`),
+    id: id || controlId
+  });
+});
+FormSelect.displayName = 'FormSelect';
+var FormSelect$1 = FormSelect;
+
+const FormText = /*#__PURE__*/react.exports.forwardRef( // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+({
+  bsPrefix,
+  className,
+  as: Component = 'small',
+  muted,
+  ...props
+}, ref) => {
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-text');
+  return /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+    ref: ref,
+    className: classNames(className, bsPrefix, muted && 'text-muted')
+  });
+});
+FormText.displayName = 'FormText';
+var FormText$1 = FormText;
+
+const Switch = /*#__PURE__*/react.exports.forwardRef((props, ref) => /*#__PURE__*/jsxRuntime.exports.jsx(FormCheck$1, { ...props,
+  ref: ref,
+  type: "switch"
+}));
+Switch.displayName = 'Switch';
+var Switch$1 = Object.assign(Switch, {
+  Input: FormCheck$1.Input,
+  Label: FormCheck$1.Label
+});
+
+const FloatingLabel = /*#__PURE__*/react.exports.forwardRef(({
+  bsPrefix,
+  className,
+  children,
+  controlId,
+  label,
+  ...props
+}, ref) => {
+  bsPrefix = useBootstrapPrefix(bsPrefix, 'form-floating');
+  return /*#__PURE__*/jsxRuntime.exports.jsxs(FormGroup$1, {
+    ref: ref,
+    className: classNames(className, bsPrefix),
+    controlId: controlId,
+    ...props,
+    children: [children, /*#__PURE__*/jsxRuntime.exports.jsx("label", {
+      htmlFor: controlId,
+      children: label
+    })]
+  });
+});
+FloatingLabel.displayName = 'FloatingLabel';
+var FloatingLabel$1 = FloatingLabel;
+
+const propTypes = {
+  /**
+   * The Form `ref` will be forwarded to the underlying element,
+   * which means, unless it's rendered `as` a composite component,
+   * it will be a DOM node, when resolved.
+   *
+   * @type {ReactRef}
+   * @alias ref
+   */
+  _ref: PropTypes.any,
+
+  /**
+   * Mark a form as having been validated. Setting it to `true` will
+   * toggle any validation styles on the forms elements.
+   */
+  validated: PropTypes.bool,
+  as: PropTypes.elementType
+};
+const Form = /*#__PURE__*/react.exports.forwardRef(({
+  className,
+  validated,
+  // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+  as: Component = 'form',
+  ...props
+}, ref) => /*#__PURE__*/jsxRuntime.exports.jsx(Component, { ...props,
+  ref: ref,
+  className: classNames(className, validated && 'was-validated')
+}));
+Form.displayName = 'Form';
+Form.propTypes = propTypes;
+var Form$1 = Object.assign(Form, {
+  Group: FormGroup$1,
+  Control: FormControl$1,
+  Floating: FormFloating,
+  Check: FormCheck$1,
+  Switch: Switch$1,
+  Label: FormLabel$1,
+  Text: FormText$1,
+  Range: FormRange$1,
+  Select: FormSelect$1,
+  FloatingLabel: FloatingLabel$1
+});
 
 const defaultProps$8 = {
   fluid: false
@@ -7037,7 +7432,7 @@ function IntroText(props) {
     className: "introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3"
   }, /* @__PURE__ */ React.createElement("div", null, props.introText?.text), /* @__PURE__ */ React.createElement("p", null, "I am a self-learned full-stack developer with focus on .NET and react."), /* @__PURE__ */ React.createElement("p", null, "My jurney as a developer started with developing plug-ins for engineering software such as PDMS, E3D, Tekla NavisWorks and etc. This start awakened my joy and deep interest in developing even more application with higher complexity and therfore led me into learning C# and .NET. More complex applications needed more complex and user friendly user interface and this is where react came into picture as my main focus for frontend development."), /* @__PURE__ */ React.createElement("p", null, "It worths mentioning that I have also hands on developing fronend based on .NET technologies as Blazor or ASP.NET razor pages. I choose technologies based on project needs and infrastructure and complexity, but yet react is my own favorite when it comes to frontend and therefore this little webpage is fully depended on .NET for its serverside and react for client side."), /* @__PURE__ */ React.createElement("p", null, "This is just a begining. This webpage is ment to be used more and more to publish my experiences and help others who are new in the business to grow as fast as possible."));
 }
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps$1 = (dispatch) => {
   return {
     retriveData: dispatch({ type: "GET_INTROTEXT" })
   };
@@ -7048,15 +7443,61 @@ var IntroText$1 = connect(
       introText: state.aboutMe.introText.data
     };
   },
-  mapDispatchToProps
+  mapDispatchToProps$1
 )(IntroText);
+
+const Skill = (props) => {
+  return /* @__PURE__ */ React.createElement("div", {
+    className: "col-lg-6"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "row"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "skill-title col"
+  }, props.title), /* @__PURE__ */ React.createElement("div", {
+    className: "col"
+  }, [...Array(props.rate)].map((rate, j) => {
+    return /* @__PURE__ */ React.createElement("i", {
+      key: j,
+      className: "fa-solid fa-star"
+    });
+  }))), props.description && /* @__PURE__ */ React.createElement("p", {
+    className: "skill-description col-5"
+  }, props.description));
+};
+
+function SkillList(props) {
+  return /* @__PURE__ */ React.createElement(Col$1, {
+    lg: "10"
+  }, /* @__PURE__ */ React.createElement(Row$1, {
+    className: "skill-list"
+  }, props.skills?.map((skill, i) => /* @__PURE__ */ React.createElement(Skill, {
+    key: i,
+    id: skill.id,
+    title: skill.title,
+    description: skill.description,
+    rate: skill.rate
+  }))));
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    retriveData: dispatch({ type: "GET_SKILLS" })
+  };
+};
+var SkillList$1 = connect(
+  (state) => {
+    return {
+      skills: state.aboutMe.skills.data
+    };
+  },
+  mapDispatchToProps
+)(SkillList);
 
 var style = '';
 
 function AboutMe() {
   return /* @__PURE__ */ React.createElement(Row$1, {
     className: "about-me justify-content-center"
-  }, /* @__PURE__ */ React.createElement(IntroText$1, null));
+  }, /* @__PURE__ */ React.createElement(IntroText$1, null), /* @__PURE__ */ React.createElement(SkillList$1, null));
 }
 
 function ContactForm() {
@@ -7066,130 +7507,6 @@ function ContactForm() {
 function Gallery() {
   return /* @__PURE__ */ React.createElement("div", null, "This is Gallery");
 }
-
-function Protofolio() {
-  return /* @__PURE__ */ React.createElement("div", null, "This is protofolio");
-}
-
-function Content() {
-  return /* @__PURE__ */ React.createElement(Container$1, null, /* @__PURE__ */ React.createElement(Switch, null, /* @__PURE__ */ React.createElement(Route, {
-    exact: true,
-    path: "/",
-    component: AboutMe
-  }), /* @__PURE__ */ React.createElement(Route, {
-    path: "/protofolio",
-    component: Protofolio
-  }), /* @__PURE__ */ React.createElement(Route, {
-    path: "/contact",
-    component: ContactForm
-  }), /* @__PURE__ */ React.createElement(Route, {
-    path: "/gallery",
-    component: Gallery
-  })));
-}
-
-var NavBar = '';
-
-function AppNavItem(props) {
-  return /* @__PURE__ */ React.createElement("li", {
-    className: `${!props.collapsed ? `app-nav-item app-nav-item-md nav-item ${props.last ? " last" : ""}` : ""} `
-  }, /* @__PURE__ */ React.createElement(Link, {
-    className: "nav-link" + (props.active() ? " active" : ""),
-    to: props.href,
-    onClick: props.onClick
-  }, props.title));
-}
-
-const items = [
-  { title: "About me", href: "/" },
-  { title: "Protofolio", href: "/protofolio" },
-  { title: "Contact", href: "/contact" },
-  { title: "Gallery", href: "/gallery" }
-];
-const AppNavList = (props) => {
-  const { pathname } = useLocation();
-  const activeItem = items.findIndex((i) => i.href.toLowerCase() === pathname.toLowerCase());
-  const [activeItemIndex, setActiveItemIndex] = react.exports.useState(activeItem ?? 0);
-  const onClick = (index) => {
-    setActiveItemIndex(index);
-  };
-  return /* @__PURE__ */ React.createElement(Navbar$1.Collapse, {
-    id: "basic-navbar-nav bg-warning"
-  }, /* @__PURE__ */ React.createElement(Nav$1, {
-    className: "app-nav-list ms-auto me-5 text-end"
-  }, items.map((item, index) => {
-    return /* @__PURE__ */ React.createElement(AppNavItem, {
-      key: index,
-      collapsed: props.collapsed,
-      title: item.title,
-      href: item.href,
-      last: index === items.length - 1,
-      active: () => activeItemIndex === index,
-      onClick: () => onClick(index)
-    });
-  }), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement(Button$1, {
-    variant: "outline-dark"
-  }, "Sign in"))));
-};
-
-function AppNavBar(props) {
-  return /* @__PURE__ */ React.createElement(Navbar$1, {
-    bg: "white",
-    expand: "lg",
-    className: "app-nav-bar"
-  }, /* @__PURE__ */ React.createElement(Container$1, {
-    fluid: true
-  }, /* @__PURE__ */ React.createElement(Navbar$1.Brand, null, /* @__PURE__ */ React.createElement(Container$1, null, /* @__PURE__ */ React.createElement(Row$1, null, /* @__PURE__ */ React.createElement("img", {
-    className: "face-icon col-9",
-    src: "../../Resources/images/picture.jpg",
-    alt: "picture"
-  }), /* @__PURE__ */ React.createElement("div", {
-    className: "icon-txt col-3 align-self-end"
-  }, "I am Fara")))), props.collapsed && /* @__PURE__ */ React.createElement(Navbar$1.Toggle, {
-    className: "ms-auto me-3",
-    "aria-controls": "basic-navbar-nav"
-  }), /* @__PURE__ */ React.createElement(AppNavList, {
-    collapsed: props.collapsed
-  })));
-}
-
-var bootstrap_min = '';
-
-function useWindowsSize() {
-  const [windowSize, setWindowSize] = react.exports.useState([0, 0]);
-  react.exports.useLayoutEffect(() => {
-    function updateSize() {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    }
-    window.addEventListener("resize", updateSize);
-    updateSize();
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-  return windowSize;
-}
-const App = ({ store }) => {
-  const [width, height] = useWindowsSize();
-  const collapsed = width < 1e3 ? true : false;
-  return /* @__PURE__ */ React.createElement(Provider, {
-    store
-  }, /* @__PURE__ */ React.createElement(AppNavBar, {
-    collapsed
-  }), /* @__PURE__ */ React.createElement(Content, null));
-};
-
-class ApiService {
-  constructor() {
-    this.dispatch = null;
-  }
-  async get(url) {
-    const config = { method: "GET" };
-    const response = await (await fetch(url, config)).json();
-    if (this.dispatch) {
-      this.dispatch(response);
-    }
-  }
-}
-const apiServiceInstance = new ApiService();
 
 function n(n){for(var r=arguments.length,t=Array(r>1?r-1:0),e=1;e<r;e++)t[e-1]=arguments[e];throw Error("[Immer] minified error nr: "+n+(t.length?" "+t.map((function(n){return "'"+n+"'"})).join(","):"")+". Find the full error at: https://bit.ly/3cXEKWf")}function r(n){return !!n&&!!n[Q]}function t(n){return !!n&&(function(n){if(!n||"object"!=typeof n)return !1;var r=Object.getPrototypeOf(n);if(null===r)return !0;var t=Object.hasOwnProperty.call(r,"constructor")&&r.constructor;return t===Object||"function"==typeof t&&Function.toString.call(t)===Z}(n)||Array.isArray(n)||!!n[L]||!!n.constructor[L]||s(n)||v(n))}function i(n,r,t){void 0===t&&(t=!1),0===o(n)?(t?Object.keys:nn)(n).forEach((function(e){t&&"symbol"==typeof e||r(e,n[e],n);})):n.forEach((function(t,e){return r(e,t,n)}));}function o(n){var r=n[Q];return r?r.i>3?r.i-4:r.i:Array.isArray(n)?1:s(n)?2:v(n)?3:0}function u(n,r){return 2===o(n)?n.has(r):Object.prototype.hasOwnProperty.call(n,r)}function a(n,r){return 2===o(n)?n.get(r):n[r]}function f(n,r,t){var e=o(n);2===e?n.set(r,t):3===e?(n.delete(r),n.add(t)):n[r]=t;}function c(n,r){return n===r?0!==n||1/n==1/r:n!=n&&r!=r}function s(n){return X&&n instanceof Map}function v(n){return q&&n instanceof Set}function p(n){return n.o||n.t}function l(n){if(Array.isArray(n))return Array.prototype.slice.call(n);var r=rn(n);delete r[Q];for(var t=nn(r),e=0;e<t.length;e++){var i=t[e],o=r[i];!1===o.writable&&(o.writable=!0,o.configurable=!0),(o.get||o.set)&&(r[i]={configurable:!0,writable:!0,enumerable:o.enumerable,value:n[i]});}return Object.create(Object.getPrototypeOf(n),r)}function d(n,e){return void 0===e&&(e=!1),y(n)||r(n)||!t(n)?n:(o(n)>1&&(n.set=n.add=n.clear=n.delete=h),Object.freeze(n),e&&i(n,(function(n,r){return d(r,!0)}),!0),n)}function h(){n(2);}function y(n){return null==n||"object"!=typeof n||Object.isFrozen(n)}function b(r){var t=tn[r];return t||n(18,r),t}function m(n,r){tn[n]||(tn[n]=r);}function _(){return U}function j(n,r){r&&(b("Patches"),n.u=[],n.s=[],n.v=r);}function O(n){g(n),n.p.forEach(S),n.p=null;}function g(n){n===U&&(U=n.l);}function w(n){return U={p:[],l:U,h:n,m:!0,_:0}}function S(n){var r=n[Q];0===r.i||1===r.i?r.j():r.O=!0;}function P(r,e){e._=e.p.length;var i=e.p[0],o=void 0!==r&&r!==i;return e.h.g||b("ES5").S(e,r,o),o?(i[Q].P&&(O(e),n(4)),t(r)&&(r=M(e,r),e.l||x(e,r)),e.u&&b("Patches").M(i[Q].t,r,e.u,e.s)):r=M(e,i,[]),O(e),e.u&&e.v(e.u,e.s),r!==H?r:void 0}function M(n,r,t){if(y(r))return r;var e=r[Q];if(!e)return i(r,(function(i,o){return A(n,e,r,i,o,t)}),!0),r;if(e.A!==n)return r;if(!e.P)return x(n,e.t,!0),e.t;if(!e.I){e.I=!0,e.A._--;var o=4===e.i||5===e.i?e.o=l(e.k):e.o;i(3===e.i?new Set(o):o,(function(r,i){return A(n,e,o,r,i,t)})),x(n,o,!1),t&&n.u&&b("Patches").R(e,t,n.u,n.s);}return e.o}function A(e,i,o,a,c,s){if(r(c)){var v=M(e,c,s&&i&&3!==i.i&&!u(i.D,a)?s.concat(a):void 0);if(f(o,a,v),!r(v))return;e.m=!1;}if(t(c)&&!y(c)){if(!e.h.F&&e._<1)return;M(e,c),i&&i.A.l||x(e,c);}}function x(n,r,t){void 0===t&&(t=!1),n.h.F&&n.m&&d(r,t);}function z(n,r){var t=n[Q];return (t?p(t):n)[r]}function I(n,r){if(r in n)for(var t=Object.getPrototypeOf(n);t;){var e=Object.getOwnPropertyDescriptor(t,r);if(e)return e;t=Object.getPrototypeOf(t);}}function k(n){n.P||(n.P=!0,n.l&&k(n.l));}function E(n){n.o||(n.o=l(n.t));}function R(n,r,t){var e=s(r)?b("MapSet").N(r,t):v(r)?b("MapSet").T(r,t):n.g?function(n,r){var t=Array.isArray(n),e={i:t?1:0,A:r?r.A:_(),P:!1,I:!1,D:{},l:r,t:n,k:null,o:null,j:null,C:!1},i=e,o=en;t&&(i=[e],o=on);var u=Proxy.revocable(i,o),a=u.revoke,f=u.proxy;return e.k=f,e.j=a,f}(r,t):b("ES5").J(r,t);return (t?t.A:_()).p.push(e),e}function D(e){return r(e)||n(22,e),function n(r){if(!t(r))return r;var e,u=r[Q],c=o(r);if(u){if(!u.P&&(u.i<4||!b("ES5").K(u)))return u.t;u.I=!0,e=F(r,c),u.I=!1;}else e=F(r,c);return i(e,(function(r,t){u&&a(u.t,r)===t||f(e,r,n(t));})),3===c?new Set(e):e}(e)}function F(n,r){switch(r){case 2:return new Map(n);case 3:return Array.from(n)}return l(n)}function N(){function t(n,r){var t=s[n];return t?t.enumerable=r:s[n]=t={configurable:!0,enumerable:r,get:function(){var r=this[Q];return en.get(r,n)},set:function(r){var t=this[Q];en.set(t,n,r);}},t}function e(n){for(var r=n.length-1;r>=0;r--){var t=n[r][Q];if(!t.P)switch(t.i){case 5:a(t)&&k(t);break;case 4:o(t)&&k(t);}}}function o(n){for(var r=n.t,t=n.k,e=nn(t),i=e.length-1;i>=0;i--){var o=e[i];if(o!==Q){var a=r[o];if(void 0===a&&!u(r,o))return !0;var f=t[o],s=f&&f[Q];if(s?s.t!==a:!c(f,a))return !0}}var v=!!r[Q];return e.length!==nn(r).length+(v?0:1)}function a(n){var r=n.k;if(r.length!==n.t.length)return !0;var t=Object.getOwnPropertyDescriptor(r,r.length-1);if(t&&!t.get)return !0;for(var e=0;e<r.length;e++)if(!r.hasOwnProperty(e))return !0;return !1}var s={};m("ES5",{J:function(n,r){var e=Array.isArray(n),i=function(n,r){if(n){for(var e=Array(r.length),i=0;i<r.length;i++)Object.defineProperty(e,""+i,t(i,!0));return e}var o=rn(r);delete o[Q];for(var u=nn(o),a=0;a<u.length;a++){var f=u[a];o[f]=t(f,n||!!o[f].enumerable);}return Object.create(Object.getPrototypeOf(r),o)}(e,n),o={i:e?5:4,A:r?r.A:_(),P:!1,I:!1,D:{},l:r,t:n,k:i,o:null,O:!1,C:!1};return Object.defineProperty(i,Q,{value:o,writable:!0}),i},S:function(n,t,o){o?r(t)&&t[Q].A===n&&e(n.p):(n.u&&function n(r){if(r&&"object"==typeof r){var t=r[Q];if(t){var e=t.t,o=t.k,f=t.D,c=t.i;if(4===c)i(o,(function(r){r!==Q&&(void 0!==e[r]||u(e,r)?f[r]||n(o[r]):(f[r]=!0,k(t)));})),i(e,(function(n){void 0!==o[n]||u(o,n)||(f[n]=!1,k(t));}));else if(5===c){if(a(t)&&(k(t),f.length=!0),o.length<e.length)for(var s=o.length;s<e.length;s++)f[s]=!1;else for(var v=e.length;v<o.length;v++)f[v]=!0;for(var p=Math.min(o.length,e.length),l=0;l<p;l++)o.hasOwnProperty(l)||(f[l]=!0),void 0===f[l]&&n(o[l]);}}}}(n.p[0]),e(n.p));},K:function(n){return 4===n.i?o(n):a(n)}});}var G,U,W="undefined"!=typeof Symbol&&"symbol"==typeof Symbol("x"),X="undefined"!=typeof Map,q="undefined"!=typeof Set,B="undefined"!=typeof Proxy&&void 0!==Proxy.revocable&&"undefined"!=typeof Reflect,H=W?Symbol.for("immer-nothing"):((G={})["immer-nothing"]=!0,G),L=W?Symbol.for("immer-draftable"):"__$immer_draftable",Q=W?Symbol.for("immer-state"):"__$immer_state",Z=""+Object.prototype.constructor,nn="undefined"!=typeof Reflect&&Reflect.ownKeys?Reflect.ownKeys:void 0!==Object.getOwnPropertySymbols?function(n){return Object.getOwnPropertyNames(n).concat(Object.getOwnPropertySymbols(n))}:Object.getOwnPropertyNames,rn=Object.getOwnPropertyDescriptors||function(n){var r={};return nn(n).forEach((function(t){r[t]=Object.getOwnPropertyDescriptor(n,t);})),r},tn={},en={get:function(n,r){if(r===Q)return n;var e=p(n);if(!u(e,r))return function(n,r,t){var e,i=I(r,t);return i?"value"in i?i.value:null===(e=i.get)||void 0===e?void 0:e.call(n.k):void 0}(n,e,r);var i=e[r];return n.I||!t(i)?i:i===z(n.t,r)?(E(n),n.o[r]=R(n.A.h,i,n)):i},has:function(n,r){return r in p(n)},ownKeys:function(n){return Reflect.ownKeys(p(n))},set:function(n,r,t){var e=I(p(n),r);if(null==e?void 0:e.set)return e.set.call(n.k,t),!0;if(!n.P){var i=z(p(n),r),o=null==i?void 0:i[Q];if(o&&o.t===t)return n.o[r]=t,n.D[r]=!1,!0;if(c(t,i)&&(void 0!==t||u(n.t,r)))return !0;E(n),k(n);}return n.o[r]===t&&"number"!=typeof t&&(void 0!==t||r in n.o)||(n.o[r]=t,n.D[r]=!0,!0)},deleteProperty:function(n,r){return void 0!==z(n.t,r)||r in n.t?(n.D[r]=!1,E(n),k(n)):delete n.D[r],n.o&&delete n.o[r],!0},getOwnPropertyDescriptor:function(n,r){var t=p(n),e=Reflect.getOwnPropertyDescriptor(t,r);return e?{writable:!0,configurable:1!==n.i||"length"!==r,enumerable:e.enumerable,value:t[r]}:e},defineProperty:function(){n(11);},getPrototypeOf:function(n){return Object.getPrototypeOf(n.t)},setPrototypeOf:function(){n(12);}},on={};i(en,(function(n,r){on[n]=function(){return arguments[0]=arguments[0][0],r.apply(this,arguments)};})),on.deleteProperty=function(r,t){return on.set.call(this,r,t,void 0)},on.set=function(r,t,e){return en.set.call(this,r[0],t,e,r[0])};var un=function(){function e(r){var e=this;this.g=B,this.F=!0,this.produce=function(r,i,o){if("function"==typeof r&&"function"!=typeof i){var u=i;i=r;var a=e;return function(n){var r=this;void 0===n&&(n=u);for(var t=arguments.length,e=Array(t>1?t-1:0),o=1;o<t;o++)e[o-1]=arguments[o];return a.produce(n,(function(n){var t;return (t=i).call.apply(t,[r,n].concat(e))}))}}var f;if("function"!=typeof i&&n(6),void 0!==o&&"function"!=typeof o&&n(7),t(r)){var c=w(e),s=R(e,r,void 0),v=!0;try{f=i(s),v=!1;}finally{v?O(c):g(c);}return "undefined"!=typeof Promise&&f instanceof Promise?f.then((function(n){return j(c,o),P(n,c)}),(function(n){throw O(c),n})):(j(c,o),P(f,c))}if(!r||"object"!=typeof r){if(void 0===(f=i(r))&&(f=r),f===H&&(f=void 0),e.F&&d(f,!0),o){var p=[],l=[];b("Patches").M(r,f,p,l),o(p,l);}return f}n(21,r);},this.produceWithPatches=function(n,r){if("function"==typeof n)return function(r){for(var t=arguments.length,i=Array(t>1?t-1:0),o=1;o<t;o++)i[o-1]=arguments[o];return e.produceWithPatches(r,(function(r){return n.apply(void 0,[r].concat(i))}))};var t,i,o=e.produce(n,r,(function(n,r){t=n,i=r;}));return "undefined"!=typeof Promise&&o instanceof Promise?o.then((function(n){return [n,t,i]})):[o,t,i]},"boolean"==typeof(null==r?void 0:r.useProxies)&&this.setUseProxies(r.useProxies),"boolean"==typeof(null==r?void 0:r.autoFreeze)&&this.setAutoFreeze(r.autoFreeze);}var i=e.prototype;return i.createDraft=function(e){t(e)||n(8),r(e)&&(e=D(e));var i=w(this),o=R(this,e,void 0);return o[Q].C=!0,g(i),o},i.finishDraft=function(r,t){var e=r&&r[Q];var i=e.A;return j(i,t),P(void 0,i)},i.setAutoFreeze=function(n){this.F=n;},i.setUseProxies=function(r){r&&!B&&n(20),this.g=r;},i.applyPatches=function(n,t){var e;for(e=t.length-1;e>=0;e--){var i=t[e];if(0===i.path.length&&"replace"===i.op){n=i.value;break}}e>-1&&(t=t.slice(e+1));var o=b("Patches").$;return r(n)?o(n,t):this.produce(n,(function(n){return o(n,t)}))},e}(),an=new un;an.produce;an.produceWithPatches.bind(an);an.setAutoFreeze.bind(an);an.setUseProxies.bind(an);an.applyPatches.bind(an);an.createDraft.bind(an);an.finishDraft.bind(an);
 
@@ -7942,6 +8259,30 @@ function configureStore(options) {
 // src/index.ts
 N();
 
+class ApiService {
+  constructor() {
+    this.dispatch = null;
+  }
+  async get(url) {
+    const config = { method: "GET" };
+    const response = await (await fetch(url, config)).json();
+    if (this.dispatch) {
+      this.dispatch(response);
+    }
+  }
+  async post(url, json) {
+    const config = { method: "POST", body: JSON.stringify(json), headers: [
+      ["Accept", "application/json"],
+      ["Content-Type", "application/json"]
+    ] };
+    const response = await (await fetch(url, config)).json();
+    if (this.dispatch) {
+      this.dispatch(response);
+    }
+  }
+}
+const apiServiceInstance = new ApiService();
+
 class EntityMeta {
   constructor(data) {
     this.data = data;
@@ -7972,10 +8313,43 @@ function introTextReducer(state = new EntityMeta(), action) {
   }
   return { ...state };
 }
+function skillsReducer(state = new EntityMeta(), action) {
+  switch (action.type) {
+    case "GET_SKILLS":
+      apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");
+      break;
+  }
+  return { ...state };
+}
 const entityReducers = {
-  introText: GenericReducer("IntroductionText", introTextReducer)
+  introText: GenericReducer("IntroductionText", introTextReducer),
+  skills: GenericReducer("Skill", skillsReducer)
 };
 const aboutMeReducer = combineReducers(entityReducers);
+
+function userReducer(state = new EntityMeta(), action) {
+  switch (action.type) {
+    case "AUTHENTICATE":
+      apiServiceInstance.get("https://localhost:7260/api/user");
+      break;
+    case "AUTHENTICATED":
+      state = { ...new EntityMeta(action.payload.data) };
+      break;
+    case "UN-AUTHENTICATED":
+      state = { ...new EntityMeta() };
+      break;
+    case "SIGNUP":
+      apiServiceInstance.post("https://localhost:7260/api/user/signup", action.data);
+      break;
+    case "LOGIN":
+      apiServiceInstance.post("https://localhost:7260/api/user/signin", action.data);
+      break;
+    case "LOGOUT":
+      apiServiceInstance.get("https://localhost:7260/api/user/logout");
+      break;
+  }
+  return { ...state };
+}
 
 const reducers = {
   aboutMe: aboutMeReducer
@@ -7983,15 +8357,242 @@ const reducers = {
 combineReducers(reducers);
 const store = configureStore({
   reducer: {
-    aboutMe: aboutMeReducer
+    aboutMe: aboutMeReducer,
+    currentUser: userReducer
   }
 });
 const getStore = () => store;
+
+const onLogin = (model) => {
+  var store = getStore();
+  store.dispatch({
+    type: "LOGIN",
+    data: model
+  });
+};
+function LoginComponent() {
+  const [email, setEmail] = react.exports.useState("");
+  const [password, setPassword] = react.exports.useState("");
+  const onSubmit = () => {
+    const model = {
+      email,
+      password
+    };
+    onLogin(model);
+  };
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Form$1, null, /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Email address"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "email",
+    placeholder: "Enter email address",
+    onChange: (e) => setEmail(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Password"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "password",
+    placeholder: "Password",
+    onChange: (e) => setPassword(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Button$1, {
+    variant: "primary",
+    onClick: onSubmit
+  }, "Log in")), /* @__PURE__ */ React.createElement(Link, {
+    to: "/signup"
+  }, "Or sign up here"));
+}
+
+const onSignup = (model) => {
+  var store = getStore();
+  store.dispatch({
+    type: "SIGNUP",
+    data: model
+  });
+};
+function SignupComponent() {
+  const [email, setEmail] = react.exports.useState("");
+  const [password, setPassword] = react.exports.useState("");
+  const [firstName, setFirstName] = react.exports.useState("");
+  const [lastName, setLastName] = react.exports.useState("");
+  const onSubmit = () => {
+    const model = {
+      email,
+      firstName,
+      lastName,
+      password
+    };
+    onSignup(model);
+  };
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Form$1, null, /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Email address"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "email",
+    placeholder: "Enter email address",
+    onChange: (e) => setEmail(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "First name"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "name",
+    placeholder: "Enter first name",
+    onChange: (e) => setFirstName(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Last name"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "name",
+    placeholder: "Enter last name",
+    onChange: (e) => setLastName(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Form$1.Group, {
+    className: "mb-3"
+  }, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Password"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+    type: "password",
+    placeholder: "Password",
+    onChange: (e) => setPassword(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Button$1, {
+    variant: "primary",
+    onClick: onSubmit
+  }, "Sign up")));
+}
+
+function Protofolio() {
+  return /* @__PURE__ */ React.createElement("div", null, "This is protofolio");
+}
+
+function Content() {
+  return /* @__PURE__ */ React.createElement(Container$1, null, /* @__PURE__ */ React.createElement(Switch$2, null, /* @__PURE__ */ React.createElement(Route, {
+    exact: true,
+    path: "/",
+    component: AboutMe
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "/protofolio",
+    component: Protofolio
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "/contact",
+    component: ContactForm
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "/gallery",
+    component: Gallery
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "/login",
+    component: LoginComponent
+  }), /* @__PURE__ */ React.createElement(Route, {
+    path: "/signup",
+    component: SignupComponent
+  })));
+}
+
+var NavBar = '';
+
+function AppNavItem(props) {
+  return /* @__PURE__ */ React.createElement("li", {
+    className: `${!props.collapsed ? `app-nav-item app-nav-item-md nav-item ${props.last ? " last" : ""}` : ""} `
+  }, /* @__PURE__ */ React.createElement(Link, {
+    className: "nav-link" + (props.active() ? " active" : ""),
+    to: props.href,
+    onClick: props.onClick
+  }, props.title));
+}
+
+const items = [
+  { title: "About me", href: "/" },
+  { title: "Protofolio", href: "/protofolio" },
+  { title: "Contact", href: "/contact" },
+  { title: "Gallery", href: "/gallery" }
+];
+const onLogout = () => {
+  var store = getStore();
+  store.dispatch({ type: "LOGOUT" });
+};
+const AppNavList = (props) => {
+  const { pathname } = useLocation();
+  const activeItem = items.findIndex((i) => i.href.toLowerCase() === pathname.toLowerCase());
+  const [activeItemIndex, setActiveItemIndex] = react.exports.useState(activeItem ?? 0);
+  const onClick = (index) => {
+    setActiveItemIndex(index);
+  };
+  return /* @__PURE__ */ React.createElement(Navbar$1.Collapse, {
+    id: "basic-navbar-nav bg-warning"
+  }, /* @__PURE__ */ React.createElement(Nav$1, {
+    className: "app-nav-list ms-auto me-5 text-end"
+  }, items.map((item, index) => {
+    return /* @__PURE__ */ React.createElement(AppNavItem, {
+      key: index,
+      collapsed: props.collapsed,
+      title: item.title,
+      href: item.href,
+      last: index === items.length - 1,
+      active: () => activeItemIndex === index,
+      onClick: () => onClick(index)
+    });
+  }), /* @__PURE__ */ React.createElement("li", null, !props.currentUser && /* @__PURE__ */ React.createElement(Link, {
+    to: "/login",
+    className: "btn btn-outline-dark"
+  }, "Log in"), props.currentUser && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", null, props.currentUser.email), /* @__PURE__ */ React.createElement(Link, {
+    to: "#",
+    onClick: onLogout
+  }, "Log out")))));
+};
+
+function AppNavBar(props) {
+  return /* @__PURE__ */ React.createElement(Navbar$1, {
+    bg: "white",
+    expand: "lg",
+    className: "app-nav-bar"
+  }, /* @__PURE__ */ React.createElement(Container$1, {
+    fluid: true
+  }, /* @__PURE__ */ React.createElement(Navbar$1.Brand, null, /* @__PURE__ */ React.createElement(Container$1, null, /* @__PURE__ */ React.createElement(Row$1, null, /* @__PURE__ */ React.createElement("img", {
+    className: "face-icon col-9",
+    src: "../../Resources/images/picture.jpg",
+    alt: "picture"
+  }), /* @__PURE__ */ React.createElement("div", {
+    className: "icon-txt col-3 align-self-end"
+  }, "I am Fara")))), props.collapsed && /* @__PURE__ */ React.createElement(Navbar$1.Toggle, {
+    className: "ms-auto me-3",
+    "aria-controls": "basic-navbar-nav"
+  }), /* @__PURE__ */ React.createElement(AppNavList, {
+    collapsed: props.collapsed,
+    currentUser: props.currentUser.data
+  })));
+}
+const connector = connect(
+  (state, p) => {
+    return {
+      currentUser: state.currentUser
+    };
+  }
+);
+const AppNavBarComponent = connector(AppNavBar);
+
+var bootstrap_min = '';
+
+function useWindowsSize() {
+  const [windowSize, setWindowSize] = react.exports.useState([0, 0]);
+  react.exports.useLayoutEffect(() => {
+    function updateSize() {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+  return windowSize;
+}
+const App = ({ store }) => {
+  const [width, height] = useWindowsSize();
+  const collapsed = width < 1e3 ? true : false;
+  return /* @__PURE__ */ React.createElement(Provider, {
+    store
+  }, /* @__PURE__ */ React.createElement(AppNavBarComponent, {
+    collapsed
+  }), /* @__PURE__ */ React.createElement(Content, null));
+};
 
 (() => {
   const store = getStore();
   if (store) {
     apiServiceInstance.dispatch = store.dispatch;
+  }
+  if (!store.getState().currentUser.data) {
+    console.log(store.getState());
+    store.dispatch({ type: "AUTHENTICATE" });
+    console.log(store.getState());
   }
   const root = createRoot(document.getElementById("root"));
   root.render(

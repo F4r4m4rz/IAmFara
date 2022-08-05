@@ -1,4 +1,5 @@
 ﻿using Data.Model;
+using Infrastructure.Authentication.Models;
 
 namespace App.Controllers.Api.Contracts
 {
@@ -30,6 +31,50 @@ namespace App.Controllers.Api.Contracts
                     Data = dtos,
                     Key = "Skills"
                 }
+            };
+        }
+
+        public static ApiResponse MapToResponse(AppUser user)
+        {
+            return new ApiResponse
+            {
+                Type = "LOGIN_SUCCEDDED",
+                Payload =
+                {
+                    EntityName = "AppUser",
+                    Data = Map(user),
+                    Key = "currentUser"
+                }
+            };
+        }
+
+        public static SignUpModel Map(SignUpDto dto)
+        {
+            return new SignUpModel
+            {
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Password = dto.Password,
+            };
+        }
+
+        public static SignInModel Map(SignInDto dto)
+        {
+            return new SignInModel
+            {
+                Email = dto.Email,
+                Password = dto.Password,
+            };
+        }
+
+        static AppUserDto Map(AppUser user)
+        {
+            return new AppUserDto
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
             };
         }
 

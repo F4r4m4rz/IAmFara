@@ -1,11 +1,15 @@
 import React, { useLayoutEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import "./NavBar.css";
 import { AppNavItem } from "./AppNavItem";
 import { Button, Nav, Navbar } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { SecurityUser } from "../../contractTypes";
+import { getStore } from "../../utils/Store";
 
 type NavListProps = {
     collapsed: boolean;
+    currentUser: SecurityUser;
 }
 
 const items = [
@@ -14,6 +18,12 @@ const items = [
     {title: "Contact", href: "/contact"},
     {title: "Gallery", href: "/gallery"},
 ]
+
+const onLogout = () => {
+    var store = getStore();
+
+    store.dispatch({type: "LOGOUT"});
+}
 
 const AppNavList = (props: NavListProps) => {
     const {pathname} = useLocation();
@@ -34,9 +44,16 @@ const AppNavList = (props: NavListProps) => {
                     })
                 }
                 <li>
-                    <Button variant="outline-dark">Sign in</Button>
+                    {!props.currentUser && (
+                        <Link to="/login" className="btn btn-outline-dark">Log in</Link>
+                    )}
+                    {props.currentUser &&(
+                        <div>
+                            <p>{props.currentUser.email}</p>
+                            <Link to="#" onClick={onLogout}>Log out</Link>
+                        </div>
+                    )}
                 </li>
-                
             </Nav>
             
         </Navbar.Collapse>

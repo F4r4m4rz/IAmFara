@@ -24,9 +24,9 @@ namespace Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         { 
-            app.UseCors(builder => builder.AllowAnyOrigin());
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-            app.UserCorelationId();
+            app.UseApplicationMidllewares();
 
             app.UseHttpsRedirection();
 

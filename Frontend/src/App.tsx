@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useState } from "react";
-import { BrowserRouter as Router, Switch, Route, useRouteMatch } from 'react-router-dom';
 import { Content } from "./Components/Content";
-import { AppNavBar } from "./Components/NavBar/AppNavBar";
+import { AppNavBarComponent } from "./Components/NavBar/AppNavBar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Store } from "redux";
 import { Provider } from "react-redux";
@@ -28,7 +27,7 @@ const App = ({ store }: { store: Store<AppState>}) => {
     
     return (
         <Provider store={store}>
-            <AppNavBar collapsed={collapsed}/>
+            <AppNavBarComponent collapsed={collapsed} />
             <Content />
         </Provider>
     );

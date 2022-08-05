@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Builder
 {
-    public static class ApplicationBuilderExtensions
+    public static class LoggingApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseApplicationMidllewares(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseCorelationId(this IApplicationBuilder builder)
         {
             return builder
-                .UseCoockieAuthentication()
-                .UseCorelationId();
+                .UseMiddleware<CorrelationIdGeneratorMiddleware>();
         }
     }
 }
