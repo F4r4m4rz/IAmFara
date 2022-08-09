@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import App from "./App";
 import { apiServiceInstance } from "./utils/apiService";
 import { getStore } from "./utils/Store";
@@ -15,8 +15,8 @@ import { getStore } from "./utils/Store";
     
     const root = createRoot(document.getElementById("root")!);
     root.render(
-    <BrowserRouter>
+    <HashRouter>
         <App store={store} />
-    </BrowserRouter>
+    </HashRouter>
     );
 })();
