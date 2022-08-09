@@ -3,6 +3,7 @@ import { Container } from "react-bootstrap";
 import { Switch, Route, } from 'react-router-dom';
 import { AboutMe } from "./AboutMe/AboutMe";
 import { ContactForm } from "./Contact/Contact";
+import { Error } from "./Error/Error";
 import { Gallery } from "./Gallery/Gallery";
 import LoginComponent from "./Login/Login";
 import SignupComponent from "./Login/Signup";
@@ -19,6 +20,7 @@ export function Content() {
                 <Route path="/gallery" component={Gallery}></Route>
                 <Route path="/login" component={LoginComponent}></Route>
                 <Route path="/signup" component={SignupComponent}></Route>
+                <Route path="/error" component={Error}></Route>
             </Switch>
         </Container>
     )

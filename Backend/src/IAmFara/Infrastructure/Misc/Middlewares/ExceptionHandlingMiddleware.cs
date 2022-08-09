@@ -32,7 +32,7 @@ namespace Infrastructure.Misc.Middlewares
                         {
                             data = new
                             {
-                                CorrelationId = correlationIdAccessor.CorelationId?.CorelationId,
+                                CorrelationId = correlationIdAccessor.CorelationId?.CorelationId.ToString(),
                                 Message = exception.Message
                             }
                         }

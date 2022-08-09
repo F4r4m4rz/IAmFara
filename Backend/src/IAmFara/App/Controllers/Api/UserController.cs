@@ -36,7 +36,7 @@ namespace App.Controllers.Api
 
             _userManager.SignUp(Mapper.Map(model));
 
-            return Authenticate();
+            return Ok(new { type = "SUCCESSFUL-LOGIN", payload = new { data = _currentUserAccessor.User } });
         }
 
         [HttpPost("signin", Name = "Login")]
@@ -46,7 +46,7 @@ namespace App.Controllers.Api
 
             _userManager.LogIn(Mapper.Map(model));
 
-            return Authenticate();
+            return Ok(new { type = "SUCCESSFUL-LOGIN", payload = new { data = _currentUserAccessor.User } });
         }
 
         [HttpGet("logout", Name = "Logout")]
