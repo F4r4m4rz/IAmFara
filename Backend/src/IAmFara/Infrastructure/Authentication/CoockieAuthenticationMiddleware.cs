@@ -17,8 +17,9 @@ namespace Infrastructure.Authentication
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, IAppCoockieHandler coockieHandler, IUserManager userManager)
+        public async Task Invoke(HttpContext context, IAppCoockieHandler coockieHandler, IUserManager userManager, ICurrentUserProvider userProvider)
         {
+            // Log in using coockie if any coockies found
             if (context.Request.Cookies.TryGetValue("iamfaraCoockie", out var appCoockie))
             {
                 try
@@ -37,38 +38,28 @@ namespace Infrastructure.Authentication
                 
             }
 
-            await _next(context);
-        }
-    }
-
-    internal class AttachCoockieMiddleware
-    {
-        private readonly RequestDelegate _next;
-
-        public AttachCoockieMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task Invoke(HttpContext context, IAppCoockieHandler coockieHandler, ICurrentUserProvider userProvider)
-        {
-            await _next(context);
-
-            if (userProvider.CurrentUser is null)
+            // Attach delegate handling adding or removing coockie
+            context.Response.OnStarting(() =>
             {
-                context.Response.Cookies.Delete("iamfaraCoockie");
-            }
-            else
-            {
-                if (!context.Request.Cookies.TryGetValue("iamfaraCoockie", out var appCoockie))
+                if (userProvider.CurrentUser is null)
                 {
-                    var coockie = new AppCoockie { UserName = userProvider.CurrentUser.Email, Password = userProvider.LogInPassword };
-                    var encrypted = coockieHandler.Encrypt(coockie);
-                    var options = new CookieOptions() { Expires = DateTime.Now.AddDays(1), Secure = true };
-                    context.Response.Cookies.Append("iamfaraCoockie", encrypted, options); 
+                    context.Response.Cookies.Delete("iamfaraCoockie");
                 }
-            }
-            
+                else
+                {
+                    if (!context.Request.Cookies.TryGetValue("iamfaraCoockie", out var appCoockie))
+                    {
+                        var coockie = new AppCoockie { UserName = userProvider.CurrentUser.Email, Password = userProvider.LogInPassword };
+                        var encrypted = coockieHandler.Encrypt(coockie);
+                        var options = new CookieOptions() { Expires = DateTime.Now.AddDays(1), Secure = true };
+                        context.Response.Cookies.Append("iamfaraCoockie", encrypted, options);
+                    }
+                }
+
+                return Task.CompletedTask;
+            });
+
+            await _next(context);
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Microsoft.AspNetCore.Builder
         public static IApplicationBuilder UseCoockieAuthentication(this IApplicationBuilder builder)
         {
             return builder
-                .UseMiddleware<AttachCoockieMiddleware>()
                 .UseMiddleware<CoockieAuthenticationMiddleware>();
         }
     }

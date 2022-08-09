@@ -1,5 +1,6 @@
 ﻿using Data.Model;
 using Data.Repositories;
+using Infrastructure.Authentication.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -20,14 +21,12 @@ namespace Infrastructure.Authentication
     internal class AppCoockieHandler : IAppCoockieHandler
     {
         private readonly ILogger<AppCoockieHandler> _logger;
-        private readonly IAppUserRepository _appUserRepository;
         private readonly IDataProtectionProvider _provider;
         private readonly IPasswordHandler _passwordHandler;
 
-        public AppCoockieHandler(ILogger<AppCoockieHandler> logger, IAppUserRepository appUserRepository, IDataProtectionProvider provider, IPasswordHandler passwordHandler)
+        public AppCoockieHandler(ILogger<AppCoockieHandler> logger, IDataProtectionProvider provider, IPasswordHandler passwordHandler)
         {
             _logger = logger;
-            _appUserRepository = appUserRepository;
             _provider = provider;
             _passwordHandler = passwordHandler;
         }
