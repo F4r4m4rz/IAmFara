@@ -28,7 +28,8 @@ namespace Data.Repositories.InMemory
             {
                 Email = "bob@email.com",
                 FirstName = "Bob",
-                Password = "MGcYc5JnwviZZQj6kN5YxA==:BIad+yrJlLfIoHJL4ZDfUIPq1WVkJHcrNJxjveyt1lo="
+                Password = "MGcYc5JnwviZZQj6kN5YxA==:BIad+yrJlLfIoHJL4ZDfUIPq1WVkJHcrNJxjveyt1lo=",
+                UserRoles = new[] { "Admin", "SomeRole" }
             };
 
             var user2 = new AppUser

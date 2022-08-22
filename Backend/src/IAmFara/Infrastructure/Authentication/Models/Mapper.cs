@@ -27,6 +27,7 @@ namespace Infrastructure.Authentication.Models
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                UserRoles = user.UserRoles?.Select(r=> new UserRole { role = r }).ToArray()
             };
         }
     }

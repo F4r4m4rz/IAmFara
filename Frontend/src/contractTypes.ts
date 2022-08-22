@@ -37,7 +37,12 @@ export type SignInDto = {
 export type SecurityUser = {
     email: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    userRoles: UserRole[]
+}
+
+export type UserRole = {
+    role: string,
 }
 
 export enum NotificationActionLevelDto

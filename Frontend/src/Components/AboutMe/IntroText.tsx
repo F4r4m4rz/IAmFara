@@ -3,11 +3,16 @@ import { Col } from "react-bootstrap";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { IntroductionTextDto } from "../../contractTypes";
+import { IsUserAdmin } from "../../utils/Helpers";
 import { AppState } from "../../utils/Store";
 
 function IntroText(props: Props) {
     return(
         <Col lg="10" className="introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3">
+            {props.isAdmin && (
+                <p>Good morning admin!</p>
+            )}
+
             <div>{props.introText?.text}</div>
             <p>I am a self-learned full-stack developer with focus on .NET and react.</p>
             <p>My jurney as a developer started with developing plug-ins for engineering software such as PDMS, E3D, Tekla NavisWorks and etc. 
@@ -36,11 +41,13 @@ const mapDispatchToProps  = (dispatch: Dispatch) => {
 export default connect(
     (state: AppState) => {
         return {
-            introText: state.aboutMe.introText.data
+            introText: state.aboutMe.introText.data,
+            isAdmin: IsUserAdmin()
         };
     }, mapDispatchToProps
 )(IntroText);
 
 type Props = {
-    introText: IntroductionTextDto
+    introText: IntroductionTextDto,
+    isAdmin: boolean
 }

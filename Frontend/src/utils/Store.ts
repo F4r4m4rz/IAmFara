@@ -2,6 +2,7 @@ import { AnyAction, combineReducers, configureStore } from "@reduxjs/toolkit";
 import { aboutMeReducer } from "../Components/AboutMe/AboutMeReducers";
 import { ProgressAlertReducer } from "../Components/Alerts/ProgressAlertReducer";
 import { userReducer } from "../Components/Login/LoginReducer";
+import { IntroductionTextDto, ProgressNotificationDto, SecurityUser, SkillDto } from "../contractTypes";
 import { commonReducers } from "./CommonReducers";
 
 export const reducers = {
@@ -29,9 +30,17 @@ export type ApiResponse = {
 
 export const appReducers = combineReducers(reducers);
 
-export type AppState = Omit<ReturnType<typeof store.getState>, "common">;
+export type AppState = {
+    aboutMe: {
+        introText: IEntityMeta<IntroductionTextDto>,
+        skills: IEntityMeta<SkillDto[]>
+    },
+    currentUser: IEntityMeta<SecurityUser>,
+    alerts: IEntityMeta<ProgressNotificationDto[]>,
+    common: any
+}
 
-const store = configureStore<any, ApiAction>({
+const store = configureStore<AppState, ApiAction>({
     reducer: {
         aboutMe: aboutMeReducer,
         currentUser: userReducer,
