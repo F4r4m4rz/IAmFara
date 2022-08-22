@@ -8,6 +8,7 @@ import { Gallery } from "./Gallery/Gallery";
 import LoginComponent from "./Login/Login";
 import SignupComponent from "./Login/Signup";
 import { Protofolio } from "./Protofolio/Protofolio";
+import ProgressAlerts from "./Alerts/ProgressAlerts";
 
 export function Content() {
     

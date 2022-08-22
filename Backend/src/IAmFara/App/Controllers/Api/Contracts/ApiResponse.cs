@@ -1,13 +1,30 @@
 ﻿namespace App.Controllers.Api
 {
-#pragma warning disable CS8618
+#nullable disable
     public class ApiResponse
     {
-        public string Type { get; set; }
-        public ApiResponsePayload Payload { get; set; } = new ApiResponsePayload();
+        private ApiResponse()
+        {
+
+        }
+
+        public IEnumerable<ApiAction> Actions { get; set; }
+
+        public static ApiResponse GenerateResponse(params ApiAction[] actions)
+        {
+            var response = new ApiResponse();
+            response.Actions = actions;
+            return response;
+        }
     }
 
-    public class ApiResponsePayload
+    public class ApiAction
+    {
+        public string Type { get; set; }
+        public ApiActionPayload Payload { get; set; }
+    }
+
+    public class ApiActionPayload
     {
         public string EntityName { get; set; }
         public string Key { get; set; }

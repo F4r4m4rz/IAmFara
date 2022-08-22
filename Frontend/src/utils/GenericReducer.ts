@@ -1,17 +1,6 @@
 import { Action, AnyAction, Reducer } from "redux";
 import { AppEntityName } from "../contractTypes";
-
-export interface IDataUpdated<AppEntityName> {
-    type: "DATA_UPDATED",
-    payload: {
-        entityName: AppEntityName,
-        key: string,
-        data: any
-    }
-}
-export interface IEntityMeta<T> {
-    data: T
-}
+import { ApiAction, IEntityMeta } from "./Store";
 
 export class EntityMeta<T> implements IEntityMeta<T> {
     data: T;
@@ -22,8 +11,8 @@ export class EntityMeta<T> implements IEntityMeta<T> {
 
 export function GenericReducer<TEntity>(
     name: AppEntityName, 
-    baseReducer?: Reducer<IEntityMeta<TEntity>, Action<string>>
-    ) : Reducer<IEntityMeta<TEntity>, AnyAction> {
+    baseReducer?: Reducer<IEntityMeta<TEntity>, ApiAction>
+    ) : Reducer<IEntityMeta<TEntity>, ApiAction> {
     return (state = new EntityMeta<TEntity>(), action) => {
         switch (action.type) {
             case "DATA_UPDATED": {

@@ -39,3 +39,20 @@ export type SecurityUser = {
     firstName: string,
     lastName: string
 }
+
+export enum NotificationActionLevelDto
+{
+    Info,
+    Success,
+    Warning,
+    Error
+}
+
+export type ProgressNotificationDto = {
+    id: string,
+    level: NotificationActionLevelDto,
+    message: string,
+    dismissable: boolean,
+    autoDismiss: boolean,
+    timeout: number
+}

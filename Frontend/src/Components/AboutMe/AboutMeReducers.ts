@@ -3,8 +3,9 @@ import { combineReducers } from "redux";
 import { IntroductionTextDto, SkillDto } from "../../contractTypes";
 import { apiServiceInstance } from "../../utils/apiService";
 import { EntityMeta, GenericReducer } from "../../utils/GenericReducer";
+import { ApiAction, IEntityMeta } from "../../utils/Store";
 
-function introTextReducer(state: EntityMeta<IntroductionTextDto>  = new EntityMeta<IntroductionTextDto>(), action: Action<string>) {
+function introTextReducer(state: IEntityMeta<IntroductionTextDto>  = new EntityMeta<IntroductionTextDto>(), action: ApiAction) {
     switch (action.type) {
         case "GET_INTROTEXT":
             apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext");
@@ -16,7 +17,7 @@ function introTextReducer(state: EntityMeta<IntroductionTextDto>  = new EntityMe
     return {...state};
 }
 
-function skillsReducer(state: EntityMeta<SkillDto[]>  = new EntityMeta<SkillDto[]>(), action: Action<string>) {
+function skillsReducer(state: IEntityMeta<SkillDto[]>  = new EntityMeta<SkillDto[]>(), action: ApiAction) {
     switch (action.type) {
         case "GET_SKILLS":
             apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");

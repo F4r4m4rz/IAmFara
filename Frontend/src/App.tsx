@@ -5,6 +5,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Store } from "redux";
 import { Provider } from "react-redux";
 import { AppState } from "./utils/Store";
+import ProgressAlerts from "./Components/Alerts/ProgressAlerts";
+
 
 function useWindowsSize() {
     const [windowSize, setWindowSize] = useState([0,0]);
@@ -28,6 +30,7 @@ const App = ({ store }: { store: Store<AppState>}) => {
     return (
         <Provider store={store}>
             <AppNavBarComponent collapsed={collapsed} />
+            <ProgressAlerts />
             <Content />
         </Provider>
     );

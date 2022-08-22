@@ -1,0 +1,12 @@
+.alerts {
+    width: 20%;
+    position:fixed;
+    top: auto;
+    right: 0;
+    margin-right: 15%;
+}
+
+.alert {
+    opacity: 70%;
+    margin: 5px;
+}

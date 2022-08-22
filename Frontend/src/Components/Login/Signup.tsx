@@ -8,7 +8,9 @@ const onSignup = (model: SignUpDto) => {
     
     store.dispatch({
         type: "SIGNUP",
-        data: model
+        payload: {
+            data: model
+        }
     });
 }
 

@@ -24,7 +24,12 @@ namespace App.Controllers.Api
         {
             _logger.LogInformation("Retriving introduction text");
             var introText = _introTextRepository.GetIntroductionText();
-            return Ok(Mapper.MapToResponse(introText));
+            var dataUpdateAction = Mapper.MapToAction(introText);
+
+            var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully pulled data of type: IntroductionText", false, true, 3);
+
+            var response = ApiResponse.GenerateResponse(dataUpdateAction, successNotification);
+            return Ok(response);
         }
 
         [HttpGet("skills", Name = "Get skills")]
@@ -32,7 +37,12 @@ namespace App.Controllers.Api
         {
             _logger.LogInformation("Retriving skills");
             var skills = _skillsRepository.GetAll();
-            return Ok(Mapper.MapToResponse(skills));
+            var dataUpdateAction = Mapper.MapToAction(skills);
+
+            var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully pulled data of type: Skills", false, true, 3);
+
+            var response = ApiResponse.GenerateResponse(dataUpdateAction, successNotification);
+            return Ok(response);
         }
     }
 }

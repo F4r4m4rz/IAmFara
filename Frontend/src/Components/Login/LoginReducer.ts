@@ -2,9 +2,10 @@ import { Reducer } from "react";
 import { Action, AnyAction } from "redux";
 import { SecurityUser, SignInDto, SignUpDto } from "../../contractTypes";
 import { apiServiceInstance } from "../../utils/apiService";
-import { EntityMeta, IEntityMeta } from "../../utils/GenericReducer";
+import { EntityMeta } from "../../utils/GenericReducer";
+import { ApiAction, IEntityMeta } from "../../utils/Store";
 
-export function userReducer(state: EntityMeta<SecurityUser> = new EntityMeta(), action: AnyAction) {
+export function userReducer(state: IEntityMeta<SecurityUser> = new EntityMeta(), action: ApiAction) {
     switch (action.type) {
         case "AUTHENTICATE":
             apiServiceInstance.get("https://localhost:7260/api/user");
@@ -16,10 +17,10 @@ export function userReducer(state: EntityMeta<SecurityUser> = new EntityMeta(), 
             state = {...new EntityMeta<SecurityUser>()};
             break;
         case "SIGNUP": 
-            apiServiceInstance.post<SignUpDto>("https://localhost:7260/api/user/signup", action.data);
+            apiServiceInstance.post<SignUpDto>("https://localhost:7260/api/user/signup", action.payload.data);
             break;
         case "LOGIN":
-            apiServiceInstance.post<SignInDto>("https://localhost:7260/api/user/signin", action.data);
+            apiServiceInstance.post<SignInDto>("https://localhost:7260/api/user/signin", action.payload.data);
             break;
         case "SUCCESSFUL-LOGIN":
             window.location.href = "/#";

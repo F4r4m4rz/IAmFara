@@ -9,7 +9,9 @@ const onLogin = (model: SignInDto) => {
     
     store.dispatch({
         type: "LOGIN",
-        data: model
+        payload: {
+            data: model
+        }
     });
 }
 

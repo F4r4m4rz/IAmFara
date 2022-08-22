@@ -5,12 +5,12 @@ namespace App.Controllers.Api.Contracts
 {
     public static class Mapper
     {
-        public static ApiResponse MapToResponse(IntroductionTextModel data)
+        public static ApiAction MapToAction(IntroductionTextModel data)
         {
-            return new ApiResponse
+            return new ApiAction
             {
                 Type = "DATA_UPDATED",
-                Payload =
+                Payload = new ApiActionPayload
                 {
                     EntityName = "IntroductionText",
                     Data = Map(data),
@@ -19,13 +19,13 @@ namespace App.Controllers.Api.Contracts
             };
         }
 
-        public static ApiResponse MapToResponse(IEnumerable<SkillModel> skills)
+        public static ApiAction MapToAction(IEnumerable<SkillModel> skills)
         {
             var dtos = skills.Select(s => Map(s));
-            return new ApiResponse
+            return new ApiAction
             {
                 Type = "DATA_UPDATED",
-                Payload =
+                Payload = new ApiActionPayload
                 {
                     EntityName = "Skill",
                     Data = dtos,
@@ -34,12 +34,12 @@ namespace App.Controllers.Api.Contracts
             };
         }
 
-        public static ApiResponse MapToResponse(AppUser user)
+        public static ApiAction MapToAction(AppUser user)
         {
-            return new ApiResponse
+            return new ApiAction
             {
                 Type = "LOGIN_SUCCEDDED",
-                Payload =
+                Payload = new ApiActionPayload
                 {
                     EntityName = "AppUser",
                     Data = Map(user),

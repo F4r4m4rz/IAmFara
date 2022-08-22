@@ -24,9 +24,9 @@ namespace App.Controllers.Api
         public IActionResult Authenticate()
         {
             if (_currentUserAccessor.User is null)
-                return Ok(new { type = "UN-AUTHENTICATED" });
+                return Ok(ApiResponse.GenerateResponse(new ApiAction { Type = "UN-AUTHENTICATED" }));
             else
-                return Ok(new { Type = "AUTHENTICATED", Payload = new { Data = _currentUserAccessor.User } });
+                return Ok(ApiResponse.GenerateResponse(new ApiAction { Type = "AUTHENTICATED", Payload = new ApiActionPayload { Data = _currentUserAccessor.User } }));
         }
 
         [HttpPost("signup", Name = "Signup")]
@@ -36,7 +36,7 @@ namespace App.Controllers.Api
 
             _userManager.SignUp(Mapper.Map(model));
 
-            return Ok(new { type = "SUCCESSFUL-LOGIN", payload = new { data = _currentUserAccessor.User } });
+            return Ok(ApiResponse.GenerateResponse(new ApiAction { Type = "SUCCESSFUL-LOGIN", Payload = new ApiActionPayload { Data = _currentUserAccessor.User } }));
         }
 
         [HttpPost("signin", Name = "Login")]
@@ -46,7 +46,7 @@ namespace App.Controllers.Api
 
             _userManager.LogIn(Mapper.Map(model));
 
-            return Ok(new { type = "SUCCESSFUL-LOGIN", payload = new { data = _currentUserAccessor.User } });
+            return Ok(ApiResponse.GenerateResponse(new ApiAction { Type = "SUCCESSFUL-LOGIN", Payload = new ApiActionPayload { Data = _currentUserAccessor.User } }));
         }
 
         [HttpGet("logout", Name = "Logout")]

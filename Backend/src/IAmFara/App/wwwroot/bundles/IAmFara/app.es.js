@@ -4103,7 +4103,7 @@ const collapseStyles = {
   [ENTERING]: 'collapsing',
   [ENTERED]: 'collapse show'
 };
-const defaultProps$d = {
+const defaultProps$e = {
   in: false,
   timeout: 300,
   mountOnEnter: false,
@@ -4164,7 +4164,7 @@ const Collapse = /*#__PURE__*/React.forwardRef(({
 }); // @ts-ignore
 
 // @ts-ignore
-Collapse.defaultProps = defaultProps$d;
+Collapse.defaultProps = defaultProps$e;
 var Collapse$1 = Collapse;
 
 /**
@@ -4407,7 +4407,7 @@ const Anchor = /*#__PURE__*/react.exports.forwardRef((_ref, ref) => {
 });
 Anchor.displayName = 'Anchor';
 
-const defaultProps$c = {
+const defaultProps$d = {
   in: false,
   timeout: 300,
   mountOnEnter: false,
@@ -4439,7 +4439,7 @@ const Fade = /*#__PURE__*/react.exports.forwardRef(({
     })
   });
 });
-Fade.defaultProps = defaultProps$c;
+Fade.defaultProps = defaultProps$d;
 Fade.displayName = 'Fade';
 var Fade$1 = Fade;
 
@@ -4454,7 +4454,7 @@ const propTypes$2 = {
    */
   variant: PropTypes.oneOf(['white'])
 };
-const defaultProps$b = {
+const defaultProps$c = {
   'aria-label': 'Close'
 };
 const CloseButton = /*#__PURE__*/react.exports.forwardRef(({
@@ -4469,7 +4469,7 @@ const CloseButton = /*#__PURE__*/react.exports.forwardRef(({
 }));
 CloseButton.displayName = 'CloseButton';
 CloseButton.propTypes = propTypes$2;
-CloseButton.defaultProps = defaultProps$b;
+CloseButton.defaultProps = defaultProps$c;
 var CloseButton$1 = CloseButton;
 
 var divWithClassName = (className => /*#__PURE__*/react.exports.forwardRef((p, ref) => /*#__PURE__*/jsxRuntime.exports.jsx("div", { ...p,
@@ -4509,6 +4509,72 @@ function createWithBsPrefix(prefix, {
   BsComponent.displayName = displayName;
   return BsComponent;
 }
+
+const DivStyledAsH4 = divWithClassName('h4');
+DivStyledAsH4.displayName = 'DivStyledAsH4';
+const AlertHeading = createWithBsPrefix('alert-heading', {
+  Component: DivStyledAsH4
+});
+const AlertLink = createWithBsPrefix('alert-link', {
+  Component: Anchor
+});
+const defaultProps$b = {
+  variant: 'primary',
+  show: true,
+  transition: Fade$1,
+  closeLabel: 'Close alert'
+};
+const Alert = /*#__PURE__*/react.exports.forwardRef((uncontrolledProps, ref) => {
+  const {
+    bsPrefix,
+    show,
+    closeLabel,
+    closeVariant,
+    className,
+    children,
+    variant,
+    onClose,
+    dismissible,
+    transition,
+    ...props
+  } = useUncontrolled(uncontrolledProps, {
+    show: 'onClose'
+  });
+  const prefix = useBootstrapPrefix(bsPrefix, 'alert');
+  const handleClose = useEventCallback(e => {
+    if (onClose) {
+      onClose(false, e);
+    }
+  });
+  const Transition = transition === true ? Fade$1 : transition;
+
+  const alert = /*#__PURE__*/jsxRuntime.exports.jsxs("div", {
+    role: "alert",
+    ...(!Transition ? props : undefined),
+    ref: ref,
+    className: classNames(className, prefix, variant && `${prefix}-${variant}`, dismissible && `${prefix}-dismissible`),
+    children: [dismissible && /*#__PURE__*/jsxRuntime.exports.jsx(CloseButton$1, {
+      onClick: handleClose,
+      "aria-label": closeLabel,
+      variant: closeVariant
+    }), children]
+  });
+
+  if (!Transition) return show ? alert : null;
+  return /*#__PURE__*/jsxRuntime.exports.jsx(Transition, {
+    unmountOnExit: true,
+    ...props,
+    ref: undefined,
+    in: show,
+    children: alert
+  });
+});
+Alert.displayName = 'Alert';
+Alert.defaultProps = defaultProps$b;
+var Alert$1 = Object.assign(Alert, {
+  Link: AlertLink,
+  Heading: AlertHeading
+});
 
 const defaultProps$a = {
   variant: 'primary',
@@ -8433,9 +8499,7 @@ class ApiService {
     const config = { method: "GET" };
     await fetch(url, config).then(async (r) => {
       const response = await r.json();
-      if (this.dispatch) {
-        this.dispatch(response);
-      }
+      this.dispatchActions(response);
     });
   }
   async post(url, json) {
@@ -8445,10 +8509,17 @@ class ApiService {
     ] };
     await fetch(url, config).then(async (r) => {
       const response = await r.json();
-      if (this.dispatch) {
-        this.dispatch(response);
-      }
+      this.dispatchActions(response);
     });
+  }
+  dispatchActions(response) {
+    if (response && response.actions) {
+      response.actions.forEach((action) => {
+        if (this.dispatch) {
+          this.dispatch(action);
+        }
+      });
+    }
   }
 }
 const apiServiceInstance = new ApiService();
@@ -8497,6 +8568,42 @@ const entityReducers = {
 };
 const aboutMeReducer = combineReducers(entityReducers);
 
+function AliveProgressAlertReducer(state = new EntityMeta(), action) {
+  switch (action.type) {
+    case "NOTIFICATION-ACTION":
+      const notifications = [];
+      if (state.data) {
+        notifications.push(...state.data);
+      }
+      notifications.push(action.payload.data);
+      state = { ...new EntityMeta(notifications) };
+      break;
+    case "NOTIFIED":
+      const liveNotifications = [...state.data].filter((a) => a.id !== action.payload.data.id);
+      state = { ...new EntityMeta(liveNotifications) };
+      break;
+  }
+  return { ...state };
+}
+function DeadProgressAlertReducer(state = new EntityMeta(), action) {
+  switch (action.type) {
+    case "NOTIFIED":
+      const deadNotifications = [];
+      if (state.data) {
+        deadNotifications.push(...state.data);
+      }
+      deadNotifications.push(action.payload.data);
+      state = { ...new EntityMeta(deadNotifications) };
+      break;
+  }
+  return { ...state };
+}
+const reducers$1 = {
+  aliveAlerts: AliveProgressAlertReducer,
+  deadAlerts: DeadProgressAlertReducer
+};
+const ProgressAlertReducer = combineReducers(reducers$1);
+
 function userReducer(state = new EntityMeta(), action) {
   switch (action.type) {
     case "AUTHENTICATE":
@@ -8509,10 +8616,10 @@ function userReducer(state = new EntityMeta(), action) {
       state = { ...new EntityMeta() };
       break;
     case "SIGNUP":
-      apiServiceInstance.post("https://localhost:7260/api/user/signup", action.data);
+      apiServiceInstance.post("https://localhost:7260/api/user/signup", action.payload.data);
       break;
     case "LOGIN":
-      apiServiceInstance.post("https://localhost:7260/api/user/signin", action.data);
+      apiServiceInstance.post("https://localhost:7260/api/user/signin", action.payload.data);
       break;
     case "SUCCESSFUL-LOGIN":
       window.location.href = "/#";
@@ -8542,6 +8649,7 @@ const store = configureStore({
   reducer: {
     aboutMe: aboutMeReducer,
     currentUser: userReducer,
+    progressAlerts: ProgressAlertReducer,
     common: commonReducers
   }
 });
@@ -8551,7 +8659,9 @@ const onLogin = (model) => {
   var store = getStore();
   store.dispatch({
     type: "LOGIN",
-    data: model
+    payload: {
+      data: model
+    }
   });
 };
 function LoginComponent() {
@@ -8588,7 +8698,9 @@ const onSignup = (model) => {
   var store = getStore();
   store.dispatch({
     type: "SIGNUP",
-    data: model
+    payload: {
+      data: model
+    }
   });
 };
 function SignupComponent() {
@@ -8749,6 +8861,62 @@ const AppNavBarComponent = connector(AppNavBar);
 
 var bootstrap_min = '';
 
+var NotificationActionLevelDto = /* @__PURE__ */ ((NotificationActionLevelDto2) => {
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Info"] = 0] = "Info";
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Warning"] = 1] = "Warning";
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Error"] = 2] = "Error";
+  return NotificationActionLevelDto2;
+})(NotificationActionLevelDto || {});
+
+function RenderProgressAlert(alert) {
+  const [show, setShow] = react.exports.useState(true);
+  if (alert.autoDismiss) {
+    setInterval(() => setShow(false), (alert.timeout ?? 5) * 1e3);
+  }
+  let variant;
+  switch (alert.level) {
+    case NotificationActionLevelDto.Info:
+      variant = "info";
+      break;
+    case NotificationActionLevelDto.Error:
+      variant = "danger";
+      break;
+    case NotificationActionLevelDto.Warning:
+      variant = "warning";
+      break;
+    default:
+      variant = "info";
+      break;
+  }
+  var store = getStore();
+  store.dispatch({
+    type: "NOTIFIED",
+    payload: {
+      data: [alert]
+    }
+  });
+  return /* @__PURE__ */ React.createElement(Alert$1, {
+    variant,
+    dismissible: alert.dismissable
+  }, /* @__PURE__ */ React.createElement("p", null, alert.message));
+}
+function ProgressAlerts(props) {
+  const alives = props.aliveAlerts ?? [];
+  const deads = props.deadAlerts ?? [];
+  const alerts = alives.filter((a) => !deads.find((r) => r.id === a.id)) ?? [];
+  console.log(alerts);
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, alerts && alerts.length != 0 && alerts.map((a) => {
+    RenderProgressAlert(a);
+  }));
+}
+var ProgressAlerts$1 = connect(
+  (state) => {
+    return {
+      alerts: state.progressAlerts.aliveAlerts.data
+    };
+  }
+)(ProgressAlerts);
+
 function useWindowsSize() {
   const [windowSize, setWindowSize] = react.exports.useState([0, 0]);
   react.exports.useLayoutEffect(() => {
@@ -8768,7 +8936,7 @@ const App = ({ store }) => {
     store
   }, /* @__PURE__ */ React.createElement(AppNavBarComponent, {
     collapsed
-  }), /* @__PURE__ */ React.createElement(Content, null));
+  }), /* @__PURE__ */ React.createElement(ProgressAlerts$1, null), /* @__PURE__ */ React.createElement(Content, null));
 };
 
 (() => {

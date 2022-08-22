@@ -1,17 +1,16 @@
 import { AnyAction, Dispatch } from "redux";
+import { ApiAction, ApiResponse } from "./Store";
 
 export class ApiService  {
-    dispatch: Dispatch<AnyAction> | null = null;
+    dispatch: Dispatch<ApiAction> | null = null;
 
     async get(url: string){
         const config: RequestInit = {method: "GET"};
         
         await fetch(url, config).then(async (r) => {
-            const response = await r.json();
+            const response = await r.json()  as ApiResponse;
 
-            if (this.dispatch){
-                this.dispatch(response);
-            }
+            this.dispatchActions(response);
         });
     }
 
@@ -20,13 +19,23 @@ export class ApiService  {
         ["Content-Type", "application/json"]] };
         
         await fetch(url, config).then(async (r) => {
-            const response = await r.json();
+            const response = await r.json() as ApiResponse;
             
-            if (this.dispatch){
-                this.dispatch(response);
-            }
+            this.dispatchActions(response);
         });
     }
+
+    dispatchActions(response: ApiResponse) {
+        if (response && response.actions){
+            response.actions.forEach(action => {
+                if (this.dispatch){
+                    this.dispatch(action);
+                }
+            });
+        }
+    }
 }
+
+
 
 export const apiServiceInstance = new ApiService();
