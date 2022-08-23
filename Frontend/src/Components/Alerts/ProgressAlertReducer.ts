@@ -13,10 +13,6 @@ export function ProgressAlertReducer(state: IEntityMeta<ProgressNotificationDto[
             notifications.push(action.payload.data)
             state = {...new EntityMeta<ProgressNotificationDto[]>(notifications)};
             break;
-        case "NOTIFIED":
-            const liveNotifications = [...state.data].filter(a => a.id !== action.payload.data.id);
-            state = {...new EntityMeta<ProgressNotificationDto[]>(liveNotifications)};
-            break;
         default:
             break;
     }
