@@ -6,8 +6,6 @@ import { ApiAction, IEntityMeta } from "../../utils/Store";
 export function ProgressAlertReducer(state: IEntityMeta<ProgressNotificationDto[]> = new EntityMeta<ProgressNotificationDto[]>(), action: ApiAction) {
     switch (action.type) {
         case "NOTIFICATION-ACTION":
-            console.log(action);
-            
             const notifications : ProgressNotificationDto[] = [];
             if (state.data) {
                 notifications.push(...state.data);
