@@ -18,12 +18,6 @@ function SkillList(props: Props) {
     );
 }
 
-const mapDispatchToProps  = (dispatch: Dispatch) => {
-    return {
-        retriveData: () => dispatch({type: "GET_SKILLS"}),
-    };
-};
-
 export default connect(
     (state: AppState) => {
         return {

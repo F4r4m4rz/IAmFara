@@ -12,12 +12,12 @@ function IntroText(props: Props) {
     return(
         <Col lg="10" className="introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3">
             {props.isAdmin && (
-                <Form>
+                <Form onSubmit={() => props.onSubmit(updatedText)}>
                     <Form.Group>
                         <Form.Label>Introduction text</Form.Label>
                         <Form.Control as="textarea" rows={20} defaultValue={props.introText?.text} onChange={(e) => setUpdatedText(e.currentTarget.value)}></Form.Control>
                     </Form.Group>
-                    <Button variant="primary" className="mt-3" onClick={() => props.onSubmit(updatedText)}>
+                    <Button variant="primary" type="submit" className="mt-3" >
                         Save
                     </Button>
                 </Form>

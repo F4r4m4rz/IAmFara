@@ -8491,10 +8491,6 @@ function ProgressAlertReducer(state = new EntityMeta(), action) {
       notifications.push(action.payload.data);
       state = { ...new EntityMeta(notifications) };
       break;
-    case "NOTIFIED":
-      const liveNotifications = [...state.data].filter((a) => a.id !== action.payload.data.id);
-      state = { ...new EntityMeta(liveNotifications) };
-      break;
   }
   return { ...state };
 }
@@ -8563,15 +8559,17 @@ function IntroText(props) {
   return /* @__PURE__ */ React.createElement(Col$1, {
     lg: "10",
     className: "introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3"
-  }, props.isAdmin && /* @__PURE__ */ React.createElement(Form$1, null, /* @__PURE__ */ React.createElement(Form$1.Group, null, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Introduction text"), /* @__PURE__ */ React.createElement(Form$1.Control, {
+  }, props.isAdmin && /* @__PURE__ */ React.createElement(Form$1, {
+    onSubmit: () => props.onSubmit(updatedText)
+  }, /* @__PURE__ */ React.createElement(Form$1.Group, null, /* @__PURE__ */ React.createElement(Form$1.Label, null, "Introduction text"), /* @__PURE__ */ React.createElement(Form$1.Control, {
     as: "textarea",
     rows: 20,
     defaultValue: props.introText?.text,
     onChange: (e) => setUpdatedText(e.currentTarget.value)
   })), /* @__PURE__ */ React.createElement(Button$1, {
     variant: "primary",
-    className: "mt-3",
-    onClick: () => props.onSubmit(updatedText)
+    type: "submit",
+    className: "mt-3"
   }, "Save")), !props.isAdmin && props.introText?.text && props.introText?.text.split("\n").map((line, i) => {
     return /* @__PURE__ */ React.createElement("p", {
       key: i
