@@ -1,42 +1,52 @@
-import React from "react";
-import { Col } from "react-bootstrap";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { Button, Col, Form } from "react-bootstrap";
+import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { IntroductionTextDto } from "../../contractTypes";
 import { IsUserAdmin } from "../../utils/Helpers";
 import { AppState } from "../../utils/Store";
 
 function IntroText(props: Props) {
+    const [updatedText, setUpdatedText] = useState(props.introText?.text);
+
     return(
         <Col lg="10" className="introduction-text border-bottom border-3 border-secondary mt-lg-5 mt-3 mb-3 mb-lg-5 pb-3">
             {props.isAdmin && (
-                <p>Good morning admin!</p>
+                <Form>
+                    <Form.Group>
+                        <Form.Label>Introduction text</Form.Label>
+                        <Form.Control as="textarea" rows={20} defaultValue={props.introText?.text} onChange={(e) => setUpdatedText(e.currentTarget.value)}></Form.Control>
+                    </Form.Group>
+                    <Button variant="primary" className="mt-3" onClick={() => props.onSubmit(updatedText)}>
+                        Save
+                    </Button>
+                </Form>
             )}
-
-            <div>{props.introText?.text}</div>
-            <p>I am a self-learned full-stack developer with focus on .NET and react.</p>
-            <p>My jurney as a developer started with developing plug-ins for engineering software such as PDMS, E3D, Tekla NavisWorks and etc. 
-                This start awakened my joy and deep interest in developing even more application with higher complexity and therfore led me into learning C# and .NET.
-                More complex applications needed more complex and user friendly user interface and this is where react came into picture as my main focus for frontend
-                development.
-            </p>
-            <p>It worths mentioning that I have also hands on developing fronend based on .NET technologies as Blazor or ASP.NET razor pages. I choose technologies 
-               based on project needs and infrastructure and complexity, but yet react is my own favorite when it comes to frontend and therefore this little webpage
-               is fully depended on .NET for its serverside and react for client side.
-            </p>
-            <p>
-                This is just a begining. This webpage is ment to be used more and more to publish my experiences and help others who are new in the business to grow
-                as fast as possible. 
-            </p>
+            {!props.isAdmin && props.introText?.text && (
+                props.introText?.text.split('\n').map((line, i) => {
+                    return (
+                        <p key={i}>{line}</p>
+                    )
+                })
+            )}
+            
         </Col>
     )
 }
 
-const mapDispatchToProps  = (dispatch: Dispatch) => {
+const actions = (dispatch: Dispatch) => {
     return {
-        retriveData: dispatch({type: "GET_INTROTEXT"}),
-    };
-};
+        onSubmit: (newIntroText: string) => {
+            const action = {
+                type: "INTROTEXT-UPDATED",
+                payload: {
+                    data: newIntroText
+                }
+            };
+            dispatch(action);
+        }
+    }
+}
 
 export default connect(
     (state: AppState) => {
@@ -44,10 +54,11 @@ export default connect(
             introText: state.aboutMe.introText.data,
             isAdmin: IsUserAdmin()
         };
-    }, mapDispatchToProps
+    }, actions
 )(IntroText);
 
 type Props = {
     introText: IntroductionTextDto,
-    isAdmin: boolean
+    isAdmin: boolean,
+    onSubmit: (newIntroText: string) => void
 }

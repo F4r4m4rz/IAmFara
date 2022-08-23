@@ -10,6 +10,9 @@ function introTextReducer(state: IEntityMeta<IntroductionTextDto>  = new EntityM
         case "GET_INTROTEXT":
             apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext");
             break;
+        case "INTROTEXT-UPDATED":
+            apiServiceInstance.post("https://localhost:7260/api/aboutme/introtext", action.payload.data);
+            break;
         default:
             break;
     }

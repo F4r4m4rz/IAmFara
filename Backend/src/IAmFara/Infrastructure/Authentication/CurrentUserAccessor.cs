@@ -10,7 +10,7 @@ namespace Infrastructure.Authentication
     internal interface ICurrentUserProvider
     {
         SecurityUser? CurrentUser { get; }
-        string LogInPassword { get; }
+        string? LogInPassword { get; }
         void SetCurrentUser(SecurityUser user, string loginPassword);
         void RemoveCurrentUser();
     }

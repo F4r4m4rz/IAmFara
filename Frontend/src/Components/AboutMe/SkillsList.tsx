@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -6,8 +6,8 @@ import { SkillDto } from "../../contractTypes";
 import { AppState } from "../../utils/Store";
 import Skill from "./Skill";
 
-
 function SkillList(props: Props) {
+    
     return (
         <Col lg="10">
             <Row  className="skill-list">
@@ -20,7 +20,7 @@ function SkillList(props: Props) {
 
 const mapDispatchToProps  = (dispatch: Dispatch) => {
     return {
-        retriveData: dispatch({type: "GET_SKILLS"}),
+        retriveData: () => dispatch({type: "GET_SKILLS"}),
     };
 };
 
@@ -29,7 +29,7 @@ export default connect(
         return {
             skills: state.aboutMe.skills.data
         };
-    }, mapDispatchToProps
+    }
 )(SkillList);
 
 type Props = {

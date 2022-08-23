@@ -12,13 +12,13 @@ namespace Data.Repositories
         IntroductionTextModel GetIntroductionText();
         IntroductionTextModel GetIntroductionText(int id);
         IntroductionTextModel UpdateIntroductionText(IntroductionTextModel newIntroductionText);
-        IntroductionTextModel AddIntroductionText(IntroductionTextModel newIntroductionText);
+        IntroductionTextModel AddIntroductionText(string newIntroductionText);
         void DeleteIntroductionText(int id);
     }
 
     internal class IntroductionTextRepository : IIntroductionTextRepository
     {
-        public IntroductionTextModel AddIntroductionText(IntroductionTextModel newIntroductionText)
+        public IntroductionTextModel AddIntroductionText(string newIntroductionText)
         {
             throw new NotImplementedException();
         }

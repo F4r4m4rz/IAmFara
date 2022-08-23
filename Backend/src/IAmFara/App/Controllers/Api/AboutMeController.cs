@@ -32,6 +32,20 @@ namespace App.Controllers.Api
             return Ok(response);
         }
 
+        [HttpPost("introtext", Name = "Update introduction text")]
+        public IActionResult UpdateIntroText([FromBody] string introText)
+        {
+            _logger.LogInformation("Updating introduction text");
+
+            var introTextModel = _introTextRepository.AddIntroductionText(introText);
+            var dataUpdateAction = Mapper.MapToAction(introTextModel);
+
+            var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully updated data: IntroductionText", false, true, 3);
+
+            var response = ApiResponse.GenerateResponse(dataUpdateAction, successNotification);
+            return Ok(response);
+        }
+
         [HttpGet("skills", Name = "Get skills")]
         public IActionResult GetSkills()
         {

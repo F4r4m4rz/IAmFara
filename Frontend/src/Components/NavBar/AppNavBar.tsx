@@ -4,8 +4,25 @@ import AppNavList from "./AppNavList";
 import {Button, Container, Nav, Navbar, Row} from 'react-bootstrap';
 import { connect, ConnectedProps } from "react-redux";
 import { AppState } from "../../utils/Store";
+import { Dispatch } from "redux";
+
+function isCollapsed() : boolean {
+    const [windowSize, setWindowSize] = useState([0,0]);
+    useLayoutEffect(() => {
+        function updateSize() {
+            setWindowSize([window.innerWidth, window.innerHeight]);
+        }
+
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    const [width, height] = windowSize;
+    return width < 1000 ? true : false;
+}
 
 function AppNavBar(props: Props) {
+
     return (
         <Navbar bg="white" expand="lg" className="app-nav-bar">
             <Container fluid>
@@ -19,27 +36,23 @@ function AppNavBar(props: Props) {
                         </Row>
                     </Container>
                 </Navbar.Brand>
-                {props.collapsed && (
+                {isCollapsed() && (
                     <Navbar.Toggle className="ms-auto me-3" aria-controls="basic-navbar-nav" />
                 )}
-                <AppNavList collapsed={props.collapsed} currentUser={props.currentUser.data} />
+                <AppNavList collapsed={isCollapsed()} currentUser={props.currentUser.data} />
             </Container>
         </Navbar>
     );
 }
 
-type ExternalProps = {
-    collapsed: boolean
-}
-
 const connector = connect(
-    (state: AppState, p: ExternalProps) => {
+    (state: AppState) => {
         return {
             currentUser: state.currentUser
         }
     }
 )
 
-type Props = ConnectedProps<typeof connector> & ExternalProps;
+type Props = ConnectedProps<typeof connector>;
 
 export const AppNavBarComponent = connector(AppNavBar);

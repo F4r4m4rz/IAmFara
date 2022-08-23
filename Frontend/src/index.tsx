@@ -15,8 +15,8 @@ import { getStore } from "./utils/Store";
     
     const root = createRoot(document.getElementById("root")!);
     root.render(
-    <HashRouter>
-        <App store={store} />
-    </HashRouter>
+        <HashRouter>
+            <App store={store} />
+        </HashRouter>
     );
 })();

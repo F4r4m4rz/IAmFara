@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { Switch, Route, } from 'react-router-dom';
-import { AboutMe } from "./AboutMe/AboutMe";
+import AboutMe from "./AboutMe/AboutMe";
 import { ContactForm } from "./Contact/Contact";
 import { Error } from "./Error/Error";
 import { Gallery } from "./Gallery/Gallery";
