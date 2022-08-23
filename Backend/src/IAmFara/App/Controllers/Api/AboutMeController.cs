@@ -24,6 +24,12 @@ namespace App.Controllers.Api
         {
             _logger.LogInformation("Retriving introduction text");
             var introText = _introTextRepository.GetIntroductionText();
+            if (introText is null)
+            {
+                var warningNotification = NotificationAction.Notify(NotificationActionLevelDto.Warning, "Could not find any data of type: IntroductionText", false, true, 5);
+                return Ok(ApiResponse.GenerateResponse(warningNotification));
+            }
+
             var dataUpdateAction = Mapper.MapToAction(introText);
 
             var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully pulled data of type: IntroductionText", false, true, 3);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Data;
 using Infrastructure;
 using Infrastructure.Logging;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
             IConfiguration settings = config.GetSection(AppDbContextFactorySettings._section);
             services.Configure<AppDbContextFactorySettings>(settings);
             services.AddSingleton<IAppDbContextFactory, AppDbContextFactory>()
+                    .AddScoped<DataDbContext>(sp => sp.GetRequiredService<IAppDbContextFactory>().CreateContext())
                     .AddScoped<AppDbContext>(sp => sp.GetRequiredService<IAppDbContextFactory>().CreateContext());
 
             return services;

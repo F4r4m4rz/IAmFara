@@ -59,6 +59,21 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Skills", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserRolesString = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Email);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -71,6 +86,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Skills");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

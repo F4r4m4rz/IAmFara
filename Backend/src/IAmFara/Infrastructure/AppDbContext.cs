@@ -1,4 +1,5 @@
-﻿using Data.Model;
+﻿using Data;
+using Data.Model;
 using Infrastructure.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,23 +11,13 @@ using System.Threading.Tasks;
 namespace Infrastructure
 {
 #nullable disable
-    internal class AppDbContext : DbContext
+    internal class AppDbContext : DataDbContext
     {
-        private readonly string _connectionString;
-
-        public AppDbContext(string connectionString)
+        public AppDbContext(string connectionString) : base(connectionString)
         {
-            _connectionString = connectionString;
-        }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            builder.UseSqlServer(_connectionString);
         }
 
         public DbSet<LogRecord> Logs { get; set; }
-        public DbSet<IntroductionTextModel> IntroTexts { get; set; }
-        public DbSet<SkillModel> Skills { get; set; }
-        public DbSet<AppUser> Users { get; set; }
     }
 }

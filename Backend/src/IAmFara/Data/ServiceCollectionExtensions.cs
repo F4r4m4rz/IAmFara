@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IIntroductionTextRepository, InMemoryIntroTextRepository>();
+            services.AddScoped<IIntroductionTextRepository, IntroductionTextRepository>();
             services.AddScoped<ISkillsRepository, InMemorySkillsRepository>();
             services.AddScoped<IAppUserRepository, InMemoryAppUserRepository>();
 
