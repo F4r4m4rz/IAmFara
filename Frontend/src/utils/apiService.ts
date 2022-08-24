@@ -25,6 +25,16 @@ export class ApiService  {
         });
     }
 
+    async delete(url: string){
+        const config: RequestInit = {method: "DELETE"};
+        
+        await fetch(url, config).then(async (r) => {
+            const response = await r.json()  as ApiResponse;
+
+            this.dispatchActions(response);
+        });
+    }
+
     dispatchActions(response: ApiResponse) {
         if (response && response.actions){
             response.actions.forEach(action => {
@@ -35,6 +45,8 @@ export class ApiService  {
         }
     }
 }
+
+
 
 
 

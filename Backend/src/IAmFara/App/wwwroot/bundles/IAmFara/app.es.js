@@ -8422,6 +8422,13 @@ class ApiService {
       this.dispatchActions(response);
     });
   }
+  async delete(url) {
+    const config = { method: "DELETE" };
+    await fetch(url, config).then(async (r) => {
+      const response = await r.json();
+      this.dispatchActions(response);
+    });
+  }
   dispatchActions(response) {
     if (response && response.actions) {
       response.actions.forEach((action) => {
@@ -8471,6 +8478,23 @@ function skillsReducer(state = new EntityMeta(), action) {
   switch (action.type) {
     case "GET_SKILLS":
       apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");
+      break;
+    case "ADDUPDATE-SKILL":
+      apiServiceInstance.post("https://localhost:7260/api/aboutme/skills", action.payload.data);
+      break;
+    case "NEW-SKILL":
+      const newSkillList = [...state.data];
+      newSkillList.push(action.payload.data);
+      state = { ...new EntityMeta(newSkillList) };
+      break;
+    case "DELETE-SKILL":
+      const id = action.payload.data;
+      apiServiceInstance.delete(`https://localhost:7260/api/aboutme/skills?id=${id}`);
+      break;
+    case "SKILL-DELETED":
+      const allSkills = [...state.data];
+      const newList = allSkills.filter((s) => s.id != action.payload.data);
+      state = { ...new EntityMeta(newList) };
       break;
   }
   return { ...state };
@@ -8599,42 +8623,171 @@ var IntroText$1 = connect(
   actions
 )(IntroText);
 
+const StarRate = (props) => {
+  const [selectedRate, setSelectedRate] = react.exports.useState(props.numberOfActiveStars);
+  const [activeStarsCount, setActiveStarsCount] = react.exports.useState(selectedRate);
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, !props.editable && [...Array(props.numberOfActiveStars)].map((i, j) => {
+    return /* @__PURE__ */ React.createElement(Star, {
+      key: j,
+      filled: true
+    });
+  }), props.editable && [...Array(props.numberOfTotalStars)].map((i, j) => {
+    return /* @__PURE__ */ React.createElement(Star, {
+      key: j,
+      filled: j < activeStarsCount ? true : false,
+      onMouseOver: () => setActiveStarsCount(j + 1),
+      onMouseLeave: () => setActiveStarsCount(selectedRate),
+      onMouseDown: () => {
+        setSelectedRate(j + 1);
+        if (props.onChange) {
+          props.onChange(j + 1);
+        }
+      }
+    });
+  }));
+};
+const Star = (props) => {
+  let variant = props.filled ? "fa-solid" : "fa-regular";
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("i", {
+    className: `${variant} fa-star`,
+    onMouseOver: props.onMouseOver,
+    onMouseLeave: props.onMouseLeave,
+    onMouseDown: props.onMouseDown
+  }));
+};
+
 const Skill = (props) => {
+  const [isEditMode, setIsEditMode] = react.exports.useState(props.isEditMode ?? false);
   return /* @__PURE__ */ React.createElement("div", {
     className: "col-lg-6"
-  }, /* @__PURE__ */ React.createElement("div", {
+  }, isEditMode && /* @__PURE__ */ React.createElement(EditableSkill, {
+    skill: props.skill,
+    onSubmit: (skill) => {
+      if (props.onChanged) {
+        props.onChanged(skill);
+      }
+      setIsEditMode(false);
+    }
+  }), !isEditMode && renderNotEditable(props.skill, props.isAdmin, () => setIsEditMode(true), props.onDelete));
+};
+function renderNotEditable(skill, isAdmin, onEditable, onDelete) {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, isAdmin && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("a", {
+    href: "#",
+    onClick: onEditable
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: "fa-solid fa-pencil"
+  })), onDelete && /* @__PURE__ */ React.createElement("a", {
+    href: "#",
+    className: "m-2",
+    onClick: () => onDelete(skill)
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: "fa-solid fa-trash-can"
+  }))), /* @__PURE__ */ React.createElement("div", {
     className: "row"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "skill-title col"
-  }, props.title), /* @__PURE__ */ React.createElement("div", {
+  }, skill.title), /* @__PURE__ */ React.createElement("div", {
     className: "col"
-  }, [...Array(props.rate)].map((rate, j) => {
-    return /* @__PURE__ */ React.createElement("i", {
-      key: j,
-      className: "fa-solid fa-star"
-    });
-  }))), props.description && /* @__PURE__ */ React.createElement("p", {
+  }, /* @__PURE__ */ React.createElement(StarRate, {
+    numberOfActiveStars: skill.rate,
+    editable: false,
+    numberOfTotalStars: 5
+  }))), skill.description && /* @__PURE__ */ React.createElement("p", {
     className: "skill-description col-5"
-  }, props.description));
-};
+  }, skill.description));
+}
+function EditableSkill(props) {
+  const { skill, onSubmit } = props;
+  const [editedTitle, setEditedTitle] = react.exports.useState(skill.title);
+  const [editedDesc, setEditedDesc] = react.exports.useState(skill.description);
+  const [editedRate, setEditedRate] = react.exports.useState(skill.rate === 0 ? 1 : skill.rate);
+  const handleSubmit = () => {
+    const newSkill = {
+      id: props.skill.id,
+      title: editedTitle,
+      description: editedDesc,
+      rate: editedRate
+    };
+    onSubmit(newSkill);
+  };
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Form$1, {
+    onSubmit: handleSubmit
+  }, /* @__PURE__ */ React.createElement(Button$1, {
+    type: "submit",
+    variant: "link"
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: "fa-solid fa-check"
+  })), /* @__PURE__ */ React.createElement(Form$1.Group, null, /* @__PURE__ */ React.createElement(Row$1, null, /* @__PURE__ */ React.createElement(Col$1, null, /* @__PURE__ */ React.createElement(Form$1.Control, {
+    required: true,
+    as: "textarea",
+    rows: 1,
+    placeholder: "Title",
+    defaultValue: editedTitle,
+    onChange: (e) => setEditedTitle(e.currentTarget.value)
+  })), /* @__PURE__ */ React.createElement(Col$1, null, /* @__PURE__ */ React.createElement(StarRate, {
+    numberOfActiveStars: editedRate,
+    editable: true,
+    numberOfTotalStars: 5,
+    onChange: (selectedRate) => setEditedRate(selectedRate)
+  })))), /* @__PURE__ */ React.createElement(Form$1.Group, null, /* @__PURE__ */ React.createElement(Form$1.Control, {
+    as: "textarea",
+    rows: 1,
+    placeholder: "Description",
+    defaultValue: editedDesc,
+    onChange: (e) => setEditedDesc(e.currentTarget.value)
+  }))));
+}
 
+function addUpdateSkill(skill) {
+  const store = getStore();
+  store.dispatch({
+    type: "ADDUPDATE-SKILL",
+    payload: {
+      data: skill
+    }
+  });
+}
+function deleteSkill(skill) {
+  const store = getStore();
+  store.dispatch({
+    type: "DELETE-SKILL",
+    payload: {
+      data: skill.id
+    }
+  });
+}
 function SkillList(props) {
+  const [showNewSkillField, setShowNewSkillField] = react.exports.useState(false);
+  const data = [...props.skills ?? []];
+  const sorted = data?.sort((s1, s2) => s1.rate - s2.rate);
   return /* @__PURE__ */ React.createElement(Col$1, {
     lg: "10"
-  }, /* @__PURE__ */ React.createElement(Row$1, {
+  }, props.isAdmin && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Button$1, {
+    className: "mb-5",
+    onClick: () => setShowNewSkillField(true)
+  }, "Add new"), props.isAdmin && showNewSkillField && /* @__PURE__ */ React.createElement(Skill, {
+    skill: { id: -1, title: "", description: "", rate: 0 },
+    isAdmin: props.isAdmin,
+    isEditMode: true,
+    onChanged: (skill) => {
+      addUpdateSkill(skill);
+      setShowNewSkillField(false);
+    }
+  })), /* @__PURE__ */ React.createElement(Row$1, {
     className: "skill-list"
-  }, props.skills?.map((skill, i) => /* @__PURE__ */ React.createElement(Skill, {
+  }, sorted?.sort((s1, s2) => s2.rate - s1.rate).map((skill, i) => /* @__PURE__ */ React.createElement(Skill, {
     key: i,
-    id: skill.id,
-    title: skill.title,
-    description: skill.description,
-    rate: skill.rate
+    skill,
+    isAdmin: props.isAdmin,
+    onChanged: (skill2) => addUpdateSkill(skill2),
+    onDelete: (skill2) => deleteSkill(skill2)
   }))));
 }
 var SkillList$1 = connect(
   (state) => {
     return {
-      skills: state.aboutMe.skills.data
+      skills: state.aboutMe.skills.data,
+      isAdmin: IsUserAdmin()
     };
   }
 )(SkillList);

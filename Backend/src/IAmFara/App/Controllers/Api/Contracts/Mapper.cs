@@ -34,6 +34,20 @@ namespace App.Controllers.Api.Contracts
             };
         }
 
+        public static ApiAction MapToAction(SkillModel skill, bool isNew)
+        {
+            return new ApiAction
+            {
+                Type = "NEW-SKILL",
+                Payload = new ApiActionPayload
+                {
+                    EntityName = "Skill",
+                    Data = Map(skill),
+                    Key = "Skill"
+                }
+            };
+        }
+
         public static ApiAction MapToAction(AppUser user)
         {
             return new ApiAction
@@ -100,6 +114,16 @@ namespace App.Controllers.Api.Contracts
             };
         }
         
+        public static SkillModel Map(SkillDto skill)
+        {
+            return new SkillModel
+            {
+                Id = skill.Id < 0 ? 0 : skill.Id,
+                Title = skill.Title,
+                Description = skill.Description,
+                Rate = (SkillRateEnum)skill.Rate
+            };
+        }
     }
 
 

@@ -13,6 +13,7 @@ function introTextReducer(state: IEntityMeta<IntroductionTextDto>  = new EntityM
         case "INTROTEXT-UPDATED":
             apiServiceInstance.post("https://localhost:7260/api/aboutme/introtext", action.payload.data);
             break;
+        
         default:
             break;
     }
@@ -24,6 +25,23 @@ function skillsReducer(state: IEntityMeta<SkillDto[]>  = new EntityMeta<SkillDto
     switch (action.type) {
         case "GET_SKILLS":
             apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");
+            break;
+        case "ADDUPDATE-SKILL":
+            apiServiceInstance.post("https://localhost:7260/api/aboutme/skills", action.payload.data);
+            break;
+        case "NEW-SKILL":
+            const newSkillList = [...state.data];
+            newSkillList.push(action.payload.data);
+            state = {...new EntityMeta(newSkillList)};
+            break;
+        case "DELETE-SKILL":
+            const id = action.payload.data;
+            apiServiceInstance.delete(`https://localhost:7260/api/aboutme/skills?id=${id}`);
+            break;
+        case "SKILL-DELETED":
+            const allSkills = [...state.data]
+            const newList = allSkills.filter(s => s.id != action.payload.data);
+            state = {...new EntityMeta(newList)};
             break;
         default:
             break;

@@ -66,7 +66,7 @@ namespace Data.Repositories.InMemory
             _skills.Add(skill4);
         }
 
-        public SkillModel Add(SkillModel skill)
+        public SkillModel AddOrUpdate(SkillModel skill)
         {
             throw new NotImplementedException();
         }
@@ -86,11 +86,6 @@ namespace Data.Repositories.InMemory
             _logger.LogInformation("Getting all skills from in memory database");
 
             return _skills;
-        }
-
-        public SkillModel Update(SkillModel skill)
-        {
-            throw new NotImplementedException();
         }
     }
 }

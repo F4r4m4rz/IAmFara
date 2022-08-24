@@ -1,11 +1,14 @@
-﻿using Infrastructure.Logging;
+﻿using Data.Exceptions;
+using Infrastructure.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Infrastructure.Misc.Middlewares
 {
@@ -18,30 +21,22 @@ namespace Infrastructure.Misc.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ICorrelationIdAccessor correlationIdAccessor)
+        public async Task Invoke(HttpContext context, ICorrelationIdAccessor correlationIdAccessor, ILogger<ExceptionHandlingMiddleware> logger)
         {
             Exception? exception = null;
-            context.Response.OnStarting( async () =>
+            if (exception != null)
             {
-                if (exception != null)
+                if (exception is HandledException handled)
                 {
-                    var action = new
-                    {
-                        type = "UNHANDLED_EXCEPTION",
-                        payload = new
-                        {
-                            data = new
-                            {
-                                CorrelationId = correlationIdAccessor.CorelationId?.CorelationId.ToString(),
-                                Message = exception.Message
-                            }
-                        }
-                    };
-
-                    var json = JsonSerializer.Serialize(action);
-                    await context.Response.WriteAsync(json);
+                    // Nothing needs to be done just logging as warning
+                    logger.LogWarning(handled.Message, handled.InnerException);
                 }
-            });
+                else
+                {
+                    // Log as error and redirect to error page
+                    logger.LogError(exception.Message, exception);
+                }
+            }
 
             try
             {
