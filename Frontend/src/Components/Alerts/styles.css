@@ -1,9 +1,16 @@
+.test {
+    position: sticky;
+    background-color: red;
+    height: 0px;
+    float: right;
+    top:0px;
+}
+
 .alerts {
-    width: 20%;
-    position:fixed;
-    top: auto;
-    right: 0;
-    margin-right: 15%;
+    position: sticky;
+    height: 0px;
+    float: right;
+    top:0px;
 }
 
 .alert {

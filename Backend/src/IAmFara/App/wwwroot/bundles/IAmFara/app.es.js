@@ -3337,7 +3337,7 @@ function isTransform(value) {
   return !!(value && supportedTransforms.test(value));
 }
 
-function style$1(node, property) {
+function style$2(node, property) {
   var css = '';
   var transforms = '';
 
@@ -3897,7 +3897,7 @@ function triggerEvent(node, eventName, bubbles, cancelable) {
 }
 
 function parseDuration$1(node) {
-  var str = style$1(node, 'transitionDuration') || '';
+  var str = style$2(node, 'transitionDuration') || '';
   var mult = str.indexOf('ms') === -1 ? 1000 : 1;
   return parseFloat(str) * mult;
 }
@@ -3933,7 +3933,7 @@ function transitionEnd(element, handler, duration, padding) {
 }
 
 function parseDuration(node, property) {
-  const str = style$1(node, property) || '';
+  const str = style$2(node, property) || '';
   const mult = str.indexOf('ms') === -1 ? 1000 : 1;
   return parseFloat(str) * mult;
 }
@@ -4093,8 +4093,8 @@ function getDefaultDimensionValue(dimension, elem) {
   const value = elem[offset];
   const margins = MARGINS[dimension];
   return value + // @ts-ignore
-  parseInt(style$1(elem, margins[0]), 10) + // @ts-ignore
-  parseInt(style$1(elem, margins[1]), 10);
+  parseInt(style$2(elem, margins[0]), 10) + // @ts-ignore
+  parseInt(style$2(elem, margins[1]), 10);
 }
 
 const collapseStyles = {
@@ -5499,11 +5499,11 @@ class ModalManager {
     if (containerState.scrollBarWidth) {
       // use computed style, here to get the real padding
       // to add our scrollbar width
-      style[paddingProp] = `${parseInt(style$1(container, paddingProp) || '0', 10) + containerState.scrollBarWidth}px`;
+      style[paddingProp] = `${parseInt(style$2(container, paddingProp) || '0', 10) + containerState.scrollBarWidth}px`;
     }
 
     container.setAttribute(OPEN_DATA_ATTRIBUTE, '');
-    style$1(container, style);
+    style$2(container, style);
   }
 
   reset() {
@@ -5897,8 +5897,8 @@ class BootstrapModalManager extends ModalManager {
     // @ts-ignore
 
     element.dataset[prop] = actual;
-    style$1(element, {
-      [prop]: `${parseFloat(style$1(element, prop)) + adjust}px`
+    style$2(element, {
+      [prop]: `${parseFloat(style$2(element, prop)) + adjust}px`
     });
   }
 
@@ -5907,7 +5907,7 @@ class BootstrapModalManager extends ModalManager {
 
     if (value !== undefined) {
       delete element.dataset[prop];
-      style$1(element, {
+      style$2(element, {
         [prop]: value
       });
     }
@@ -8401,6 +8401,14 @@ function configureStore(options) {
 // src/index.ts
 N();
 
+var NotificationActionLevelDto = /* @__PURE__ */ ((NotificationActionLevelDto2) => {
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Info"] = 0] = "Info";
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Success"] = 1] = "Success";
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Warning"] = 2] = "Warning";
+  NotificationActionLevelDto2[NotificationActionLevelDto2["Error"] = 3] = "Error";
+  return NotificationActionLevelDto2;
+})(NotificationActionLevelDto || {});
+
 class ApiService {
   constructor() {
     this.dispatch = null;
@@ -8469,6 +8477,7 @@ function introTextReducer(state = new EntityMeta(), action) {
       apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext").catch((r) => {
         const store = getStore();
         store.dispatch({ type: "LOADING-INTROTEXT-FAILED" });
+        store.dispatch(Notify(NotificationActionLevelDto.Error, "Failed to load introduction text"));
       });
       break;
     case "INTROTEXT-UPDATED":
@@ -8486,6 +8495,7 @@ function skillsReducer(state = new EntityMeta(), action) {
       apiServiceInstance.get("https://localhost:7260/api/aboutme/skills").catch((r) => {
         const store = getStore();
         store.dispatch({ type: "LOADING-SKILLS-FAILED" });
+        store.dispatch(Notify(NotificationActionLevelDto.Error, "Failed to load skills"));
       });
       break;
     case "ADDUPDATE-SKILL":
@@ -8588,6 +8598,23 @@ function IsUserAdmin() {
     return true;
   }
   return false;
+}
+function Notify(level, message, dismissable = true, autoDissmiss = false, timeout = 0) {
+  return {
+    type: "NOTIFICATION-ACTION",
+    payload: {
+      data: {
+        id: "",
+        level,
+        message,
+        dismissable,
+        autoDissmiss,
+        timeout
+      },
+      entityName: "",
+      key: ""
+    }
+  };
 }
 
 var styles$1 = '';
@@ -8826,7 +8853,7 @@ var SkillList$1 = connect(
   }
 )(SkillList);
 
-var style = '';
+var style$1 = '';
 
 function AboutMe(props) {
   react.exports.useEffect(() => {
@@ -8951,6 +8978,8 @@ function Protofolio() {
   return /* @__PURE__ */ React.createElement("div", null, "This is protofolio");
 }
 
+var style = '';
+
 function Content() {
   return /* @__PURE__ */ React.createElement(Container$1, null, /* @__PURE__ */ React.createElement(Switch$2, null, /* @__PURE__ */ React.createElement(Route, {
     exact: true,
@@ -9073,14 +9102,6 @@ const connector = connect(
 const AppNavBarComponent = connector(AppNavBar);
 
 var bootstrap_min = '';
-
-var NotificationActionLevelDto = /* @__PURE__ */ ((NotificationActionLevelDto2) => {
-  NotificationActionLevelDto2[NotificationActionLevelDto2["Info"] = 0] = "Info";
-  NotificationActionLevelDto2[NotificationActionLevelDto2["Success"] = 1] = "Success";
-  NotificationActionLevelDto2[NotificationActionLevelDto2["Warning"] = 2] = "Warning";
-  NotificationActionLevelDto2[NotificationActionLevelDto2["Error"] = 3] = "Error";
-  return NotificationActionLevelDto2;
-})(NotificationActionLevelDto || {});
 
 function ProgressAlert(props) {
   const [show, setShow] = react.exports.useState(true);

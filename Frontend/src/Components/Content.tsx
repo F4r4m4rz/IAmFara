@@ -2,13 +2,14 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import { Switch, Route, } from 'react-router-dom';
 import AboutMe from "./AboutMe/AboutMe";
+import ProgressAlerts from "./Alerts/ProgressAlerts";
 import { ContactForm } from "./Contact/Contact";
 import { Error } from "./Error/Error";
 import { Gallery } from "./Gallery/Gallery";
 import LoginComponent from "./Login/Login";
 import SignupComponent from "./Login/Signup";
 import { Protofolio } from "./Protofolio/Protofolio";
-import ProgressAlerts from "./Alerts/ProgressAlerts";
+import "./style.css";
 
 export function Content() {
     
