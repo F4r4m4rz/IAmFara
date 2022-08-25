@@ -1,13 +1,16 @@
 ﻿using App.Controllers.Api.Contracts;
 using Data.Exceptions;
 using Data.Repositories;
+using Infrastructure.Authorization;
 using Infrastructure.Misc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers.Api
 {
     [Route("api/{controller}")]
     [ApiController]
+    [Authorize(AuthorizationConstants.AdminPolicyName)]
     public class AboutMeController : BaseController
     {
         private readonly ILogger<AboutMeController> _logger;
@@ -22,6 +25,7 @@ namespace App.Controllers.Api
         }
 
         [HttpGet("introtext", Name = "Get introduction text")]
+        [AllowAnonymous]
         public IActionResult GetIntroText()
         {
             try
@@ -75,6 +79,7 @@ namespace App.Controllers.Api
         }
 
         [HttpGet("skills", Name = "Get skills")]
+        [AllowAnonymous]
         public IActionResult GetSkills()
         {
             try

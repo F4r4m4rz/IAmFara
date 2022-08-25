@@ -20,7 +20,7 @@ namespace Infrastructure.Authentication
         public async Task Invoke(HttpContext context, IAppCoockieHandler coockieHandler, IUserManager userManager, ICurrentUserProvider userProvider)
         {
             // Log in using coockie if any coockies found
-            if (context.Request.Cookies.TryGetValue("iamfaraCoockie", out var appCoockie))
+            if (context.Request.Cookies.TryGetValue(AuthenticationConstants.CoockieName, out var appCoockie))
             {
                 try
                 {
@@ -33,7 +33,7 @@ namespace Infrastructure.Authentication
                 }
                 catch
                 {
-                    context.Response.Cookies.Delete("iamfaraCoockie");
+                    context.Response.Cookies.Delete(AuthenticationConstants.CoockieName);
                 }
                 
             }
@@ -43,16 +43,16 @@ namespace Infrastructure.Authentication
             {
                 if (userProvider.CurrentUser is null)
                 {
-                    context.Response.Cookies.Delete("iamfaraCoockie");
+                    context.Response.Cookies.Delete(AuthenticationConstants.CoockieName);
                 }
                 else
                 {
-                    if (!context.Request.Cookies.TryGetValue("iamfaraCoockie", out var appCoockie))
+                    if (!context.Request.Cookies.TryGetValue(AuthenticationConstants.CoockieName, out var appCoockie))
                     {
                         var coockie = new AppCoockie { UserName = userProvider.CurrentUser.Email, Password = userProvider.LogInPassword };
                         var encrypted = coockieHandler.Encrypt(coockie);
                         var options = new CookieOptions() { Expires = DateTime.Now.AddDays(1), Secure = true };
-                        context.Response.Cookies.Append("iamfaraCoockie", encrypted, options);
+                        context.Response.Cookies.Append(AuthenticationConstants.CoockieName, encrypted, options);
                     }
                 }
 

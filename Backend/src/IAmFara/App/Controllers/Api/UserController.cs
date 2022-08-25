@@ -1,6 +1,8 @@
 ﻿using App.Controllers.Api.Contracts;
 using Data.Repositories;
 using Infrastructure.Authentication;
+using Infrastructure.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers.Api

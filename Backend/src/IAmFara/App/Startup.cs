@@ -20,6 +20,8 @@ namespace Api
             services.AddAppDependencies(_configuration);
 
             services.AddHttpContextAccessor();
+
+            services.AddApplicationAuthorizationPolicies();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

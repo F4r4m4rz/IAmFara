@@ -18,5 +18,15 @@ namespace Infrastructure.Authentication.Models
     public class UserRole
     {
         public string role { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return role != null && obj is UserRole userRole && role.Equals(userRole?.role);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
