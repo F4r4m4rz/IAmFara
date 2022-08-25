@@ -5,6 +5,7 @@ import { Dispatch } from "redux";
 import { IntroductionTextDto } from "../../contractTypes";
 import { IsUserAdmin } from "../../utils/Helpers";
 import { AppState } from "../../utils/Store";
+import { LoadingSymbol } from "../Shared/LoadingSymbol";
 
 function IntroText(props: Props) {
     const [updatedText, setUpdatedText] = useState(props.introText?.text);
@@ -29,7 +30,12 @@ function IntroText(props: Props) {
                     )
                 })
             )}
-            
+            {!props.isAdmin && !props.introText && (
+                <LoadingSymbol />
+            )}
+            {!props.isAdmin && props.introText && !props.introText.text && (
+                <p>Failed to load Introduction text</p>
+            )}
         </Col>
     )
 }

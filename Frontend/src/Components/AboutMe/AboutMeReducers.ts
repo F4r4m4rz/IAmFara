@@ -3,17 +3,22 @@ import { combineReducers } from "redux";
 import { IntroductionTextDto, SkillDto } from "../../contractTypes";
 import { apiServiceInstance } from "../../utils/apiService";
 import { EntityMeta, GenericReducer } from "../../utils/GenericReducer";
-import { ApiAction, IEntityMeta } from "../../utils/Store";
+import { ApiAction, getStore, IEntityMeta } from "../../utils/Store";
 
-function introTextReducer(state: IEntityMeta<IntroductionTextDto>  = new EntityMeta<IntroductionTextDto>(), action: ApiAction) {
+function introTextReducer(state: IEntityMeta<IntroductionTextDto | any>  = new EntityMeta<IntroductionTextDto>(), action: ApiAction) {
     switch (action.type) {
         case "GET_INTROTEXT":
-            apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext");
+            apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext").catch((r) => {
+                const store = getStore();
+                store.dispatch({type: "LOADING-INTROTEXT-FAILED"})
+            });
             break;
         case "INTROTEXT-UPDATED":
             apiServiceInstance.post("https://localhost:7260/api/aboutme/introtext", action.payload.data);
             break;
-        
+        case "LOADING-INTROTEXT-FAILED":
+            state = {...new EntityMeta({text: null})};
+            break;
         default:
             break;
     }
@@ -24,7 +29,10 @@ function introTextReducer(state: IEntityMeta<IntroductionTextDto>  = new EntityM
 function skillsReducer(state: IEntityMeta<SkillDto[]>  = new EntityMeta<SkillDto[]>(), action: ApiAction) {
     switch (action.type) {
         case "GET_SKILLS":
-            apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");
+            apiServiceInstance.get("https://localhost:7260/api/aboutme/skills").catch((r) => {
+                const store = getStore();
+                store.dispatch({type: "LOADING-SKILLS-FAILED"})
+            });
             break;
         case "ADDUPDATE-SKILL":
             apiServiceInstance.post("https://localhost:7260/api/aboutme/skills", action.payload.data);
@@ -43,10 +51,13 @@ function skillsReducer(state: IEntityMeta<SkillDto[]>  = new EntityMeta<SkillDto
             const newList = allSkills.filter(s => s.id != action.payload.data);
             state = {...new EntityMeta(newList)};
             break;
+        case "LOADING-SKILLS-FAILED":
+            state = {...new EntityMeta([])};
+            break;
         default:
             break;
     }
-
+    
     return {...state};
 }
 

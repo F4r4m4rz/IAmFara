@@ -43,6 +43,10 @@ namespace App.Controllers.Api
                 var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully pulled data of type: IntroductionText", false, true, 3);
 
                 var response = ApiResponse.GenerateResponse(dataUpdateAction, successNotification);
+
+                // Make latency, just to demonstrate
+                Thread.Sleep(3000);
+
                 return Ok(response);
             }
             catch (IAmFaraException ex)
@@ -91,6 +95,10 @@ namespace App.Controllers.Api
                 var successNotification = NotificationAction.Notify(NotificationActionLevelDto.Success, "Successfully pulled data of type: Skills", false, true, 3);
 
                 var response = ApiResponse.GenerateResponse(dataUpdateAction, successNotification);
+
+                // Make latency, just to demonstrate
+                Thread.Sleep(2000);
+
                 return Ok(response);
             }
             catch (IAmFaraException ex)

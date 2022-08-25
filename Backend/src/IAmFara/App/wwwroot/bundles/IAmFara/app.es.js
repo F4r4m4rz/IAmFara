@@ -8466,10 +8466,16 @@ function GenericReducer(name, baseReducer) {
 function introTextReducer(state = new EntityMeta(), action) {
   switch (action.type) {
     case "GET_INTROTEXT":
-      apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext");
+      apiServiceInstance.get("https://localhost:7260/api/aboutme/introtext").catch((r) => {
+        const store = getStore();
+        store.dispatch({ type: "LOADING-INTROTEXT-FAILED" });
+      });
       break;
     case "INTROTEXT-UPDATED":
       apiServiceInstance.post("https://localhost:7260/api/aboutme/introtext", action.payload.data);
+      break;
+    case "LOADING-INTROTEXT-FAILED":
+      state = { ...new EntityMeta({ text: null }) };
       break;
   }
   return { ...state };
@@ -8477,7 +8483,10 @@ function introTextReducer(state = new EntityMeta(), action) {
 function skillsReducer(state = new EntityMeta(), action) {
   switch (action.type) {
     case "GET_SKILLS":
-      apiServiceInstance.get("https://localhost:7260/api/aboutme/skills");
+      apiServiceInstance.get("https://localhost:7260/api/aboutme/skills").catch((r) => {
+        const store = getStore();
+        store.dispatch({ type: "LOADING-SKILLS-FAILED" });
+      });
       break;
     case "ADDUPDATE-SKILL":
       apiServiceInstance.post("https://localhost:7260/api/aboutme/skills", action.payload.data);
@@ -8495,6 +8504,9 @@ function skillsReducer(state = new EntityMeta(), action) {
       const allSkills = [...state.data];
       const newList = allSkills.filter((s) => s.id != action.payload.data);
       state = { ...new EntityMeta(newList) };
+      break;
+    case "LOADING-SKILLS-FAILED":
+      state = { ...new EntityMeta([]) };
       break;
   }
   return { ...state };
@@ -8578,6 +8590,16 @@ function IsUserAdmin() {
   return false;
 }
 
+var styles$1 = '';
+
+function LoadingSymbol() {
+  return /* @__PURE__ */ React.createElement("div", {
+    className: "loading-symbol"
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: "fa-solid fa-spinner"
+  }));
+}
+
 function IntroText(props) {
   const [updatedText, setUpdatedText] = react.exports.useState(props.introText?.text);
   return /* @__PURE__ */ React.createElement(Col$1, {
@@ -8598,7 +8620,7 @@ function IntroText(props) {
     return /* @__PURE__ */ React.createElement("p", {
       key: i
     }, line);
-  }));
+  }), !props.isAdmin && !props.introText && /* @__PURE__ */ React.createElement(LoadingSymbol, null), !props.isAdmin && props.introText && !props.introText.text && /* @__PURE__ */ React.createElement("p", null, "Failed to load Introduction text"));
 }
 const actions = (dispatch) => {
   return {
@@ -8667,6 +8689,12 @@ const Skill = (props) => {
         props.onChanged(skill);
       }
       setIsEditMode(false);
+    },
+    onAbort: () => {
+      if (props.onAbort) {
+        props.onAbort();
+      }
+      setIsEditMode(false);
     }
   }), !isEditMode && renderNotEditable(props.skill, props.isAdmin, () => setIsEditMode(true), props.onDelete));
 };
@@ -8717,6 +8745,11 @@ function EditableSkill(props) {
     variant: "link"
   }, /* @__PURE__ */ React.createElement("i", {
     className: "fa-solid fa-check"
+  })), /* @__PURE__ */ React.createElement(Button$1, {
+    variant: "link",
+    onClick: props.onAbort
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: "fa-solid fa-xmark"
   })), /* @__PURE__ */ React.createElement(Form$1.Group, null, /* @__PURE__ */ React.createElement(Row$1, null, /* @__PURE__ */ React.createElement(Col$1, null, /* @__PURE__ */ React.createElement(Form$1.Control, {
     required: true,
     as: "textarea",
@@ -8772,7 +8805,8 @@ function SkillList(props) {
     onChanged: (skill) => {
       addUpdateSkill(skill);
       setShowNewSkillField(false);
-    }
+    },
+    onAbort: () => setShowNewSkillField(false)
   })), /* @__PURE__ */ React.createElement(Row$1, {
     className: "skill-list"
   }, sorted?.sort((s1, s2) => s2.rate - s1.rate).map((skill, i) => /* @__PURE__ */ React.createElement(Skill, {
@@ -8781,7 +8815,7 @@ function SkillList(props) {
     isAdmin: props.isAdmin,
     onChanged: (skill2) => addUpdateSkill(skill2),
     onDelete: (skill2) => deleteSkill(skill2)
-  }))));
+  })), !props.skills && /* @__PURE__ */ React.createElement(LoadingSymbol, null), props.skills && props.skills.length === 0 && /* @__PURE__ */ React.createElement("p", null, "Failed to load skills")));
 }
 var SkillList$1 = connect(
   (state) => {

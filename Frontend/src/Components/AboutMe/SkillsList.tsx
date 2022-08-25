@@ -6,6 +6,7 @@ import { Dispatch } from "redux";
 import { SkillDto } from "../../contractTypes";
 import { IsUserAdmin } from "../../utils/Helpers";
 import { AppState, getStore } from "../../utils/Store";
+import { LoadingSymbol } from "../Shared/LoadingSymbol";
 import Skill from "./Skill";
 
 function addUpdateSkill(skill: SkillDto) {
@@ -53,6 +54,12 @@ function SkillList(props: Props) {
                     <Skill key={i} skill={skill} isAdmin={props.isAdmin} 
                         onChanged={(skill) => addUpdateSkill(skill)} 
                         onDelete={(skill) => deleteSkill(skill)} />)}
+                {!props.skills && (
+                    <LoadingSymbol />
+                )}
+                {props.skills && props.skills.length === 0 && (
+                    <p>Failed to load skills</p>
+                )}
             </Row>
         </Col>
     );
