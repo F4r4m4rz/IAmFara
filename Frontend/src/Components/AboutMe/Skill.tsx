@@ -40,7 +40,7 @@ const Skill = (props: Props) => {
 
 function renderNotEditable(skill: SkillDto, isAdmin: boolean, onEditable: () => void, onDelete?: (skill: SkillDto) => void) {
     return(
-        <>
+        <div className="skill-card">
             {isAdmin && (
                 <div>
                     <a href="#" onClick={onEditable}>
@@ -63,7 +63,7 @@ function renderNotEditable(skill: SkillDto, isAdmin: boolean, onEditable: () => 
             {skill.description && (
                 <p className="skill-description col-5">{skill.description}</p>
             )}
-        </>
+        </div>
     )
 }
 

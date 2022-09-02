@@ -1,10 +1,7 @@
 import React, { useLayoutEffect, useState } from "react";
 import "./NavBar.css";
 import AppNavList from "./AppNavList";
-import {Button, Container, Nav, Navbar, Row} from 'react-bootstrap';
-import { connect, ConnectedProps } from "react-redux";
-import { AppState } from "../../utils/Store";
-import { Dispatch } from "redux";
+import {Container, Navbar, Row} from 'react-bootstrap';
 
 function isCollapsed() : boolean {
     const [windowSize, setWindowSize] = useState([0,0]);
@@ -21,7 +18,7 @@ function isCollapsed() : boolean {
     return width < 1000 ? true : false;
 }
 
-function AppNavBar(props: Props) {
+export function AppNavBar() {
 
     return (
         <Navbar bg="white" expand="lg" className="app-nav-bar">
@@ -39,20 +36,8 @@ function AppNavBar(props: Props) {
                 {isCollapsed() && (
                     <Navbar.Toggle className="ms-auto me-3" aria-controls="basic-navbar-nav" />
                 )}
-                <AppNavList collapsed={isCollapsed()} currentUser={props.currentUser.data} />
+                <AppNavList collapsed={isCollapsed()} />
             </Container>
         </Navbar>
     );
 }
-
-const connector = connect(
-    (state: AppState) => {
-        return {
-            currentUser: state.currentUser
-        }
-    }
-)
-
-type Props = ConnectedProps<typeof connector>;
-
-export const AppNavBarComponent = connector(AppNavBar);

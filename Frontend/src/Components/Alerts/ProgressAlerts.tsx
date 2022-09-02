@@ -1,35 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { connect, useDispatch } from "react-redux";
-import { NotificationActionLevelDto, ProgressNotificationDto } from "../../contractTypes";
-import { AppState, getStore } from "../../utils/Store";
+import React, { useContext, useState } from "react";
+import { GlobalContext } from "../../utils/GlobalState";
 import { ProgressAlert } from "./progressAlert";
 import "./styles.css";
 
 const rendered : string[] = [];
 
-function ProgressAlerts(props: AlertProps) {
+export function ProgressAlerts() {
+    const gs = useContext(GlobalContext);
     return (
-        <div className="alerts">
-            {props.alerts && props.alerts.length != 0 && (
-               props.alerts.map((a) => {
-                    return (
-                        <ProgressAlert key={a.id} alert={a} />
-                    );
-               }) 
-            )}
-        </div>
+        <GlobalContext.Consumer>
+            {value => 
+                <div className="alerts">
+                    {value.alerts && value.alerts.length != 0 && (
+                        value.handleAlerts((a) => {
+                            return <ProgressAlert key={a.id} alert={a} />
+                        })  
+                    )}
+                </div>
+            }
+        </GlobalContext.Consumer>
     );
-}
-
-export default connect(
-    (state: AppState) => {
-        return {
-            alerts: state.alerts.data
-        };
-    }
-)(ProgressAlerts);
-
-type AlertProps = {
-    alerts: ProgressNotificationDto[]
 }

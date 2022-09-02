@@ -24,7 +24,7 @@ namespace App.Controllers.Api
             _skillsRepository = skillsRepository;
         }
 
-        [HttpGet("introtext", Name = "Get introduction text")]
+        [HttpGet("introtext", Name = "Get introduction text (old)")]
         [AllowAnonymous]
         public IActionResult GetIntroText()
         {
@@ -58,7 +58,7 @@ namespace App.Controllers.Api
             }
         }
 
-        [HttpPost("introtext", Name = "Update introduction text")]
+        [HttpPost("introtext", Name = "Update introduction text  (old)")]
         public IActionResult UpdateIntroText([FromBody] string introText)
         {
             try
@@ -82,7 +82,7 @@ namespace App.Controllers.Api
             }
         }
 
-        [HttpGet("skills", Name = "Get skills")]
+        [HttpGet("skills", Name = "Get skills  (old)")]
         [AllowAnonymous]
         public IActionResult GetSkills()
         {
@@ -110,7 +110,7 @@ namespace App.Controllers.Api
             }
         }
 
-        [HttpPost("skills", Name = "Add or update skill")]
+        [HttpPost("skills", Name = "Add or update skill  (old)")]
         public IActionResult AddOrUpdateSkill([FromBody] SkillDto skill)
         {
             try
@@ -134,7 +134,7 @@ namespace App.Controllers.Api
             }
         }
 
-        [HttpDelete("skills", Name = "Delete skill")]
+        [HttpDelete("skills", Name = "Delete skill  (old)")]
         public IActionResult DeleteSkill([FromQuery] int id)
         {
             try

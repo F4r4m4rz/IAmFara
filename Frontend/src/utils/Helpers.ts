@@ -1,30 +1,35 @@
-import { NotificationActionLevelDto } from "../contractTypes";
-import { ApiAction, getStore } from "./Store";
+import { useContext } from "react";
+import { AlertLevelDto, AlertDto, SecurityUser } from "../contractTypes";
+import { GlobalContext } from "./GlobalState";
 
-export function IsUserAdmin() : boolean {
-    const state = getStore().getState();
-    
-    if (state.currentUser?.data?.userRoles.find(r=>r.role == "Admin")) {
-        return true;
+export function isAdmin(user: SecurityUser | null) : boolean {
+    if (user) {
+        return user.userRoles?.find(r => r.role === "Admin") !== undefined;
     }
 
     return false;
 }
 
-export function Notify(level: NotificationActionLevelDto, message: string, dismissable: boolean = true, autoDissmiss: boolean = false, timeout: number = 0) : ApiAction {
+export function notify(level: AlertLevelDto, message: string, dismissable: boolean = true, autoDismiss: boolean = false, timeout: number = 0) : AlertDto {
     return {
-        type: "NOTIFICATION-ACTION",
-        payload: {
-            data: {
-                id: "",
-                level,
-                message,
-                dismissable,
-                autoDissmiss,
-                timeout
-            },
-            entityName: "",
-            key: ""
-        }
+        id: "",
+        level,
+        message,
+        dismissable,
+        autoDismiss,
+        timeout
     };
+}
+
+export function useNotify(level: AlertLevelDto, message: string, dismissable: boolean = true, autoDismiss: boolean = false, timeout: number = 0) {
+    const alert: AlertDto = {
+        id: "",
+        level,
+        message,
+        dismissable,
+        autoDismiss,
+        timeout
+    };
+    const gs = useContext(GlobalContext);
+    gs.addAlerts([...[], alert]);
 }

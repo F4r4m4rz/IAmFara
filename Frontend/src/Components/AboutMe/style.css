@@ -20,6 +20,10 @@
     font-size: small;
 }
 
+.skill-card {
+    height: 80px;
+}
+
 @media screen and (max-width: 1300px) {
     .introduction-text {
         font-size: large;

@@ -1,53 +1,29 @@
 import { AnyAction, Dispatch } from "redux";
-import { ApiAction, ApiResponse } from "./Store";
+import { ApiResponse } from "../contractTypes";
 
 export class ApiService  {
-    dispatch: Dispatch<ApiAction> | null = null;
+    mainUrl : string = "https://localhost:7260/api/v2/";
 
-    async get(url: string){
+    async get<T>(url: string) : Promise<ApiResponse<T>> {
         const config: RequestInit = {method: "GET"};
-        
-        await fetch(url, config).then(async (r) => {
-            const response = await r.json()  as ApiResponse;
-
-            this.dispatchActions(response);
-        });
+        const response = await fetch(this.mainUrl + url, config);
+        return await response.json() as ApiResponse<T>;
     }
 
-    async post<T>(url: string, json: T) {
+    async post<T, U>(url: string, json: T) : Promise<ApiResponse<U>> {
         const config: RequestInit = {method: "POST", body: JSON.stringify(json), headers:[["Accept", "application/json"],
         ["Content-Type", "application/json"]] };
-        
-        await fetch(url, config).then(async (r) => {
-            const response = await r.json() as ApiResponse;
-            
-            this.dispatchActions(response);
-        });
+
+        const response = await fetch(this.mainUrl + url, config);
+        return await response.json() as ApiResponse<U>;
     }
 
-    async delete(url: string){
+    async delete<T>(url: string) :Promise<ApiResponse<T>> {
         const config: RequestInit = {method: "DELETE"};
         
-        await fetch(url, config).then(async (r) => {
-            const response = await r.json()  as ApiResponse;
-
-            this.dispatchActions(response);
-        });
-    }
-
-    dispatchActions(response: ApiResponse) {
-        if (response && response.actions){
-            response.actions.forEach(action => {
-                if (this.dispatch){
-                    this.dispatch(action);
-                }
-            });
-        }
+        const response = await fetch(this.mainUrl + url, config);
+        return await response.json() as ApiResponse<T>;
     }
 }
-
-
-
-
 
 export const apiServiceInstance = new ApiService();

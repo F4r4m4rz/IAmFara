@@ -1,5 +1,10 @@
 export type AppEntityName = "IntroductionText" | "Skill";
 
+export type ApiResponse<T> = {
+    data: T | null,
+    alerts: AlertDto[]
+}
+
 export type IntroductionTextDto = {
     id: number;
     createdOn: string;
@@ -45,7 +50,7 @@ export type UserRole = {
     role: string,
 }
 
-export enum NotificationActionLevelDto
+export enum AlertLevelDto
 {
     Info,
     Success,
@@ -53,9 +58,9 @@ export enum NotificationActionLevelDto
     Error
 }
 
-export type ProgressNotificationDto = {
+export type AlertDto = {
     id: string,
-    level: NotificationActionLevelDto,
+    level: AlertLevelDto,
     message: string,
     dismissable: boolean,
     autoDismiss: boolean,

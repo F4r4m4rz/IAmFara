@@ -1,21 +1,21 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { createContext, useContext, useLayoutEffect, useState } from "react";
 import { Content } from "./Components/Content";
-import { AppNavBarComponent } from "./Components/NavBar/AppNavBar";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Store } from "redux";
-import { Provider } from "react-redux";
-import { AppState } from "./utils/Store";
-import ProgressAlerts from "./Components/Alerts/ProgressAlerts";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { GlobalState, GlobalStateProvider } from "./utils/GlobalState";
+import { AlertDto, AlertLevelDto, ApiResponse, SecurityUser } from "./contractTypes";
+import { apiServiceInstance } from "./utils/apiService";
+import { AppNavBar } from "./Components/NavBar/AppNavBar";
+import { ProgressAlerts } from "./Components/Alerts/ProgressAlerts";
 
-const App = ({ store }: { store: Store<AppState>}) => {
-    
+
+export const App = () => {
+  
     return (
-        <Provider store={store}>
-            <AppNavBarComponent />
+        <GlobalStateProvider>
+            <AppNavBar />
             <ProgressAlerts />
             <Content />
-        </Provider>
+        </GlobalStateProvider>
     );
 }
-
-export default App;

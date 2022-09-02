@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Col } from "react-bootstrap";
 import Alert from "react-bootstrap/esm/Alert";
-import { NotificationActionLevelDto, ProgressNotificationDto } from "../../contractTypes";
+import { AlertLevelDto, AlertDto } from "../../contractTypes";
 
 type Props = {
-    alert: ProgressNotificationDto
+    alert: AlertDto
 }
 
 export function ProgressAlert(props: Props) {
@@ -15,16 +14,16 @@ export function ProgressAlert(props: Props) {
 
     let variant : string;
     switch (props.alert.level) {
-        case NotificationActionLevelDto.Info:
+        case AlertLevelDto.Info:
             variant = "info";
             break;
-        case NotificationActionLevelDto.Error:
+        case AlertLevelDto.Error:
             variant = "danger";
             break;
-        case NotificationActionLevelDto.Warning:
+        case AlertLevelDto.Warning:
             variant = "warning";
             break;
-        case NotificationActionLevelDto.Success:
+        case AlertLevelDto.Success:
             variant = "success";
             break;
         default:
