@@ -2,7 +2,7 @@ import { AnyAction, Dispatch } from "redux";
 import { ApiResponse } from "../contractTypes";
 
 export class ApiService  {
-    mainUrl : string = "https://localhost:7260/api/v2/";
+    mainUrl : string = "https://iamfara.com/api/v2/";
 
     async get<T>(url: string) : Promise<ApiResponse<T>> {
         const config: RequestInit = {method: "GET"};

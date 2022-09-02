@@ -1,5 +1,8 @@
-﻿using Infrastructure.Authentication;
+﻿using Infrastructure;
+using Infrastructure.Authentication;
 using Infrastructure.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +15,17 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static IApplicationBuilder UseApplicationMidllewares(this IApplicationBuilder builder)
         {
-            return builder
-                .UseExceptionHanling()
-                .UseCoockieAuthentication()
-                .UseCorelationId();
+            // Migrate database
+            using (var services = builder.ApplicationServices.CreateScope())
+            {
+                var dbContext = services.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.Migrate();
+            }
+
+                return builder
+                    .UseExceptionHanling()
+                    .UseCoockieAuthentication()
+                    .UseCorelationId();
         }
     }
 }
