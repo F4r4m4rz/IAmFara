@@ -7,6 +7,7 @@ namespace IAmFara.Web
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddControllers();
             builder.Services.AddRazorPages();
 
             var app = builder.Build();
@@ -26,7 +27,12 @@ namespace IAmFara.Web
 
             app.UseAuthorization();
 
-            app.MapRazorPages();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+                endpoints.MapFallbackToPage("/index");
+            });
 
             app.Run();
         }

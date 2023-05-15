@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Route, Routes } from 'react-router-dom';
 import TestComponent from 'src/components/test-component/TestComponent';
 
 const StyledApp = styled.div`
@@ -7,9 +8,12 @@ const StyledApp = styled.div`
 
 export function App() {
   return (
-    <StyledApp>
-      <TestComponent />
-    </StyledApp>
+    <Routes>
+      {/*This is for layout <Route element={layout} />*/}
+      <Route path="" element={<>Home page</>} />
+      <Route path="Blog" element={<>Blog page</>} />
+      <Route path="Test" element={<TestComponent />} />
+    </Routes>
   );
 }
 
