@@ -6,8 +6,6 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -43,8 +41,8 @@ jobs:
         # Add your deployment steps here
         # Example: Use SSH to copy files to your server
         run: |
-          apt-get update
-          apt-get install -y lftp
-          lftp -u main-folder_001,Far1898859 sftp://main-folder_001.smarternet.hosting <<EOF
-          mirror -R -e ./src/Backend/publish /
-          EOF
+          uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+          with:
+            server: sftp://main-folder_001.smarternet.hosting
+            username: main-folder_001
+            password: Far1898859
