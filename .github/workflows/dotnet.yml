@@ -43,3 +43,5 @@ jobs:
           server: iamfara.com
           username: ${{ secrets.FTP_User_Name }}
           password: ${{ secrets.FTP_Password }}
+          local-dir: ./publish/
+          dangerous-clean-slate: true
