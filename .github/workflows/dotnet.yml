@@ -24,7 +24,7 @@ jobs:
           node-version: '14'
 
       - name: Build and Copy Frontend
-        working-directory: src/frontend/iamfara/src
+        working-directory: src/Frontend/iamfara/src
         run: |
           npm install
           npm run build
@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '7.0.x' 
 
       - name: Build and Publish Backend
-        working-directory: src/backend 
+        working-directory: src/Backend 
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to Server
@@ -46,5 +46,5 @@ jobs:
           apt-get update
           apt-get install -y lftp
           lftp -u main-folder_001,Far1898859 sftp://main-folder_001.smarternet.hosting <<EOF
-          mirror -R -e ./src/backend/publish /
+          mirror -R -e ./src/Backend/publish /
           EOF
