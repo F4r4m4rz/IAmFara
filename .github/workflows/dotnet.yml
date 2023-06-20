@@ -38,11 +38,8 @@ jobs:
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to Server
-        # Add your deployment steps here
-        # Example: Use SSH to copy files to your server
-        run: |
-          uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-          with:
-            server: sftp://main-folder_001.smarternet.hosting
-            username: main-folder_001
-            password: Far1898859
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: sftp://main-folder_001.smarternet.hosting
+          username: main-folder_001
+          password: Far1898859
