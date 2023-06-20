@@ -40,6 +40,6 @@ jobs:
       - name: Deploy to Server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: sftp://main-folder_001.smarterasp.net
+          server: iamfara.smarterasp.net
           username: ${{ secrets.FTP_User_Name }}
           password: ${{ secrets.FTP_Password }}
