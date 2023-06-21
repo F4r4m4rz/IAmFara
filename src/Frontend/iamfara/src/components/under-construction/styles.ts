@@ -1,23 +1,32 @@
 import styled from "@emotion/styled";
 
-export const ContainerDiv = styled.div`
+export const CenteredDiv = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  height: 300px;
+
+  .icon {
+    margin-right: 20px;
+  }
+
+  h2 {
+    display: inline;
+  }
 
   .mobile {
+    width: 300px;
     margin-top: 30px;
     font-size: 12px;
-    width: 300px;
   }
 `;
 
-export const WelcomeText = styled.div`
-  width: 600px;
+export const StyledDiv = styled.div`
+  margin-top: 50px;
   font-family: 'Bangers', Courier, monospace;
   font-size: 18px;
-  margin-top: 100px;
-
-  
+  width: 600px;
 
   p {
     text-align: justify;
