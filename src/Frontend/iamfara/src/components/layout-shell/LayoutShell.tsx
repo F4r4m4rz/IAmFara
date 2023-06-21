@@ -1,4 +1,4 @@
-import { BookOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
+import { BookOutlined, MessageOutlined, UserOutlined, MenuOutlined } from '@ant-design/icons';
 import { Layout } from 'antd';
 import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -19,12 +19,13 @@ export function LayoutShell() {
     <StyledLayout>
       <StyledHeader>
         <Link to={'/'}>
-          <img className={isMobile ? "mobile-logo" : "logo"} src="/icon.png" alt="icon" />
+          <img className="logo" src="/icon.png" alt="icon" />
         </Link>
         <StyledMenu
           mode="horizontal"
           items={menuItems(navigate)}
           selectedKeys={[location.pathname]}
+          overflowedIndicator={<MenuOutlined rev={undefined} />}
         />
       </StyledHeader>
       <StyledContent>
@@ -37,7 +38,7 @@ export function LayoutShell() {
 const menuItems: (
   navigate: (url: string) => void
 ) => ItemType<MenuItemType>[] = (navigate) => [
-  /*{
+  {
     key: '/about',
     icon: <UserOutlined rev={undefined} />,
     title: 'About Me',
@@ -57,5 +58,5 @@ const menuItems: (
     title: 'Contact Me',
     label: 'Contact Me',
     onClick: () => navigate('/contact'),
-  },*/
+  },
 ];
