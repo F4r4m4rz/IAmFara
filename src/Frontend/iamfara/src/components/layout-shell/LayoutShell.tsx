@@ -2,22 +2,24 @@ import { BookOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
 import { Layout } from 'antd';
 import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useMobile } from 'src/utils/mediaQueries';
 import {
-  Logo,
   StyledContent,
   StyledHeader,
+  StyledLayout,
   StyledMenu,
 } from './LayoutShell.Styles';
 
 export function LayoutShell() {
+  const isMobile = useMobile();
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
-    <Layout>
+    <StyledLayout>
       <StyledHeader>
         <Link to={'/'}>
-          <Logo src="/icon.png" alt="icon" />
+          <img className={isMobile ? "mobile-logo" : "logo"} src="/icon.png" alt="icon" />
         </Link>
         <StyledMenu
           mode="horizontal"
@@ -28,32 +30,32 @@ export function LayoutShell() {
       <StyledContent>
         <Outlet />
       </StyledContent>
-    </Layout>
+    </StyledLayout>
   );
 }
 
 const menuItems: (
   navigate: (url: string) => void
 ) => ItemType<MenuItemType>[] = (navigate) => [
-  {
+  /*{
     key: '/about',
-    icon: <UserOutlined />,
+    icon: <UserOutlined rev={undefined} />,
     title: 'About Me',
     label: 'About Me',
     onClick: () => navigate('/about'),
   },
   {
     key: '/blog',
-    icon: <BookOutlined />,
+    icon: <BookOutlined rev={undefined} />,
     title: 'Blog',
     label: 'Blog',
     onClick: () => navigate('/blog'),
   },
   {
     key: '/contact',
-    icon: <MessageOutlined />,
+    icon: <MessageOutlined rev={undefined} />,
     title: 'Contact Me',
     label: 'Contact Me',
     onClick: () => navigate('/contact'),
-  },
+  },*/
 ];

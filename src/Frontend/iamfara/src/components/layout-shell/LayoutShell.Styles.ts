@@ -5,6 +5,7 @@ import { layoutColors } from "src/utils/colors";
 export const StyledLayout = styled(Layout)`
   background: ${layoutColors.background};
   margin: 0px;
+  min-height: 100vh;
 `;
 
 export const StyledHeader = styled(Layout.Header)`
@@ -18,15 +19,20 @@ export const StyledHeader = styled(Layout.Header)`
     justify-content: center; 
     align-items: center;
   }
-`;
 
-export const Logo = styled.img`
-  height: 50px;
-  width: 50px;
+  .mobile-logo {
+    height: 25px;
+    width: 25px;
+  }
+
+  .logo {
+    height: 50px;
+    width: 50px;
+  }
 `;
 
 export const StyledContent = styled(Layout.Content)`
-  height: 100vh;
+  overflow: auto;
   background: inherit;
 `;
 
