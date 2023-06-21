@@ -16,18 +16,15 @@ export const StyledHeader = styled(Layout.Header)`
 
   a {
     display: flex;
-    justify-content: center; 
+    justify-content: start; 
     align-items: center;
-  }
-
-  .mobile-logo {
-    height: 25px;
-    width: 25px;
+    width: 50%;
   }
 
   .logo {
     height: 50px;
     width: 50px;
+    float: left;
   }
 `;
 
