@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { TextPane } from "src/components/text-pane/TextPane";
 
 export const ContainerDiv = styled.div`
   display: flex;
@@ -11,13 +12,9 @@ export const ContainerDiv = styled.div`
   }
 `;
 
-export const WelcomeText = styled.div`
+export const WelcomeText = styled(TextPane)`
   width: 600px;
-  font-family: 'Bangers', Courier, monospace;
-  font-size: 18px;
   margin-top: 100px;
-
-  
 
   p {
     text-align: justify;

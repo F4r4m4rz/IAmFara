@@ -5,7 +5,6 @@ export const CenteredDiv = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 300px;
 
   .icon {
     margin-right: 20px;
@@ -20,6 +19,12 @@ export const CenteredDiv = styled.div`
     margin-top: 30px;
     font-size: 12px;
   }
+
+  .text-pane {
+    width: 700px;
+    margin-top: 30px;
+  }
+
 `;
 
 export const StyledDiv = styled.div`

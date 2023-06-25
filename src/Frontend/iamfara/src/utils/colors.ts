@@ -1,4 +1,4 @@
 
 export const layoutColors = {
-    background: '#fafafa'
+    background: '#cccccc'
 }
