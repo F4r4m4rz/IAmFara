@@ -1,8 +1,11 @@
-import { BookOutlined, MessageOutlined, UserOutlined, MenuOutlined } from '@ant-design/icons';
-import { Layout } from 'antd';
+import {
+  BookOutlined,
+  MenuOutlined,
+  MessageOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useMobile } from 'src/utils/mediaQueries';
 import {
   StyledContent,
   StyledHeader,
@@ -11,7 +14,6 @@ import {
 } from './LayoutShell.Styles';
 
 export function LayoutShell() {
-  const isMobile = useMobile();
   const navigate = useNavigate();
   const location = useLocation();
 
