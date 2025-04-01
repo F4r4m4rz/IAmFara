@@ -27,12 +27,10 @@ namespace IAmFara.Web
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapRazorPages();
-                endpoints.MapFallbackToPage("/index");
-            });
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }

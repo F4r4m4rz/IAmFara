@@ -5,11 +5,10 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -19,22 +18,21 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "18"
 
       - name: Build and Copy Frontend
-        working-directory: src/Frontend/iamfara/src
+        working-directory: src/frontend
         run: |
           npm install
           npm run build
-          npm run copy-to-wwwroot
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '7.0.x' 
+          dotnet-version: "7.0.x"
 
       - name: Build and Publish Backend
-        working-directory: src/Backend 
+        working-directory: src/Backend
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to Server
