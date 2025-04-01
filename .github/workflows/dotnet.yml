@@ -20,10 +20,10 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Reset npm config
+      - name: Force public registry + remove auth
         run: |
-            npm config delete '//registry.npmjs.org/:_authToken'
-            npm config set registry https://registry.npmjs.org/
+          rm -f ~/.npmrc
+          npm config set registry https://registry.npmjs.org/
 
       - name: Build and Copy Frontend
         working-directory: src/frontend
