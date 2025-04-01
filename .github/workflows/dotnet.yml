@@ -20,14 +20,10 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Force public registry + remove auth
-        run: |
-          rm -f ~/.npmrc
-          npm config set registry https://registry.npmjs.org/
-
       - name: Build and Copy Frontend
         working-directory: src/frontend
         run: |
+          npm config list
           npm install
           npm run build
 
