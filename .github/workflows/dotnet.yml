@@ -18,12 +18,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "14"
 
       - name: Build and Copy Frontend
         working-directory: src/frontend
         run: |
-          npm config list
           npm install
           npm run build
 
