@@ -20,8 +20,10 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Fix NPM registry (avoid auth error)
-        run: npm config set //registry.npmjs.org/:_authToken ""
+      - name: Reset npm config
+        run: |
+            npm config delete '//registry.npmjs.org/:_authToken'
+            npm config set registry https://registry.npmjs.org/
 
       - name: Build and Copy Frontend
         working-directory: src/frontend
