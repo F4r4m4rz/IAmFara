@@ -20,8 +20,15 @@ jobs:
         with:
           node-version: 18
 
-      - name: Delete local .npmrc if present
-        run: rm -f src/frontend/.npmrc
+      - name: Debug npm config
+        run: npm config list
+
+      - name: Nuking ALL .npmrc
+        run: |
+          rm -f ~/.npmrc
+          rm -f src/frontend/.npmrc
+          npm config delete '//registry.npmjs.org/:_authToken'
+          npm config set registry https://registry.npmjs.org/
 
       - name: Nuke global .npmrc og sett public registry
         run: |
