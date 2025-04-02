@@ -45,7 +45,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Build and Publish Backend
-        working-directory: src/backend
+        working-directory: src/Backend/
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to Server
@@ -54,4 +54,4 @@ jobs:
           server: iamfara.com
           username: ${{ secrets.FTP_User_Name }}
           password: ${{ secrets.FTP_Password }}
-          local-dir: ./src/backend/publish/
+          local-dir: ./src/Backend/publish/
