@@ -20,29 +20,17 @@ jobs:
         with:
           node-version: 18
 
-      - name: Debug npm config
-        run: |
-          npm config list
-          npm config ls -l
-
-      - name: Nuking ALL .npmrc
+      - name: Nuke all auth
         run: |
           rm -f ~/.npmrc
           rm -f src/frontend/.npmrc
           npm config delete '//registry.npmjs.org/:_authToken'
-          npm config set registry https://registry.npmjs.org/
-
-      - name: Nuke global .npmrc og sett public registry
-        run: |
-          rm -f ~/.npmrc
-          echo "registry=https://registry.npmjs.org/" > ~/.npmrc
 
       - name: Build and Copy Frontend
         working-directory: src/frontend
         run: |
-          npm install
+          npm ci --registry=https://registry.npmjs.org/
           npm run build
-
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
