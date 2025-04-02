@@ -16,9 +16,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "18"
+          cache: 'npm'
+
+      - name: Nuke .npmrc og sett public registry
+        run: |
+          rm -f ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" > ~/.npmrc
 
       - name: Build and Copy Frontend
         working-directory: src/frontend
