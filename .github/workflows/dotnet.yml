@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Nuke .npmrc og sett public registry
+      - name: Delete local .npmrc if present
+        run: rm -f src/frontend/.npmrc
+
+      - name: Nuke global .npmrc og sett public registry
         run: |
           rm -f ~/.npmrc
           echo "registry=https://registry.npmjs.org/" > ~/.npmrc
@@ -30,6 +33,7 @@ jobs:
         run: |
           npm install
           npm run build
+
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
