@@ -21,7 +21,9 @@ jobs:
           node-version: 18
 
       - name: Debug npm config
-        run: npm config list
+        run: |
+          npm config list
+          npm config ls -l
 
       - name: Nuking ALL .npmrc
         run: |
