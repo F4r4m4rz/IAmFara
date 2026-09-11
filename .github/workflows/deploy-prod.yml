@@ -35,7 +35,7 @@ jobs:
       - name: Publish and deploy backend via Web Deploy
         working-directory: src/backend/IAmFara.Web
         run: >
-          dotnet publish IAmFara.Web.csproj -c Release
+          dotnet build IAmFara.Web.csproj -c Release
           /p:DeployOnBuild=true
           /p:DeployDefaultTarget=WebPublish
           /p:WebPublishMethod=MSDeploy
