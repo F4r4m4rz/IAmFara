@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
@@ -8,10 +8,10 @@ type Props = {
 };
 
 const navItems = [
-  { label: "Home", path: "/" },
-  { label: "Projects", path: "/projects" },
-  { label: "Blogs", path: "/blogs" },
-  { label: "Contact", path: "/contact" },
+  { label: "home", path: "/" },
+  { label: "projects", path: "/projects" },
+  { label: "blogs", path: "/blogs" },
+  { label: "contact", path: "/contact" },
 ];
 
 export default function Layout({ children }: Props) {
@@ -20,11 +20,26 @@ export default function Layout({ children }: Props) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
-      {/* Navbar */}
-      <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-8">
-        {/* Left (Logo) */}
-        <div className=" text-2xl font-bold tracking-tight">iamfara</div>
+    <div className="min-h-screen bg-term-bg text-term-text font-mono">
+      {/* Titlebar */}
+      <nav className="h-14 bg-term-panel/95 backdrop-blur-sm border-b border-term-border flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20">
+        {/* Left (traffic lights + path) */}
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+            <span className="w-3 h-3 rounded-full bg-term-pink" />
+            <span className="w-3 h-3 rounded-full bg-term-orange" />
+            <span className="w-3 h-3 rounded-full bg-term-green" />
+          </div>
+          <Link
+            to="/"
+            className="text-sm sm:text-base font-semibold tracking-tight text-term-text truncate"
+          >
+            <span className="text-term-green">faramarz</span>
+            <span className="text-term-muted">@</span>
+            <span className="text-term-blue">iamfara</span>
+            <span className="text-term-muted">:~$</span>
+          </Link>
+        </div>
         {/* NavBar */}
         {collapseNav ? <CollapsedNavBar /> : <ListNavBar />}
       </nav>
@@ -37,17 +52,18 @@ export default function Layout({ children }: Props) {
 function ListNavBar() {
   const location = useLocation();
   return (
-    <ul className="flex gap-8 text-base font-medium mx-auto absolute left-1/2 -translate-x-1/2">
+    <ul className="flex gap-6 text-sm">
       {navItems.map((item) => (
         <li key={item.path}>
           <Link
             to={item.path}
-            className={`transition-colors duration-200 hover:text-gray-600 ${
+            className={`transition-colors duration-200 hover:text-term-green ${
               location.pathname === item.path
-                ? "text-gray-800 font-semibold"
-                : "text-gray-300"
+                ? "text-term-green font-semibold"
+                : "text-term-muted"
             }`}
           >
+            <span className="text-term-border">./</span>
             {item.label}
           </Link>
         </li>
@@ -63,13 +79,14 @@ function CollapsedNavBar() {
   return (
     <div className="flex items-center gap-4 relative">
       <button
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+        className="flex items-center justify-center w-9 h-9 rounded border border-term-border bg-term-bg text-term-text hover:border-term-green hover:text-term-green transition-colors focus:outline-none"
         onClick={() => setOpen(!open)}
+        aria-label="Toggle menu"
       >
-        <Menu className="w-6 h-6" />
+        {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
       <div
-        className={`absolute right-0 top-12 w-48 bg-white rounded-md shadow-lg z-10 ${
+        className={`absolute right-0 top-12 w-52 bg-term-panel border border-term-border rounded-md shadow-xl z-10 overflow-hidden ${
           open ? "" : "hidden"
         }`}
       >
@@ -79,12 +96,13 @@ function CollapsedNavBar() {
               <Link
                 to={item.path}
                 onClick={() => setOpen(false)}
-                className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                className={`block px-4 py-2 text-sm hover:bg-term-bg hover:text-term-green transition-colors ${
                   location.pathname === item.path
-                    ? "bg-gray-100 font-semibold"
-                    : ""
+                    ? "text-term-green font-semibold"
+                    : "text-term-muted"
                 }`}
               >
+                <span className="text-term-border">./</span>
                 {item.label}
               </Link>
             </li>
