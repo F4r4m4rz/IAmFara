@@ -1,33 +1,28 @@
-export function TechStackCard() {
-  const techStack = [
-    {
-      name: ".NET",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/e/ee/.NET_Core_Logo.svg",
-    },
-    {
-      name: "React",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
-    },
-    {
-      name: "MongoDB",
-      icon: "https://webassets.mongodb.com/_com_assets/cms/mongodb_logo1-76twgcu2dm.png",
-    },
-    {
-      name: "GraphQL",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/1/17/GraphQL_Logo.svg",
-    },
-  ];
+const techStack = [
+  ".NET",
+  "React",
+  "TypeScript",
+  "MongoDB",
+  "GraphQL",
+  "Azure",
+  "Tailwind CSS",
+  "Docker",
+];
 
+export function TechStackCard() {
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-md">
-      <div className="grid grid-cols-4 self-stretch">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+      <div className="text-sm font-semibold tracking-wide text-gray-400 uppercase text-center mb-6">
+        Tools &amp; technologies I work with
+      </div>
+      <div className="flex flex-wrap justify-center gap-3">
         {techStack.map((tech) => (
-          <div
-            key={tech.name}
-            className="flex flex-col items-center justify-center"
+          <span
+            key={tech}
+            className="px-4 py-2 rounded-full bg-gray-50 border border-gray-100 text-sm font-medium text-gray-700 transition-colors hover:bg-indigo-50 hover:border-indigo-100 hover:text-indigo-700"
           >
-            <img src={tech.icon} alt={tech.name} className="w-24 mb-2" />
-          </div>
+            {tech}
+          </span>
         ))}
       </div>
     </div>

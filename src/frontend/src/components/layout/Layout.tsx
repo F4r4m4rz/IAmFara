@@ -20,11 +20,11 @@ export default function Layout({ children }: Props) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50/60 via-white to-white text-gray-900 font-sans">
       {/* Navbar */}
-      <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-8">
+      <nav className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-20">
         {/* Left (Logo) */}
-        <div className=" text-2xl font-bold tracking-tight">iamfara</div>
+        <div className="text-2xl font-bold tracking-tight">iamfara</div>
         {/* NavBar */}
         {collapseNav ? <CollapsedNavBar /> : <ListNavBar />}
       </nav>
