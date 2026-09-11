@@ -1,0 +1,53 @@
+name: Deploy to Test (SmarterASP.NET)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: src/frontend
+        run: npm ci
+
+      # Vite writes its build output directly into src/backend/IAmFara.Web/wwwroot
+      # (see src/frontend/vite.config.ts), so this must run before dotnet publish.
+      - name: Build frontend
+        working-directory: src/frontend
+        run: npm run build
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish and deploy backend via Web Deploy
+        working-directory: src/backend/IAmFara.Web
+        run: >
+          dotnet build IAmFara.Web.csproj -c Release
+          /p:DeployOnBuild=true
+          /p:DeployDefaultTarget=WebPublish
+          /p:WebPublishMethod=MSDeploy
+          /p:MSDeployPublishMethod=WMSVC
+          /p:MSDeployServiceURL=https://${{ secrets.TEST_SERVER }}:8172/msdeploy.axd?site=${{ secrets.TEST_SITENAME }}
+          /p:DeployIisAppPath=${{ secrets.TEST_SITENAME }}
+          /p:UserName=${{ secrets.TEST_USERNAME }}
+          /p:Password=${{ secrets.TEST_PASSWORD }}
+          /p:AllowUntrustedCertificate=True
