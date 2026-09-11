@@ -12,9 +12,9 @@ export function ContactCard() {
       button={
         <button
           onClick={() => navigate("/contact")}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors"
         >
-          Get in touch <ArrowRight className="h-4 w-4" />
+          get in touch <ArrowRight className="h-4 w-4" />
         </button>
       }
     />

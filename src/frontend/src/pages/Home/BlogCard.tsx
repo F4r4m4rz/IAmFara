@@ -12,9 +12,9 @@ export function BlogCard() {
       button={
         <button
           onClick={() => navigate("/blogs")}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors"
         >
-          Read the blog <ArrowRight className="h-4 w-4" />
+          read the blog <ArrowRight className="h-4 w-4" />
         </button>
       }
     />

@@ -12,9 +12,9 @@ export function ProjectsCard() {
       button={
         <button
           onClick={() => navigate("/projects")}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors"
         >
-          View projects <ArrowRight className="h-4 w-4" />
+          view projects <ArrowRight className="h-4 w-4" />
         </button>
       }
     />
