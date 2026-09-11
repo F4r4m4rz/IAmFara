@@ -51,3 +51,4 @@ jobs:
           /p:UserName=${{ secrets.TEST_USERNAME }}
           /p:Password=${{ secrets.TEST_PASSWORD }}
           /p:AllowUntrustedCertificate=True
+          /p:EnvironmentName=Staging
