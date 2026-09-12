@@ -118,48 +118,63 @@ function CollapsedNavBar() {
           <SquareTerminal className="w-5 h-5" />
         )}
       </button>
-      {open && (
-        <div
-          id={menuId}
-          role="menu"
-          aria-label="Site navigation"
-          className="absolute right-0 top-12 w-56 max-w-[calc(100vw-2rem)] bg-term-panel border border-term-border rounded-md shadow-xl z-10 overflow-hidden"
-        >
-          <div className="flex items-center gap-1.5 px-4 py-2 border-b border-term-border bg-term-bg/60">
-            <span className="w-2.5 h-2.5 rounded-full bg-term-pink" />
-            <span className="w-2.5 h-2.5 rounded-full bg-term-orange" />
-            <span className="w-2.5 h-2.5 rounded-full bg-term-green" />
-          </div>
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-1.5 text-sm text-term-muted">
-              <span className="text-term-green">$</span>
-              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
-                ls
-              </span>
-              <span className="inline-block w-1.5 h-4 bg-term-green animate-caret" />
+      <div
+        id={menuId}
+        role="menu"
+        aria-label="Site navigation"
+        aria-hidden={!open}
+        className={`absolute right-0 top-12 w-56 max-w-[calc(100vw-2rem)] grid z-10 ${
+          open ? "" : "pointer-events-none"
+        }`}
+        style={{
+          gridTemplateRows: open ? "1fr" : "0fr",
+          opacity: open ? 1 : 0,
+          transition:
+            "grid-template-rows 500ms ease-in-out, opacity 400ms ease-in-out",
+        }}
+      >
+        <div className="overflow-hidden bg-term-panel border border-term-border rounded-md shadow-xl">
+          <div
+            key={open ? "open" : "closed"}
+            className="min-h-0 overflow-hidden"
+          >
+            <div className="flex items-center gap-1.5 px-4 py-2 border-b border-term-border bg-term-bg/60">
+              <span className="w-2.5 h-2.5 rounded-full bg-term-pink" />
+              <span className="w-2.5 h-2.5 rounded-full bg-term-orange" />
+              <span className="w-2.5 h-2.5 rounded-full bg-term-green" />
             </div>
-            <ul className="mt-2 space-y-1">
-              {navItems.map((item, i) => (
-                <li key={item.path} role="none">
-                  <Link
-                    to={item.path}
-                    role="menuitem"
-                    onClick={() => setOpen(false)}
-                    style={{ animationDelay: `${300 + i * 60}ms` }}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-transparent text-sm opacity-0 animate-fade-slide-in transition-colors hover:border-term-green hover:text-term-green hover:bg-term-bg ${
-                      location.pathname === item.path
-                        ? "text-term-green font-semibold border-term-border bg-term-bg"
-                        : "text-term-muted"
-                    }`}
-                  >
-                    ./{item.label}.sh
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-1.5 text-sm text-term-muted">
+                <span className="text-term-green">$</span>
+                <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
+                  ls
+                </span>
+                <span className="inline-block w-1.5 h-4 bg-term-green animate-caret" />
+              </div>
+              <ul className="mt-2 space-y-1">
+                {navItems.map((item, i) => (
+                  <li key={item.path} role="none">
+                    <Link
+                      to={item.path}
+                      role="menuitem"
+                      tabIndex={open ? 0 : -1}
+                      onClick={() => setOpen(false)}
+                      style={{ animationDelay: `${500 + i * 60}ms` }}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-transparent text-sm opacity-0 animate-fade-slide-in transition-colors hover:border-term-green hover:text-term-green hover:bg-term-bg ${
+                        location.pathname === item.path
+                          ? "text-term-green font-semibold border-term-border bg-term-bg"
+                          : "text-term-muted"
+                      }`}
+                    >
+                      ./{item.label}.sh
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
