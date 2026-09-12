@@ -7,7 +7,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { T } from "../../i18n";
+import { dirFor, T, useLocale } from "../../i18n";
 import { AvatarBadge } from "./AvatarBadge";
 import { BlogCard } from "./BlogCard";
 import { ContactCard } from "./ContactCard";
@@ -33,6 +33,7 @@ const socialLinks = [
 
 function Home() {
   const navigate = useNavigate();
+  const { locale } = useLocale();
 
   return (
     <div className="flex flex-col gap-16">
@@ -72,11 +73,19 @@ function Home() {
               <span className="text-term-muted">.dev</span>
               <span className="inline-block w-2.5 h-6 sm:h-8 bg-term-green ml-2 align-middle animate-caret" />
             </h1>
-            <p className="mt-2 flex items-center gap-1.5 text-term-orange font-medium">
-              <span className="text-term-muted">&gt;</span>
+            <p
+              dir={dirFor(locale)}
+              className="mt-2 flex items-center gap-1.5 text-term-orange font-medium"
+            >
+              <span dir="ltr" className="text-term-muted">
+                &gt;
+              </span>
               <T k="hero.tagline" />
             </p>
-            <p className="mt-1 inline-flex items-center gap-1.5 text-xs sm:text-sm text-term-muted">
+            <p
+              dir={dirFor(locale)}
+              className="mt-1 inline-flex items-center gap-1.5 text-xs sm:text-sm text-term-muted"
+            >
               <MapPin className="h-3.5 w-3.5" /> <T k="hero.location" />
             </p>
 
@@ -84,7 +93,12 @@ function Home() {
               <span className="text-term-green">$</span>
               <span>cat about.md</span>
             </div>
-            <p className="mt-2 text-term-text/90 leading-relaxed max-w-2xl border-l-2 border-term-border pl-4">
+            <p
+              dir={dirFor(locale)}
+              className={`mt-2 text-term-text/90 leading-relaxed max-w-2xl border-term-border ${
+                locale === "fa" ? "border-r-2 pr-4" : "border-l-2 pl-4"
+              }`}
+            >
               <T k="hero.about" />
             </p>
 

@@ -110,6 +110,16 @@ export function useLocale() {
   return ctx;
 }
 
+/**
+ * The `dir` to set on a block-level element (paragraph, button, etc.) that
+ * holds translated prose, so it's actually right-aligned and reads in the
+ * correct order for Persian — an inline dir on a nested span isn't enough
+ * once the text wraps across multiple lines.
+ */
+export function dirFor(locale: Locale) {
+  return locale === "fa" ? "rtl" : "ltr";
+}
+
 /** Renders a translated string with the right text direction for the current locale. */
 export function T({ k, className }: { k: string; className?: string }) {
   const { t, locale } = useLocale();

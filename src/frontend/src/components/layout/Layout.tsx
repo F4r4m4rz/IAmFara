@@ -2,6 +2,7 @@ import { SquareTerminal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
+import { EnglandFlag } from "../icons/EnglandFlag";
 import { IranLionSunFlag } from "../icons/IranLionSunFlag";
 import { useLocale } from "../../i18n";
 
@@ -66,9 +67,7 @@ function LanguageToggle() {
       {locale === "en" ? (
         <IranLionSunFlag className="w-5 h-3.5 rounded-[1px]" />
       ) : (
-        <span className="text-[10px] font-semibold text-term-green tracking-wide">
-          EN
-        </span>
+        <EnglandFlag className="w-5 h-3.5 rounded-[1px]" />
       )}
     </button>
   );
