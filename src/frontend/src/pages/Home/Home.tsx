@@ -7,6 +7,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AvatarBadge } from "./AvatarBadge";
 import { BlogCard } from "./BlogCard";
 import { ContactCard } from "./ContactCard";
 import { ProjectsCard } from "./ProjectsCard";
@@ -49,11 +50,7 @@ function Home() {
         <div className="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-5 gap-10 items-start">
           <div className="md:col-span-2 flex justify-center">
             <div className="relative">
-              <img
-                src="/myPic.png"
-                alt="Faramarz"
-                className="rounded-lg w-40 h-40 sm:w-56 sm:h-56 object-cover border-2 border-term-border grayscale-[20%]"
-              />
+              <AvatarBadge />
               <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-term-bg border border-term-border text-xs font-medium text-term-green px-3 py-1 rounded-full shadow-md whitespace-nowrap">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-term-green opacity-75"></span>
