@@ -1,10 +1,13 @@
 import { BrainCircuit, Code2, Cpu, Globe } from "lucide-react";
+import { useLocale } from "../../i18n";
 
 export function AvatarBadge() {
+  const { t } = useLocale();
+
   return (
     <div
       role="img"
-      aria-label="Faramarz — web, AI, and software engineering"
+      aria-label={t("avatar.label")}
       className="relative w-40 h-40 sm:w-56 sm:h-56 rounded-lg border-2 border-term-border bg-term-panel overflow-hidden"
     >
       {/* glow blobs */}

@@ -7,6 +7,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { T } from "../../i18n";
 import { AvatarBadge } from "./AvatarBadge";
 import { BlogCard } from "./BlogCard";
 import { ContactCard } from "./ContactCard";
@@ -72,11 +73,11 @@ function Home() {
               <span className="inline-block w-2.5 h-6 sm:h-8 bg-term-green ml-2 align-middle animate-caret" />
             </h1>
             <p className="mt-2 flex items-center gap-1.5 text-term-orange font-medium">
-              <span className="text-term-muted">&gt;</span> full-stack
-              developer crafting things for the web
+              <span className="text-term-muted">&gt;</span>
+              <T k="hero.tagline" />
             </p>
             <p className="mt-1 inline-flex items-center gap-1.5 text-xs sm:text-sm text-term-muted">
-              <MapPin className="h-3.5 w-3.5" /> Oslo, Norway
+              <MapPin className="h-3.5 w-3.5" /> <T k="hero.location" />
             </p>
 
             <div className="mt-6 flex items-center gap-2 text-term-muted">
@@ -84,11 +85,7 @@ function Home() {
               <span>cat about.md</span>
             </div>
             <p className="mt-2 text-term-text/90 leading-relaxed max-w-2xl border-l-2 border-term-border pl-4">
-              I'm a self-taught full-stack developer based in Norway with a
-              strong background in .NET and React. I care about clean,
-              maintainable code and building products that feel great to use
-              — lately I've been diving deep into AI-assisted tooling and
-              modern web architecture.
+              <T k="hero.about" />
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">

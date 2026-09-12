@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 type CardProps = {
   icon: ReactNode;
   title: string;
-  description: string;
+  description: ReactNode;
   button: ReactNode;
 };
 

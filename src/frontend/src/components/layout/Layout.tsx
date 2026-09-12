@@ -2,6 +2,8 @@ import { SquareTerminal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
+import { IranLionSunFlag } from "../icons/IranLionSunFlag";
+import { useLocale } from "../../i18n";
 
 type Props = {
   children: React.ReactNode;
@@ -41,11 +43,34 @@ export default function Layout({ children }: Props) {
           </Link>
         </div>
         {/* NavBar */}
-        {collapseNav ? <CollapsedNavBar /> : <ListNavBar />}
+        <div className="flex items-center gap-3">
+          <LanguageToggle />
+          {collapseNav ? <CollapsedNavBar /> : <ListNavBar />}
+        </div>
       </nav>
       {/* Main content */}
       <main className="max-w-5xl mx-auto px-4 py-10">{children}</main>
     </div>
+  );
+}
+
+function LanguageToggle() {
+  const { locale, toggleLocale, t } = useLocale();
+
+  return (
+    <button
+      onClick={toggleLocale}
+      aria-label={locale === "en" ? t("nav.switchToFa") : t("nav.switchToEn")}
+      className="flex items-center justify-center w-9 h-9 rounded border border-term-border bg-term-bg hover:border-term-green transition-colors overflow-hidden"
+    >
+      {locale === "en" ? (
+        <IranLionSunFlag className="w-5 h-3.5 rounded-[1px]" />
+      ) : (
+        <span className="text-[10px] font-semibold text-term-green tracking-wide">
+          EN
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -77,6 +102,7 @@ const menuId = "mobile-nav-menu";
 function CollapsedNavBar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLocale();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +133,7 @@ function CollapsedNavBar() {
         ref={buttonRef}
         className="flex items-center justify-center w-9 h-9 rounded border border-term-border bg-term-bg text-term-text hover:border-term-green hover:text-term-green transition-colors focus:outline-none"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Toggle menu"
+        aria-label={t("nav.toggleMenu")}
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={menuId}
@@ -121,7 +147,7 @@ function CollapsedNavBar() {
       <div
         id={menuId}
         role="menu"
-        aria-label="Site navigation"
+        aria-label={t("nav.siteNavigation")}
         aria-hidden={!open}
         className={`absolute right-0 top-12 w-56 max-w-[calc(100vw-2rem)] grid z-10 ${
           open ? "" : "pointer-events-none"

@@ -1,6 +1,7 @@
 import { ArrowRight, FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card/Card";
+import { T } from "../../i18n";
 
 export function ProjectsCard() {
   const navigate = useNavigate();
@@ -8,13 +9,13 @@ export function ProjectsCard() {
     <Card
       icon={<FolderOpen className="h-6 w-6" />}
       title="Projects"
-      description="Explore what I've built and what I'm building"
+      description={<T k="card.projects.description" />}
       button={
         <button
           onClick={() => navigate("/projects")}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors"
         >
-          view projects <ArrowRight className="h-4 w-4" />
+          <T k="card.projects.button" /> <ArrowRight className="h-4 w-4" />
         </button>
       }
     />
