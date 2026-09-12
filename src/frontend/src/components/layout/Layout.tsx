@@ -1,4 +1,4 @@
-import { Menu, X } from "lucide-react";
+import { SquareTerminal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
@@ -102,7 +102,11 @@ function CollapsedNavBar() {
         aria-expanded={open}
         aria-controls={menuId}
       >
-        {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {open ? (
+          <X className="w-5 h-5" />
+        ) : (
+          <SquareTerminal className="w-5 h-5" />
+        )}
       </button>
       {open && (
         <div
