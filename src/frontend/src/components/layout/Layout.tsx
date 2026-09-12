@@ -78,6 +78,7 @@ function CollapsedNavBar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -87,12 +88,21 @@ function CollapsedNavBar() {
         buttonRef.current?.focus();
       }
     };
+    const onPointerDown = (e: PointerEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
   }, [open]);
 
   return (
-    <div className="flex items-center gap-4 relative">
+    <div className="flex items-center gap-4 relative" ref={containerRef}>
       <button
         ref={buttonRef}
         className="flex items-center justify-center w-9 h-9 rounded border border-term-border bg-term-bg text-term-text hover:border-term-green hover:text-term-green transition-colors focus:outline-none"
