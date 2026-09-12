@@ -1,5 +1,5 @@
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
 
@@ -72,43 +72,80 @@ function ListNavBar() {
   );
 }
 
+const menuId = "mobile-nav-menu";
+
 function CollapsedNavBar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <div className="flex items-center gap-4 relative">
       <button
+        ref={buttonRef}
         className="flex items-center justify-center w-9 h-9 rounded border border-term-border bg-term-bg text-term-text hover:border-term-green hover:text-term-green transition-colors focus:outline-none"
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen((o) => !o)}
         aria-label="Toggle menu"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={menuId}
       >
         {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
-      <div
-        className={`absolute right-0 top-12 w-52 bg-term-panel border border-term-border rounded-md shadow-xl z-10 overflow-hidden ${
-          open ? "" : "hidden"
-        }`}
-      >
-        <ul className="py-1">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                onClick={() => setOpen(false)}
-                className={`block px-4 py-2 text-sm hover:bg-term-bg hover:text-term-green transition-colors ${
-                  location.pathname === item.path
-                    ? "text-term-green font-semibold"
-                    : "text-term-muted"
-                }`}
-              >
-                <span className="text-term-border">./</span>
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {open && (
+        <div
+          id={menuId}
+          role="menu"
+          aria-label="Site navigation"
+          className="absolute right-0 top-12 w-56 max-w-[calc(100vw-2rem)] bg-term-panel border border-term-border rounded-md shadow-xl z-10 overflow-hidden"
+        >
+          <div className="flex items-center gap-1.5 px-4 py-2 border-b border-term-border bg-term-bg/60">
+            <span className="w-2.5 h-2.5 rounded-full bg-term-pink" />
+            <span className="w-2.5 h-2.5 rounded-full bg-term-orange" />
+            <span className="w-2.5 h-2.5 rounded-full bg-term-green" />
+          </div>
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-1.5 text-sm text-term-muted">
+              <span className="text-term-green">$</span>
+              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
+                ls
+              </span>
+              <span className="inline-block w-1.5 h-4 bg-term-green animate-caret" />
+            </div>
+            <ul className="mt-2 space-y-1">
+              {navItems.map((item, i) => (
+                <li key={item.path} role="none">
+                  <Link
+                    to={item.path}
+                    role="menuitem"
+                    onClick={() => setOpen(false)}
+                    style={{ animationDelay: `${300 + i * 60}ms` }}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-transparent text-sm opacity-0 animate-fade-slide-in transition-colors hover:border-term-green hover:text-term-green hover:bg-term-bg ${
+                      location.pathname === item.path
+                        ? "text-term-green font-semibold border-term-border bg-term-bg"
+                        : "text-term-muted"
+                    }`}
+                  >
+                    ./{item.label}.sh
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

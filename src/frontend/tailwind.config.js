@@ -31,9 +31,19 @@ module.exports = {
           "0%, 49%": { opacity: "1" },
           "50%, 100%": { opacity: "0" },
         },
+        typing: {
+          from: { width: "0" },
+          to: { width: "2ch" },
+        },
+        fadeSlideIn: {
+          "0%": { opacity: "0", transform: "translateY(-4px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         caret: "caret 1s step-end infinite",
+        typing: "typing 0.3s steps(2, end) forwards",
+        "fade-slide-in": "fadeSlideIn 0.25s ease-out forwards",
       },
     },
   },
