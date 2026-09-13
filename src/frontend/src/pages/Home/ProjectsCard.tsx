@@ -1,24 +1,23 @@
-import { FolderOpen } from "lucide-react";
+import { ArrowRight, FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card/Card";
+import { dirFor, T, useLocale } from "../../i18n";
 
 export function ProjectsCard() {
   const navigate = useNavigate();
+  const { locale } = useLocale();
   return (
     <Card
-      title={
-        <>
-          <FolderOpen className="h-10 w-10" />
-          <div className="text-2xl font-bold text-gray-800">Projects</div>
-        </>
-      }
-      description="Explore what I’ve built and what I’m building"
+      icon={<FolderOpen className="h-6 w-6" />}
+      title="Projects"
+      description={<T k="card.projects.description" />}
       button={
         <button
           onClick={() => navigate("/projects")}
-          className="border-2 border-gray-700 text-gray-700 py-1 px-4 rounded mt-6 text-base"
+          dir={dirFor(locale)}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors"
         >
-          View Projects
+          <T k="card.projects.button" /> <ArrowRight className="h-4 w-4" />
         </button>
       }
     />

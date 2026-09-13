@@ -1,34 +1,48 @@
-export function TechStackCard() {
-  const techStack = [
-    {
-      name: ".NET",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/e/ee/.NET_Core_Logo.svg",
-    },
-    {
-      name: "React",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
-    },
-    {
-      name: "MongoDB",
-      icon: "https://webassets.mongodb.com/_com_assets/cms/mongodb_logo1-76twgcu2dm.png",
-    },
-    {
-      name: "GraphQL",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/1/17/GraphQL_Logo.svg",
-    },
-  ];
+const techStack = [
+  ".NET",
+  "React",
+  "TypeScript",
+  "SQL",
+  "MongoDB",
+  "GraphQL",
+  "Azure",
+  "Tailwind CSS",
+  "Docker",
+];
 
+export function TechStackCard() {
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-md">
-      <div className="grid grid-cols-4 self-stretch">
-        {techStack.map((tech) => (
-          <div
-            key={tech.name}
-            className="flex flex-col items-center justify-center"
-          >
-            <img src={tech.icon} alt={tech.name} className="w-24 mb-2" />
-          </div>
-        ))}
+    <div className="bg-term-panel rounded-lg border border-term-border shadow-sm overflow-hidden">
+      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-term-border bg-term-bg/60">
+        <span className="w-2.5 h-2.5 rounded-full bg-term-pink" />
+        <span className="w-2.5 h-2.5 rounded-full bg-term-orange" />
+        <span className="w-2.5 h-2.5 rounded-full bg-term-green" />
+        <span className="ml-2 text-xs text-term-muted">./stack.json</span>
+      </div>
+      <div className="p-6 sm:p-8 text-sm sm:text-base">
+        <div>
+          <span className="text-term-muted">{"{"}</span>
+        </div>
+        <div className="pl-4">
+          <span className="text-term-blue">"tech_stack"</span>
+          <span className="text-term-muted">: [</span>
+        </div>
+        <div className="pl-8 flex flex-wrap gap-x-2 gap-y-2 py-2">
+          {techStack.map((tech, i) => (
+            <span
+              key={tech}
+              className="px-3 py-1 rounded-md bg-term-bg border border-term-border text-term-orange transition-colors hover:border-term-green hover:text-term-green"
+            >
+              "{tech}"{i < techStack.length - 1 ? "," : ""}
+            </span>
+          ))}
+        </div>
+        <div className="pl-4">
+          <span className="text-term-muted">]</span>
+        </div>
+        <div>
+          <span className="text-term-muted">{"}"}</span>
+        </div>
       </div>
     </div>
   );

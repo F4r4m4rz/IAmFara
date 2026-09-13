@@ -1,5 +1,7 @@
+import { ComingSoon } from "../../components/ComingSoon/ComingSoon";
+
 function Projects() {
-  return <h1 className="text-2xl text-center">Mine prosjekter kommer her!</h1>;
+  return <ComingSoon path="~/projects" command="./projects.sh" />;
 }
 
 export default Projects;

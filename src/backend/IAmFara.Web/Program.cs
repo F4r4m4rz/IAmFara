@@ -20,7 +20,11 @@ namespace IAmFara.Web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsStaging())
+            {
+                app.UseHttpsRedirection();
+            }
+
             app.UseStaticFiles();
 
             app.UseRouting();
