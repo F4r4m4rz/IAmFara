@@ -23,6 +23,18 @@ public class ContactEmailSender(
         && !string.IsNullOrWhiteSpace(_resend.FromEmail)
         && !string.IsNullOrWhiteSpace(_contact.ToEmail);
 
+    /// <summary>
+    /// Which individual settings are present — booleans only, never the
+    /// actual values — so a deploy can be sanity-checked remotely without
+    /// exposing secrets.
+    /// </summary>
+    public object ConfigStatus => new
+    {
+        apiKeyConfigured = !string.IsNullOrWhiteSpace(_resend.ApiKey),
+        fromEmailConfigured = !string.IsNullOrWhiteSpace(_resend.FromEmail),
+        toEmailConfigured = !string.IsNullOrWhiteSpace(_contact.ToEmail),
+    };
+
     public async Task SendAsync(string name, string email, string message, CancellationToken ct)
     {
         var payload = new

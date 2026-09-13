@@ -81,6 +81,12 @@ namespace IAmFara.Web
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
+            // Temporary diagnostic: reports which contact-form settings are
+            // present without ever exposing their values — for sanity-
+            // checking a deploy's config remotely. Safe to remove later.
+            app.MapGet("/api/contact/status", (ContactEmailSender emailSender) =>
+                Results.Ok(emailSender.ConfigStatus));
+
             app.MapPost("/api/contact", async (
                 ContactRequest request,
                 ContactEmailSender emailSender,
