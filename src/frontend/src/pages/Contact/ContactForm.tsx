@@ -7,6 +7,7 @@ type Status = "idle" | "loading" | "success" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message", string>>;
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const CONTROL_CHAR_PATTERN = /[\x00-\x1f\x7f]/;
 
 export function ContactForm() {
   const { t, locale } = useLocale();
@@ -33,7 +34,8 @@ export function ContactForm() {
 
   function validate(): FieldErrors {
     const next: FieldErrors = {};
-    if (name.trim().length < 1) next.name = t("contact.form.validation.name");
+    if (name.trim().length < 1 || CONTROL_CHAR_PATTERN.test(name))
+      next.name = t("contact.form.validation.name");
     if (!EMAIL_PATTERN.test(email.trim()))
       next.email = t("contact.form.validation.email");
     if (message.trim().length < 10)

@@ -10,7 +10,7 @@ public static partial class ContactValidator
         var errors = new List<ContactValidationError>();
 
         var name = request.Name?.Trim() ?? "";
-        if (name.Length is < 1 or > 100)
+        if (name.Length is < 1 or > 100 || HasControlCharacters(name))
         {
             errors.Add(new ContactValidationError("name", "Please enter your name."));
         }
@@ -31,6 +31,11 @@ public static partial class ContactValidator
 
         return errors;
     }
+
+    // Blocks CR/LF (and other control characters) in the name, which is
+    // interpolated into the email Subject — without this, a name like
+    // "Bob\r\nBcc: victim@example.com" could attempt header injection.
+    private static bool HasControlCharacters(string value) => value.Any(char.IsControl);
 
     [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
     private static partial Regex EmailPattern();
