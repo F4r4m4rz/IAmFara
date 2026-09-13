@@ -12,24 +12,17 @@
   </ItemGroup>
 
   <!--
-    Contact-form config for the published (IIS/web.config) environment.
-    These MSBuild properties default to empty and are passed in at publish
-    time via `/p:ResendFromEmail=...` etc. from CI secrets — never hardcode
-    real values here. Locally, use `dotnet user-secrets` or
-    appsettings.Development.json instead; this ItemGroup only affects the
-    generated web.config used by IIS deployments.
+    Contact-form config (other than the Resend API key, see below) is
+    injected into the published web.config via the SDK's own
+    $(WebConfigEnvironmentVariables) property — a single "Name=Value%3BName2=
+    Value2" string (";" must be escaped as %3B, since a literal one is parsed
+    as an MSBuild list separator). It's passed in at publish time by CI
+    (see the deploy workflows) — never hardcode real values here. Locally,
+    use `dotnet user-secrets` or appsettings.Development.json instead.
 
     The Resend API key itself is NOT here — it's set directly as an App
     Pool environment variable ("Email_ApiKey") in the SmarterASP.NET
     control panel instead, so it survives independently of what CI deploys.
   -->
-  <ItemGroup>
-    <EnvironmentVariables Include="Resend__FromEmail">
-      <Value>$(ResendFromEmail)</Value>
-    </EnvironmentVariables>
-    <EnvironmentVariables Include="Contact__ToEmail">
-      <Value>$(ContactToEmail)</Value>
-    </EnvironmentVariables>
-  </ItemGroup>
 
 </Project>

@@ -45,5 +45,4 @@ jobs:
           /p:UserName=${{ secrets.PROD_USERNAME }}
           /p:Password=${{ secrets.PROD_PASSWORD }}
           /p:AllowUntrustedCertificate=True
-          /p:ResendFromEmail=${{ secrets.RESEND_FROM_EMAIL }}
-          /p:ContactToEmail=${{ secrets.CONTACT_TO_EMAIL }}
+          "/p:WebConfigEnvironmentVariables=Resend__FromEmail=${{ secrets.RESEND_FROM_EMAIL }}%3BContact__ToEmail=${{ secrets.CONTACT_TO_EMAIL }}"
