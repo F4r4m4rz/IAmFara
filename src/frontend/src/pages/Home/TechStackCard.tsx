@@ -2,6 +2,7 @@ const techStack = [
   ".NET",
   "React",
   "TypeScript",
+  "SQL",
   "MongoDB",
   "GraphQL",
   "Azure",

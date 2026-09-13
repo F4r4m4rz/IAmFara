@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  Download,
-  Github,
-  Linkedin,
-  Mail,
-  MapPin,
-} from "lucide-react";
+import { ArrowRight, Github, Linkedin, Mail, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { dirFor, T, useLocale } from "../../i18n";
 import { AvatarBadge } from "./AvatarBadge";
@@ -14,21 +7,14 @@ import { ContactCard } from "./ContactCard";
 import { ProjectsCard } from "./ProjectsCard";
 import { TechStackCard } from "./TechStackCard";
 
-const stats = [
-  { label: "years_of_experience", value: "6+" },
-  { label: "projects_shipped", value: "20+" },
-  { label: "happy_clients", value: "12" },
-  { label: "cups_of_coffee", value: "Infinity" },
-];
-
 const socialLinks = [
   { label: "github", href: "https://github.com/f4r4m4rz", icon: Github },
   {
     label: "linkedin",
-    href: "https://linkedin.com/in/faramarz",
+    href: "https://www.linkedin.com/in/faramarz-bodaghi-4a858250",
     icon: Linkedin,
   },
-  { label: "email", href: "mailto:hello@iamfara.com", icon: Mail },
+  { label: "email", href: "mailto:me@iamfara.com", icon: Mail },
 ];
 
 function Home() {
@@ -93,14 +79,19 @@ function Home() {
               <span className="text-term-green">$</span>
               <span>cat about.md</span>
             </div>
-            <p
+            <div
               dir={dirFor(locale)}
-              className={`mt-2 text-term-text/90 leading-relaxed max-w-2xl border-term-border ${
+              className={`mt-2 space-y-3 text-term-text/90 leading-relaxed max-w-2xl border-term-border ${
                 locale === "fa" ? "border-r-2 pr-4" : "border-l-2 pl-4"
               }`}
             >
-              <T k="hero.about" />
-            </p>
+              <p>
+                <T k="hero.about" />
+              </p>
+              <p>
+                <T k="hero.about2" />
+              </p>
+            </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <button
@@ -115,12 +106,6 @@ function Home() {
               >
                 ./get-in-touch.sh
               </button>
-              <a
-                href="/resume.pdf"
-                className="inline-flex items-center gap-2 text-term-muted font-medium px-3 py-2.5 hover:text-term-text transition-colors"
-              >
-                <Download className="h-4 w-4" /> resume.pdf
-              </a>
             </div>
 
             <div className="mt-6 flex items-center gap-4">
@@ -137,26 +122,6 @@ function Home() {
                 </a>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Stats — command output */}
-        <div className="border-t border-term-border px-6 sm:px-10 py-6">
-          <div className="flex items-center gap-2 text-term-muted text-sm sm:text-base">
-            <span className="text-term-green">$</span>
-            <span>cat stats.json</span>
-          </div>
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center sm:text-left">
-                <div className="text-2xl sm:text-3xl font-bold text-term-purple">
-                  {stat.value}
-                </div>
-                <div className="mt-1 text-xs text-term-muted break-words">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

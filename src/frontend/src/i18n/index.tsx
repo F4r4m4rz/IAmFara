@@ -19,7 +19,9 @@ const translations: Record<Locale, Dictionary> = {
     "hero.tagline": "full-stack developer crafting things for the web",
     "hero.location": "Oslo, Norway",
     "hero.about":
-      "I'm a self-taught full-stack developer based in Norway with a strong background in .NET and React. I care about clean, maintainable code and building products that feel great to use — lately I've been diving deep into AI-assisted tooling and modern web architecture.",
+      "I'm a full-stack web developer with over 10 years of experience in software development. I work with ASP.NET Core and C# on the backend, and React and TypeScript on the frontend.",
+    "hero.about2":
+      "I'm curious by nature: I enjoy exploring new technologies and understanding how things work under the hood. I learn best by building, experimenting, and learning from mistakes. When I commit to something, I stick with it and see it through.",
     "card.projects.description": "Explore what I've built and what I'm building",
     "card.projects.button": "view projects",
     "card.blogs.description": "Thoughts, guides, and dev explorations",
@@ -40,7 +42,9 @@ const translations: Record<Locale, Dictionary> = {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
     "hero.location": "اسلو، نروژ",
     "hero.about":
-      "من یه توسعه‌دهنده full-stack خودآموخته‌ام که توی نروژ زندگی می‌کنم و پیشینه‌ی قوی‌ای توی .NET و React دارم. برام مهمه که کد تمیز و قابل‌نگهداری بنویسم و محصولاتی بسازم که استفاده‌کردن باهاشون لذت‌بخش باشه — این روزها هم دارم عمیق‌تر وارد ابزارهای مبتنی‌بر هوش مصنوعی و معماری مدرن وب می‌شم.",
+      "من یه توسعه‌دهنده وب full-stack هستم با بیش از ۱۰ سال تجربه توی توسعه نرم‌افزار. توی بک‌اند با ASP.NET Core و C# کار می‌کنم و توی فرانت‌اند با React و TypeScript.",
+    "hero.about2":
+      "کنجکاوی جزو ذاتمه: از کشف تکنولوژی‌های جدید و فهمیدن اینکه زیر پوستشون چه خبره لذت می‌برم. بهترین یادگیریم از طریق ساختن، آزمایش‌کردن و یادگرفتن از اشتباهاته. وقتی به چیزی متعهد می‌شم، تا آخرش پیش می‌رم.",
     "card.projects.description": "ببین چی ساختم و دارم چی می‌سازم",
     "card.projects.button": "دیدن پروژه‌ها",
     "card.blogs.description": "فکرها، راهنماها و کندوکاوهای برنامه‌نویسی",
