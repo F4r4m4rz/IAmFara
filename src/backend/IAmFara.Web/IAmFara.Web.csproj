@@ -12,17 +12,18 @@
   </ItemGroup>
 
   <!--
-    Contact-form email credentials (Resend API) for the published
-    (IIS/web.config) environment. These MSBuild properties default to empty
-    and are passed in at publish time via `/p:ResendApiKey=...` from CI
-    secrets — never hardcode real values here. Locally, use
-    `dotnet user-secrets` or appsettings.Development.json instead; this
-    ItemGroup only affects the generated web.config used by IIS deployments.
+    Contact-form config for the published (IIS/web.config) environment.
+    These MSBuild properties default to empty and are passed in at publish
+    time via `/p:ResendFromEmail=...` etc. from CI secrets — never hardcode
+    real values here. Locally, use `dotnet user-secrets` or
+    appsettings.Development.json instead; this ItemGroup only affects the
+    generated web.config used by IIS deployments.
+
+    The Resend API key itself is NOT here — it's set directly as an App
+    Pool environment variable ("Email_ApiKey") in the SmarterASP.NET
+    control panel instead, so it survives independently of what CI deploys.
   -->
   <ItemGroup>
-    <EnvironmentVariables Include="Resend__ApiKey">
-      <Value>$(ResendApiKey)</Value>
-    </EnvironmentVariables>
     <EnvironmentVariables Include="Resend__FromEmail">
       <Value>$(ResendFromEmail)</Value>
     </EnvironmentVariables>

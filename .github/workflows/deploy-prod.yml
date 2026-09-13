@@ -45,6 +45,5 @@ jobs:
           /p:UserName=${{ secrets.PROD_USERNAME }}
           /p:Password=${{ secrets.PROD_PASSWORD }}
           /p:AllowUntrustedCertificate=True
-          /p:ResendApiKey=${{ secrets.RESEND_API_KEY }}
           /p:ResendFromEmail=${{ secrets.RESEND_FROM_EMAIL }}
           /p:ContactToEmail=${{ secrets.CONTACT_TO_EMAIL }}

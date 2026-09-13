@@ -17,6 +17,18 @@ namespace IAmFara.Web
             builder.Services.AddRazorPages();
 
             builder.Services.Configure<ResendOptions>(builder.Configuration.GetSection("Resend"));
+            // The Resend API key is set directly as an App Pool environment
+            // variable in the SmarterASP.NET control panel (named
+            // "Email_ApiKey"), rather than flowing through CI/web.config like
+            // the rest of the contact-form config — this keeps it from
+            // getting reset to empty on every deploy in case that CI wiring
+            // is ever dropped or changed. Falls back to whatever the
+            // "Resend:ApiKey" section provided (e.g. local dev secrets) when
+            // that env var isn't set.
+            builder.Services.PostConfigure<ResendOptions>(options =>
+            {
+                options.ApiKey = builder.Configuration["Email_ApiKey"] ?? options.ApiKey;
+            });
             builder.Services.Configure<ContactOptions>(builder.Configuration.GetSection("Contact"));
             builder.Services.AddSingleton<HttpClient>();
             builder.Services.AddSingleton<ContactEmailSender>();
