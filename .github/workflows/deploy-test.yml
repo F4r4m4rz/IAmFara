@@ -52,3 +52,9 @@ jobs:
           /p:Password=${{ secrets.TEST_PASSWORD }}
           /p:AllowUntrustedCertificate=True
           /p:EnvironmentName=Staging
+          /p:SmtpHost=${{ secrets.SMTP_HOST }}
+          /p:SmtpPort=${{ secrets.SMTP_PORT }}
+          /p:SmtpUser=${{ secrets.SMTP_USER }}
+          /p:SmtpPassword=${{ secrets.SMTP_PASSWORD }}
+          /p:SmtpFrom=${{ secrets.SMTP_FROM }}
+          /p:ContactToEmail=${{ secrets.CONTACT_TO_EMAIL }}

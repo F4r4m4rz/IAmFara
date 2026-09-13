@@ -37,6 +37,24 @@ const translations: Record<Locale, Dictionary> = {
     "nav.switchToFa": "Switch to Persian",
     "nav.switchToEn": "Switch to English",
     "avatar.label": "Faramarz — web, AI, and software engineering",
+    "contact.heading": "Let's build something together.",
+    "contact.intro":
+      "Got a project, a question, or just want to say hi? Send me a message — I read every one.",
+    "contact.form.name.placeholder": "Ada Lovelace",
+    "contact.form.email.placeholder": "you@example.com",
+    "contact.form.message.placeholder": "What's on your mind?",
+    "contact.form.submit": "Send message",
+    "contact.form.sending": "Sending",
+    "contact.form.success": "Message sent. I'll get back to you soon.",
+    "contact.form.error":
+      "Something went wrong. Please try again, or email me directly.",
+    "contact.form.error.rateLimit":
+      "Too many messages for now — please try again in a bit.",
+    "contact.form.validation.name": "Please enter your name.",
+    "contact.form.validation.email": "Please enter a valid email address.",
+    "contact.form.validation.message":
+      "Tell me a bit more — at least 10 characters.",
+    "contact.alt": "Prefer another way? Find me here too:",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -60,6 +78,23 @@ const translations: Record<Locale, Dictionary> = {
     "nav.switchToFa": "تغییر زبان به فارسی",
     "nav.switchToEn": "تغییر زبان به انگلیسی",
     "avatar.label": "فرامرز — وب، هوش مصنوعی و مهندسی نرم‌افزار",
+    "contact.heading": "بیا با هم یه چیزی بسازیم.",
+    "contact.intro":
+      "پروژه‌ای داری، سوالی داری، یا فقط می‌خوای سلام کنی؟ برام پیام بذار — همه‌شونو می‌خونم.",
+    "contact.form.name.placeholder": "مثلاً: سارا محمدی",
+    "contact.form.email.placeholder": "you@example.com",
+    "contact.form.message.placeholder": "چی تو ذهنته؟",
+    "contact.form.submit": "ارسال پیام",
+    "contact.form.sending": "در حال ارسال",
+    "contact.form.success": "پیام ارسال شد. به‌زودی جواب می‌دم.",
+    "contact.form.error":
+      "یه مشکلی پیش اومد. دوباره امتحان کن یا مستقیم برام ایمیل بزن.",
+    "contact.form.error.rateLimit":
+      "فعلاً پیام زیاد فرستادی — یه‌کم دیگه دوباره امتحان کن.",
+    "contact.form.validation.name": "لطفاً اسمت رو بنویس.",
+    "contact.form.validation.email": "لطفاً یه ایمیل معتبر بنویس.",
+    "contact.form.validation.message": "یه‌کم بیشتر بنویس — حداقل ۱۰ کاراکتر.",
+    "contact.alt": "یه راه دیگه رو ترجیح می‌دی؟ اینجاها هم پیدام می‌کنی:",
   },
 };
 

@@ -45,3 +45,9 @@ jobs:
           /p:UserName=${{ secrets.PROD_USERNAME }}
           /p:Password=${{ secrets.PROD_PASSWORD }}
           /p:AllowUntrustedCertificate=True
+          /p:SmtpHost=${{ secrets.SMTP_HOST }}
+          /p:SmtpPort=${{ secrets.SMTP_PORT }}
+          /p:SmtpUser=${{ secrets.SMTP_USER }}
+          /p:SmtpPassword=${{ secrets.SMTP_PASSWORD }}
+          /p:SmtpFrom=${{ secrets.SMTP_FROM }}
+          /p:ContactToEmail=${{ secrets.CONTACT_TO_EMAIL }}
