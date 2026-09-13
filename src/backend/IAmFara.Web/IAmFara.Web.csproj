@@ -12,28 +12,19 @@
   </ItemGroup>
 
   <!--
-    Contact-form SMTP credentials for the published (IIS/web.config) environment.
-    These MSBuild properties default to empty and are passed in at publish time
-    via `/p:SmtpHost=... /p:SmtpPassword=...` from CI secrets — never hardcode
-    real values here. Locally, use `dotnet user-secrets` or
-    appsettings.Development.json instead; this ItemGroup only affects the
-    generated web.config used by IIS deployments.
+    Contact-form email credentials (Resend API) for the published
+    (IIS/web.config) environment. These MSBuild properties default to empty
+    and are passed in at publish time via `/p:ResendApiKey=...` from CI
+    secrets — never hardcode real values here. Locally, use
+    `dotnet user-secrets` or appsettings.Development.json instead; this
+    ItemGroup only affects the generated web.config used by IIS deployments.
   -->
   <ItemGroup>
-    <EnvironmentVariables Include="Smtp__Host">
-      <Value>$(SmtpHost)</Value>
+    <EnvironmentVariables Include="Resend__ApiKey">
+      <Value>$(ResendApiKey)</Value>
     </EnvironmentVariables>
-    <EnvironmentVariables Include="Smtp__Port">
-      <Value>$(SmtpPort)</Value>
-    </EnvironmentVariables>
-    <EnvironmentVariables Include="Smtp__User">
-      <Value>$(SmtpUser)</Value>
-    </EnvironmentVariables>
-    <EnvironmentVariables Include="Smtp__Password">
-      <Value>$(SmtpPassword)</Value>
-    </EnvironmentVariables>
-    <EnvironmentVariables Include="Smtp__From">
-      <Value>$(SmtpFrom)</Value>
+    <EnvironmentVariables Include="Resend__FromEmail">
+      <Value>$(ResendFromEmail)</Value>
     </EnvironmentVariables>
     <EnvironmentVariables Include="Contact__ToEmail">
       <Value>$(ContactToEmail)</Value>

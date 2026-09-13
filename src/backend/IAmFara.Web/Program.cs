@@ -16,8 +16,9 @@ namespace IAmFara.Web
             builder.Services.AddControllers();
             builder.Services.AddRazorPages();
 
-            builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+            builder.Services.Configure<ResendOptions>(builder.Configuration.GetSection("Resend"));
             builder.Services.Configure<ContactOptions>(builder.Configuration.GetSection("Contact"));
+            builder.Services.AddSingleton<HttpClient>();
             builder.Services.AddSingleton<ContactEmailSender>();
 
             builder.Services.AddRateLimiter(options =>
@@ -90,7 +91,7 @@ namespace IAmFara.Web
 
                 if (!emailSender.IsConfigured)
                 {
-                    logger.LogError("Contact form submitted but SMTP/contact email is not configured.");
+                    logger.LogError("Contact form submitted but the Resend/contact email settings aren't configured.");
                     return Results.Problem(
                         "The contact form isn't fully set up yet. Please email me directly instead.",
                         statusCode: StatusCodes.Status503ServiceUnavailable);
