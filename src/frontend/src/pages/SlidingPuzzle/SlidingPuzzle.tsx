@@ -3,6 +3,7 @@ import { CompletionDialog } from "./components/CompletionDialog";
 import { ImagePicker } from "./components/ImagePicker";
 import { PuzzleCanvas } from "./components/PuzzleCanvas";
 import { PuzzleControls } from "./components/PuzzleControls";
+import { HintClient } from "./engine/hintClient";
 import { PuzzleEngine } from "./engine/PuzzleEngine";
 import { BuiltInImage, Direction, GridSize, PuzzleState } from "./engine/puzzleTypes";
 import { targetPositionForDirection } from "./engine/puzzleUtils";
@@ -43,6 +44,12 @@ function SlidingPuzzle() {
   const [showCelebration, setShowCelebration] = useState(false);
   const celebrationTimeoutRef = useRef<number | null>(null);
 
+  const hintClientRef = useRef<HintClient>(new HintClient());
+  const [hintPosition, setHintPosition] = useState<number | null>(null);
+  const [hintThinking, setHintThinking] = useState(false);
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const hintClearTimeoutRef = useRef<number | null>(null);
+
   const instructionsId = useId();
   const imagePickerHeadingId = useId();
   const imagePickerRef = useRef<HTMLDivElement>(null);
@@ -56,6 +63,10 @@ function SlidingPuzzle() {
       if (celebrationTimeoutRef.current !== null) {
         window.clearTimeout(celebrationTimeoutRef.current);
       }
+      if (hintClearTimeoutRef.current !== null) {
+        window.clearTimeout(hintClearTimeoutRef.current);
+      }
+      hintClientRef.current.destroy();
     };
   }, []);
 
@@ -85,6 +96,17 @@ function SlidingPuzzle() {
       window.clearTimeout(celebrationTimeoutRef.current);
       celebrationTimeoutRef.current = null;
     }
+
+    clearHint();
+  }
+
+  function clearHint(): void {
+    setHintPosition(null);
+    setHintMessage(null);
+    if (hintClearTimeoutRef.current !== null) {
+      window.clearTimeout(hintClearTimeoutRef.current);
+      hintClearTimeoutRef.current = null;
+    }
   }
 
   function hasUnsavedProgress(): boolean {
@@ -97,9 +119,11 @@ function SlidingPuzzle() {
   }
 
   function tryMove(position: number): void {
-    if (puzzleState.isSolved) return;
+    if (puzzleState.isSolved || hintThinking) return;
     const moved = engineRef.current.move(position);
     if (!moved) return; // invalid input never starts the timer
+
+    if (hintPosition !== null) clearHint(); // the board changed, so any highlighted hint is now stale
 
     if (startTimeRef.current === null) {
       startTimeRef.current = performance.now();
@@ -200,6 +224,31 @@ function SlidingPuzzle() {
     imagePickerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  async function handleHint(): Promise<void> {
+    if (puzzleState.isSolved || hintThinking) return;
+    clearHint();
+    setHintThinking(true);
+
+    const move = await hintClientRef.current.requestHint(puzzleState.tiles, puzzleState.grid);
+
+    setHintThinking(false);
+    if (move !== null) {
+      setHintPosition(move);
+      hintClearTimeoutRef.current = window.setTimeout(() => {
+        setHintPosition(null);
+        hintClearTimeoutRef.current = null;
+      }, 1800);
+    } else {
+      setHintMessage(
+        "Couldn't find a quick hint for this one — it happens on harder boards. Try again, or switch to an easier difficulty."
+      );
+      hintClearTimeoutRef.current = window.setTimeout(() => {
+        setHintMessage(null);
+        hintClearTimeoutRef.current = null;
+      }, 4000);
+    }
+  }
+
   return (
     <section className="rounded-lg border border-term-border bg-term-panel shadow-2xl overflow-hidden">
       <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-term-border bg-term-bg/60">
@@ -230,7 +279,8 @@ function SlidingPuzzle() {
                 state={puzzleState}
                 image={imageStatus === "ready" ? squareImage : null}
                 animate={animateNext}
-                disabled={puzzleState.isSolved || imageStatus !== "ready"}
+                disabled={puzzleState.isSolved || imageStatus !== "ready" || hintThinking}
+                hintPosition={hintPosition}
                 ariaLabel={`${grid} by ${grid} sliding puzzle board, ${puzzleState.moveCount} moves so far`}
                 instructionsId={instructionsId}
                 onActivate={tryMove}
@@ -260,6 +310,12 @@ function SlidingPuzzle() {
               </p>
             )}
 
+            {hintMessage && (
+              <p role="status" className="mt-3 text-sm text-term-muted">
+                {hintMessage}
+              </p>
+            )}
+
             {puzzleState.isSolved && (
               <CompletionDialog
                 elapsedSeconds={finalElapsedRef.current}
@@ -275,6 +331,9 @@ function SlidingPuzzle() {
               grid={grid}
               onGridChange={handleGridChange}
               onRestart={handleRestart}
+              onHint={() => void handleHint()}
+              hintThinking={hintThinking}
+              hintDisabled={puzzleState.isSolved || imageStatus !== "ready" || hintThinking}
               elapsedSeconds={puzzleState.isSolved ? finalElapsedRef.current : elapsedSeconds}
               moveCount={puzzleState.moveCount}
             />

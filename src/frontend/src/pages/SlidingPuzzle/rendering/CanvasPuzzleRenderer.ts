@@ -17,6 +17,8 @@ const MOVE_ANIMATION_MS = 150;
 /** term-pink from the site's palette — doubles as "red" for the in-progress tile outline. */
 const TILE_BORDER_COLOR = "#ff7b72";
 const TILE_BORDER_RATIO = 0.012;
+/** term-blue — the hint pulse, kept distinct from the always-on tile outline. */
+const HINT_COLOR = "#58a6ff";
 
 /**
  * Draws the puzzle board on a <canvas>. Animation runs on
@@ -41,6 +43,9 @@ export class CanvasPuzzleRenderer {
   private animations = new Map<number, Animation>();
   /** Keyed by tile id -> the position it was drawn at last frame. */
   private lastPositions = new Map<number, number>();
+
+  private hintPosition: number | null = null;
+  private hintUntil = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d");
@@ -111,6 +116,13 @@ export class CanvasPuzzleRenderer {
     this.scheduleDraw();
   }
 
+  /** Pulses a highlight around `position` for durationMs, or clears it if position is null. */
+  setHint(position: number | null, durationMs = 1800): void {
+    this.hintPosition = position;
+    this.hintUntil = position === null ? 0 : performance.now() + durationMs;
+    this.scheduleDraw();
+  }
+
   /** Converts a canvas-local CSS-pixel point to the board position under it, or null if outside the board. */
   getPositionAtPoint(x: number, y: number): number | null {
     if (this.cssSize === 0) return null;
@@ -136,7 +148,8 @@ export class CanvasPuzzleRenderer {
   private drawFrame = (): void => {
     this.rafId = null;
     this.draw();
-    if (this.animations.size > 0) {
+    const hintActive = this.hintPosition !== null && performance.now() < this.hintUntil;
+    if (this.animations.size > 0 || hintActive) {
       this.scheduleDraw();
     }
   };
@@ -184,6 +197,25 @@ export class CanvasPuzzleRenderer {
         ctx.strokeStyle = TILE_BORDER_COLOR;
         ctx.lineWidth = Math.max(1.5, cell * TILE_BORDER_RATIO);
         ctx.strokeRect(dx, dy, dSize, dSize);
+      }
+    }
+
+    if (this.hintPosition !== null) {
+      if (now < this.hintUntil) {
+        const { row, col } = positionToRowCol(this.hintPosition, grid);
+        const dx = col * cell + gap / 2;
+        const dy = row * cell + gap / 2;
+        const dSize = cell - gap;
+        const pulse = 0.5 + 0.5 * Math.sin(now / 150);
+
+        ctx.save();
+        ctx.strokeStyle = HINT_COLOR;
+        ctx.lineWidth = Math.max(3, cell * 0.045);
+        ctx.globalAlpha = 0.5 + 0.5 * pulse;
+        ctx.strokeRect(dx, dy, dSize, dSize);
+        ctx.restore();
+      } else {
+        this.hintPosition = null;
       }
     }
 

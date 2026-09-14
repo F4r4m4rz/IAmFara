@@ -9,6 +9,7 @@ type PuzzleCanvasProps = {
   image: SquareImage | null;
   animate: boolean;
   disabled: boolean;
+  hintPosition: number | null;
   ariaLabel: string;
   instructionsId: string;
   onActivate: (position: number) => void;
@@ -20,6 +21,7 @@ export function PuzzleCanvas({
   image,
   animate,
   disabled,
+  hintPosition,
   ariaLabel,
   instructionsId,
   onActivate,
@@ -90,6 +92,10 @@ export function PuzzleCanvas({
   useEffect(() => {
     rendererRef.current?.setState(state, { animate });
   }, [state, animate]);
+
+  useEffect(() => {
+    rendererRef.current?.setHint(hintPosition);
+  }, [hintPosition]);
 
   if (canvasError) {
     return (

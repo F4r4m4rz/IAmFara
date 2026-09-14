@@ -1,10 +1,13 @@
-import { Clock, Shuffle } from "lucide-react";
+import { Clock, Lightbulb, Loader2, Shuffle } from "lucide-react";
 import { GridSize } from "../engine/puzzleTypes";
 
 type PuzzleControlsProps = {
   grid: GridSize;
   onGridChange: (grid: GridSize) => void;
   onRestart: () => void;
+  onHint: () => void;
+  hintThinking: boolean;
+  hintDisabled: boolean;
   elapsedSeconds: number;
   moveCount: number;
 };
@@ -26,6 +29,9 @@ export function PuzzleControls({
   grid,
   onGridChange,
   onRestart,
+  onHint,
+  hintThinking,
+  hintDisabled,
   elapsedSeconds,
   moveCount,
 }: PuzzleControlsProps) {
@@ -59,13 +65,28 @@ export function PuzzleControls({
             {moveCount} {moveCount === 1 ? "move" : "moves"}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onRestart}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors focus:outline-none focus:ring-2 focus:ring-term-green rounded"
-        >
-          <Shuffle className="h-4 w-4" /> Shuffle
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={onHint}
+            disabled={hintDisabled}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-blue hover:text-term-green transition-colors focus:outline-none focus:ring-2 focus:ring-term-green rounded disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {hintThinking ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Lightbulb className="h-4 w-4" />
+            )}
+            Hint
+          </button>
+          <button
+            type="button"
+            onClick={onRestart}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors focus:outline-none focus:ring-2 focus:ring-term-green rounded"
+          >
+            <Shuffle className="h-4 w-4" /> Shuffle
+          </button>
+        </div>
       </div>
     </div>
   );
