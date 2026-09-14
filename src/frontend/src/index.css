@@ -42,3 +42,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #3fb950;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-puzzle-flash,
+  .animate-pop-in {
+    animation: none !important;
+  }
+}

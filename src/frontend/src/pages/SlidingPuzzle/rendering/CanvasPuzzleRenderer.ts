@@ -14,6 +14,9 @@ type Animation = {
 
 const TILE_GAP_RATIO = 0.018;
 const MOVE_ANIMATION_MS = 150;
+/** term-pink from the site's palette — doubles as "red" for the in-progress tile outline. */
+const TILE_BORDER_COLOR = "#ff7b72";
+const TILE_BORDER_RATIO = 0.012;
 
 /**
  * Draws the puzzle board on a <canvas>. Animation runs on
@@ -29,6 +32,7 @@ export class CanvasPuzzleRenderer {
   private image: TileImageSource | null = null;
   private grid: GridSize = 3;
   private tiles: readonly number[] = [];
+  private solved = false;
   private cssSize = 0;
   private dpr = 1;
   private rafId: number | null = null;
@@ -103,6 +107,7 @@ export class CanvasPuzzleRenderer {
     this.lastPositions = newPositions;
     this.grid = grid;
     this.tiles = state.tiles;
+    this.solved = state.isSolved;
     this.scheduleDraw();
   }
 
@@ -169,18 +174,17 @@ export class CanvasPuzzleRenderer {
 
       const srcRow = Math.floor(tileId / grid);
       const srcCol = tileId % grid;
+      const dx = col * cell + gap / 2;
+      const dy = row * cell + gap / 2;
+      const dSize = cell - gap;
 
-      ctx.drawImage(
-        this.image,
-        srcCol * srcSize,
-        srcRow * srcSize,
-        srcSize,
-        srcSize,
-        col * cell + gap / 2,
-        row * cell + gap / 2,
-        cell - gap,
-        cell - gap
-      );
+      ctx.drawImage(this.image, srcCol * srcSize, srcRow * srcSize, srcSize, srcSize, dx, dy, dSize, dSize);
+
+      if (!this.solved) {
+        ctx.strokeStyle = TILE_BORDER_COLOR;
+        ctx.lineWidth = Math.max(1.5, cell * TILE_BORDER_RATIO);
+        ctx.strokeRect(dx, dy, dSize, dSize);
+      }
     }
 
     ctx.restore();

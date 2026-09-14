@@ -106,7 +106,9 @@ export function PuzzleCanvas({
         tabIndex={0}
         aria-label={ariaLabel}
         aria-describedby={instructionsId}
-        className="w-full h-full rounded-lg border border-term-border bg-term-bg touch-none focus:outline-none focus:ring-2 focus:ring-term-green"
+        className={`w-full h-full rounded-lg border border-term-border bg-term-bg touch-none focus:outline-none focus:ring-2 focus:ring-term-green ${
+          state.isSolved ? "animate-puzzle-flash" : ""
+        }`}
       />
     </div>
   );

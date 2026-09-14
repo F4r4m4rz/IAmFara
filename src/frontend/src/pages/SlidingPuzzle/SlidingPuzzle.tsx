@@ -40,6 +40,9 @@ function SlidingPuzzle() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const finalElapsedRef = useRef(0);
 
+  const [showCelebration, setShowCelebration] = useState(false);
+  const celebrationTimeoutRef = useRef<number | null>(null);
+
   const instructionsId = useId();
   const imagePickerHeadingId = useId();
   const imagePickerRef = useRef<HTMLDivElement>(null);
@@ -47,8 +50,13 @@ function SlidingPuzzle() {
   // Load the first built-in image on mount.
   useEffect(() => {
     void selectBuiltInImage(BUILT_IN_IMAGES[0], { skipConfirm: true });
-    // Release whatever image bitmap is current when the page unmounts.
-    return () => closeIfBitmap(squareImageRef.current);
+    return () => {
+      // Release whatever image bitmap is current when the page unmounts.
+      closeIfBitmap(squareImageRef.current);
+      if (celebrationTimeoutRef.current !== null) {
+        window.clearTimeout(celebrationTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Tick the visible timer a few times a second — never on every animation frame.
@@ -71,6 +79,12 @@ function SlidingPuzzle() {
     finalElapsedRef.current = 0;
     setIsRunning(false);
     setElapsedSeconds(0);
+
+    setShowCelebration(false);
+    if (celebrationTimeoutRef.current !== null) {
+      window.clearTimeout(celebrationTimeoutRef.current);
+      celebrationTimeoutRef.current = null;
+    }
   }
 
   function hasUnsavedProgress(): boolean {
@@ -101,6 +115,12 @@ function SlidingPuzzle() {
         startTimeRef.current !== null ? (performance.now() - startTimeRef.current) / 1000 : 0;
       setElapsedSeconds(finalElapsedRef.current);
       setIsRunning(false);
+
+      setShowCelebration(true);
+      celebrationTimeoutRef.current = window.setTimeout(() => {
+        setShowCelebration(false);
+        celebrationTimeoutRef.current = null;
+      }, 2200);
     }
   }
 
@@ -219,6 +239,13 @@ function SlidingPuzzle() {
               {imageStatus === "loading" && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-term-bg/70 text-sm text-term-muted">
                   Loading image…
+                </div>
+              )}
+              {showCelebration && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <span className="animate-pop-in rounded-full border border-term-green/50 bg-term-bg/90 px-6 py-2.5 text-xl font-bold text-term-green shadow-lg">
+                    Good job!
+                  </span>
                 </div>
               )}
             </div>
