@@ -3,6 +3,7 @@ export const ACCEPTED_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp"] a
 const ACCEPTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 
 export type ImageErrorCode =
+  | "svg-not-supported"
   | "invalid-type"
   | "too-large"
   | "decode-failed"
@@ -29,7 +30,7 @@ export function validateUploadedFile(file: File): void {
   const looksLikeSvg = file.type === "image/svg+xml" || name.endsWith(".svg");
   if (looksLikeSvg) {
     throw new PuzzleImageError(
-      "invalid-type",
+      "svg-not-supported",
       "SVG files aren't supported. Please choose a JPEG, PNG, or WebP image."
     );
   }

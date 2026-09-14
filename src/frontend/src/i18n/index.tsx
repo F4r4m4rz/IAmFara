@@ -55,6 +55,59 @@ const translations: Record<Locale, Dictionary> = {
     "contact.form.validation.message":
       "Tell me a bit more — at least 10 characters.",
     "contact.alt": "Prefer another way? Find me here too:",
+
+    "projects.kind.experiment": "Experiment",
+    "projects.kind.project": "Project",
+    "projects.new": "New",
+    "projects.viewProject": "view project",
+    "projects.slidingPuzzle.description":
+      "A responsive image puzzle built with TypeScript and the Canvas API. It uses a testable game engine separated from rendering and input, and supports both built-in images and local image uploads.",
+
+    "puzzle.heading": "Sliding Puzzle",
+    "puzzle.intro":
+      "A small experiment in TypeScript, React, and the Canvas API: a classic 15-puzzle with a testable game engine kept separate from rendering and input. Pick an image, choose a difficulty, and reassemble it.",
+    "puzzle.loadingImage": "Loading image…",
+    "puzzle.goodJob": "Good job!",
+    "puzzle.instructions":
+      "Use the arrow keys, or tap or click a tile, to slide it into the empty space and reconstruct the image.",
+    "puzzle.boardAriaLabel": "Sliding puzzle board, {grid} by {grid}, {moves} moves so far",
+    "puzzle.imageLabel": "Image",
+    "puzzle.uploadNote": "Uploaded images stay in your browser — they're never sent anywhere.",
+    "puzzle.confirmDifficultyChange":
+      "Changing difficulty will reset your current progress. Continue?",
+    "puzzle.confirmImageChange": "Starting a new image will reset your current progress. Continue?",
+    "puzzle.hintNotFound":
+      "Couldn't find a quick hint for this one — it happens on harder boards. Try again, or switch to an easier difficulty.",
+
+    "puzzle.controls.easy": "3×3 · Easy",
+    "puzzle.controls.medium": "4×4 · Medium",
+    "puzzle.controls.hard": "5×5 · Hard",
+    "puzzle.controls.elapsedTimeAria": "Elapsed time {time}",
+    "puzzle.controls.move": "move",
+    "puzzle.controls.moves": "moves",
+    "puzzle.controls.hint": "Hint",
+    "puzzle.controls.shuffle": "Shuffle",
+
+    "puzzle.imagePicker.groupLabel": "Choose an image",
+    "puzzle.imagePicker.upload": "Upload",
+    "puzzle.imagePicker.uploadAria": "Upload your own image",
+
+    "puzzle.completion.solved": "Puzzle solved!",
+    "puzzle.completion.playAgain": "Play again",
+    "puzzle.completion.chooseImage": "Choose another image",
+
+    "puzzle.error.svgNotSupported":
+      "SVG files aren't supported. Please choose a JPEG, PNG, or WebP image.",
+    "puzzle.error.invalidType": "Unsupported file type. Please choose a JPEG, PNG, or WebP image.",
+    "puzzle.error.tooLarge": "That image is too large (max {mb}MB).",
+    "puzzle.error.decodeFailed":
+      "That image couldn't be read. It may be corrupted or in an unsupported format.",
+    "puzzle.error.networkFailed": "Couldn't load that image. Please try another one.",
+    "puzzle.error.unsupported": "Canvas isn't available in this browser.",
+    "puzzle.error.generic": "Something went wrong loading that image.",
+    "puzzle.error.fileUnusable": "That file couldn't be used.",
+    "puzzle.canvasUnsupported":
+      "This browser doesn't support the 2D canvas features this game needs.",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -95,6 +148,57 @@ const translations: Record<Locale, Dictionary> = {
     "contact.form.validation.email": "لطفاً یه ایمیل معتبر بنویس.",
     "contact.form.validation.message": "یه‌کم بیشتر بنویس — حداقل ۱۰ کاراکتر.",
     "contact.alt": "یه راه دیگه رو ترجیح می‌دی؟ اینجاها هم پیدام می‌کنی:",
+
+    "projects.kind.experiment": "آزمایش",
+    "projects.kind.project": "پروژه",
+    "projects.new": "جدید",
+    "projects.viewProject": "دیدن پروژه",
+    "projects.slidingPuzzle.description":
+      "یه پازل تصویری واکنش‌گرا که با TypeScript و Canvas API ساخته شده. از یه موتور بازی قابل‌تست استفاده می‌کنه که از رندر و ورودی جداست، و هم عکس‌های آماده رو پشتیبانی می‌کنه هم آپلود عکس دلخواه.",
+
+    "puzzle.heading": "پازل کشویی",
+    "puzzle.intro":
+      "یه آزمایش کوچیک با TypeScript، React و Canvas API: یه پازل ۱۵-تایی کلاسیک با یه موتور بازی قابل‌تست که از رندر و ورودی جداست. یه عکس انتخاب کن، سطح سختی رو مشخص کن، و دوباره بچینش.",
+    "puzzle.loadingImage": "در حال بارگذاری عکس…",
+    "puzzle.goodJob": "آفرین!",
+    "puzzle.instructions":
+      "با کلیدهای جهت‌دار، یا با ضربه‌زدن/کلیک روی یه قطعه، اونو به فضای خالی بلغزون و عکس رو دوباره بچین.",
+    "puzzle.boardAriaLabel": "تخته پازل کشویی، {grid} در {grid}، {moves} حرکت تا الان",
+    "puzzle.imageLabel": "عکس",
+    "puzzle.uploadNote": "عکس‌های آپلودشده توی مرورگرت می‌مونن — هیچ‌وقت جایی فرستاده نمی‌شن.",
+    "puzzle.confirmDifficultyChange": "تغییر سطح سختی پیشرفت فعلیت رو پاک می‌کنه. ادامه بدم؟",
+    "puzzle.confirmImageChange": "شروع با عکس جدید پیشرفت فعلیت رو پاک می‌کنه. ادامه بدم؟",
+    "puzzle.hintNotFound":
+      "نتونستم سریع یه راهنمایی پیدا کنم — تو تخته‌های سخت‌تر پیش میاد. دوباره امتحان کن، یا سطح سختی رو کم‌تر کن.",
+
+    "puzzle.controls.easy": "3×3 · آسان",
+    "puzzle.controls.medium": "4×4 · متوسط",
+    "puzzle.controls.hard": "5×5 · سخت",
+    "puzzle.controls.elapsedTimeAria": "زمان سپری‌شده {time}",
+    "puzzle.controls.move": "حرکت",
+    "puzzle.controls.moves": "حرکت",
+    "puzzle.controls.hint": "راهنمایی",
+    "puzzle.controls.shuffle": "به‌هم‌ریختن",
+
+    "puzzle.imagePicker.groupLabel": "یه عکس انتخاب کن",
+    "puzzle.imagePicker.upload": "آپلود",
+    "puzzle.imagePicker.uploadAria": "عکس دلخواه خودت رو آپلود کن",
+
+    "puzzle.completion.solved": "پازل حل شد!",
+    "puzzle.completion.playAgain": "دوباره بازی کن",
+    "puzzle.completion.chooseImage": "یه عکس دیگه انتخاب کن",
+
+    "puzzle.error.svgNotSupported":
+      "فایل‌های SVG پشتیبانی نمی‌شن. لطفاً یه عکس JPEG، PNG یا WebP انتخاب کن.",
+    "puzzle.error.invalidType": "این نوع فایل پشتیبانی نمی‌شه. لطفاً یه عکس JPEG، PNG یا WebP انتخاب کن.",
+    "puzzle.error.tooLarge": "این عکس خیلی بزرگه (حداکثر {mb} مگابایت).",
+    "puzzle.error.decodeFailed": "این عکس قابل‌خوندن نبود. ممکنه خراب باشه یا فرمتش پشتیبانی نشه.",
+    "puzzle.error.networkFailed": "نتونستم این عکس رو بارگذاری کنم. یه عکس دیگه امتحان کن.",
+    "puzzle.error.unsupported": "Canvas تو این مرورگر در دسترس نیست.",
+    "puzzle.error.generic": "یه مشکلی موقع بارگذاری عکس پیش اومد.",
+    "puzzle.error.fileUnusable": "نتونستم از این فایل استفاده کنم.",
+    "puzzle.canvasUnsupported":
+      "این مرورگر از قابلیت‌های Canvas دوبعدی که این بازی لازم داره پشتیبانی نمی‌کنه.",
   },
 };
 
@@ -102,7 +206,8 @@ type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   toggleLocale: () => void;
-  t: (key: string) => string;
+  /** Looks up `key`; if `params` is given, replaces `{name}` placeholders in the result. */
+  t: (key: string, params?: Record<string, string | number>) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -131,7 +236,14 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       setLocale: setLocaleState,
       toggleLocale: () =>
         setLocaleState((prev) => (prev === "en" ? "fa" : "en")),
-      t: (key: string) => translations[locale][key] ?? key,
+      t: (key: string, params?: Record<string, string | number>) => {
+        const template = translations[locale][key] ?? key;
+        if (!params) return template;
+        return Object.entries(params).reduce(
+          (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+          template
+        );
+      },
     }),
     [locale]
   );
@@ -160,11 +272,19 @@ export function dirFor(locale: Locale) {
 }
 
 /** Renders a translated string with the right text direction for the current locale. */
-export function T({ k, className }: { k: string; className?: string }) {
+export function T({
+  k,
+  params,
+  className,
+}: {
+  k: string;
+  params?: Record<string, string | number>;
+  className?: string;
+}) {
   const { t, locale } = useLocale();
   return (
     <span dir={locale === "fa" ? "rtl" : undefined} className={className}>
-      {t(k)}
+      {t(k, params)}
     </span>
   );
 }

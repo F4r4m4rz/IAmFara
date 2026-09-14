@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { dirFor, useLocale } from "../../../i18n";
 import { Direction, PuzzleState } from "../engine/puzzleTypes";
 import { SquareImage } from "../images/imageLoading";
 import { PuzzleInputController } from "../input/PuzzleInputController";
@@ -40,7 +41,8 @@ export function PuzzleCanvas({
   onArrowKeyRef.current = onArrowKey;
   disabledRef.current = disabled;
 
-  const [canvasError, setCanvasError] = useState<string | null>(null);
+  const [hasCanvasError, setHasCanvasError] = useState(false);
+  const { t, locale } = useLocale();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -51,7 +53,7 @@ export function PuzzleCanvas({
     try {
       renderer = new CanvasPuzzleRenderer(canvas);
     } catch {
-      setCanvasError("This browser doesn't support the 2D canvas features this game needs.");
+      setHasCanvasError(true);
       return;
     }
     rendererRef.current = renderer;
@@ -97,10 +99,13 @@ export function PuzzleCanvas({
     rendererRef.current?.setHint(hintPosition);
   }, [hintPosition]);
 
-  if (canvasError) {
+  if (hasCanvasError) {
     return (
-      <div className="w-full max-w-[520px] mx-auto rounded-lg border border-term-pink/40 bg-term-pink/5 p-6 text-center text-sm text-term-pink">
-        {canvasError}
+      <div
+        dir={dirFor(locale)}
+        className="w-full max-w-[520px] mx-auto rounded-lg border border-term-pink/40 bg-term-pink/5 p-6 text-center text-sm text-term-pink"
+      >
+        {t("puzzle.canvasUnsupported")}
       </div>
     );
   }

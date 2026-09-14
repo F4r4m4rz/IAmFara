@@ -1,4 +1,5 @@
 import { Clock, Lightbulb, Loader2, Shuffle } from "lucide-react";
+import { dirFor, useLocale } from "../../../i18n";
 import { GridSize } from "../engine/puzzleTypes";
 
 type PuzzleControlsProps = {
@@ -12,10 +13,10 @@ type PuzzleControlsProps = {
   moveCount: number;
 };
 
-const DIFFICULTIES: { grid: GridSize; label: string }[] = [
-  { grid: 3, label: "3×3 · Easy" },
-  { grid: 4, label: "4×4 · Medium" },
-  { grid: 5, label: "5×5 · Hard" },
+const DIFFICULTIES: { grid: GridSize; labelKey: string }[] = [
+  { grid: 3, labelKey: "puzzle.controls.easy" },
+  { grid: 4, labelKey: "puzzle.controls.medium" },
+  { grid: 5, labelKey: "puzzle.controls.hard" },
 ];
 
 function formatTime(totalSeconds: number): string {
@@ -35,37 +36,45 @@ export function PuzzleControls({
   elapsedSeconds,
   moveCount,
 }: PuzzleControlsProps) {
+  const { t, locale } = useLocale();
+  const dir = dirFor(locale);
+  const time = formatTime(elapsedSeconds);
+
   return (
     <div className="flex flex-col gap-4">
-      <div role="group" aria-label="Difficulty" className="flex flex-wrap items-center gap-2">
+      <div role="group" aria-label={t("puzzle.controls.difficultyLabel")} className="flex flex-wrap items-center gap-2">
         {DIFFICULTIES.map((d) => (
           <button
             key={d.grid}
             type="button"
             onClick={() => onGridChange(d.grid)}
             aria-pressed={grid === d.grid}
+            dir={dir}
             className={`px-3 py-1.5 rounded border text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-term-green ${
               grid === d.grid
                 ? "border-term-green text-term-green bg-term-green/10"
                 : "border-term-border text-term-muted hover:border-term-green hover:text-term-green"
             }`}
           >
-            {d.label}
+            {t(d.labelKey)}
           </button>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4 text-sm text-term-muted">
-          <span className="inline-flex items-center gap-1.5" aria-label={`Elapsed time ${formatTime(elapsedSeconds)}`}>
+        <div dir={dir} className="flex items-center gap-4 text-sm text-term-muted">
+          <span
+            className="inline-flex items-center gap-1.5"
+            aria-label={t("puzzle.controls.elapsedTimeAria", { time })}
+          >
             <Clock className="h-4 w-4" aria-hidden="true" />
-            {formatTime(elapsedSeconds)}
+            <span dir="ltr">{time}</span>
           </span>
-          <span aria-label={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}>
-            {moveCount} {moveCount === 1 ? "move" : "moves"}
+          <span>
+            {moveCount} {t(moveCount === 1 ? "puzzle.controls.move" : "puzzle.controls.moves")}
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div dir={dir} className="flex items-center gap-4">
           <button
             type="button"
             onClick={onHint}
@@ -77,14 +86,14 @@ export function PuzzleControls({
             ) : (
               <Lightbulb className="h-4 w-4" />
             )}
-            Hint
+            {t("puzzle.controls.hint")}
           </button>
           <button
             type="button"
             onClick={onRestart}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-term-green hover:text-term-blue transition-colors focus:outline-none focus:ring-2 focus:ring-term-green rounded"
           >
-            <Shuffle className="h-4 w-4" /> Shuffle
+            <Shuffle className="h-4 w-4" /> {t("puzzle.controls.shuffle")}
           </button>
         </div>
       </div>

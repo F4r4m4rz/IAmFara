@@ -1,5 +1,6 @@
 import { Upload } from "lucide-react";
 import { useRef } from "react";
+import { useLocale } from "../../../i18n";
 import { BuiltInImage } from "../engine/puzzleTypes";
 import { ACCEPTED_UPLOAD_TYPES } from "../images/imageLoading";
 
@@ -12,9 +13,10 @@ type ImagePickerProps = {
 
 export function ImagePicker({ images, selectedId, onSelectBuiltIn, onSelectFile }: ImagePickerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLocale();
 
   return (
-    <div role="group" aria-label="Choose an image" className="flex flex-wrap gap-3">
+    <div role="group" aria-label={t("puzzle.imagePicker.groupLabel")} className="flex flex-wrap gap-3">
       {images.map((img) => (
         <button
           key={img.id}
@@ -34,7 +36,7 @@ export function ImagePicker({ images, selectedId, onSelectBuiltIn, onSelectFile 
         type="button"
         onClick={() => fileInputRef.current?.click()}
         aria-pressed={selectedId === "upload"}
-        aria-label="Upload your own image"
+        aria-label={t("puzzle.imagePicker.uploadAria")}
         className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 text-term-muted transition-colors focus:outline-none focus:ring-2 focus:ring-term-green ${
           selectedId === "upload"
             ? "border-term-green text-term-green"
@@ -42,7 +44,7 @@ export function ImagePicker({ images, selectedId, onSelectBuiltIn, onSelectFile 
         }`}
       >
         <Upload className="h-5 w-5" aria-hidden="true" />
-        <span className="text-[10px]">Upload</span>
+        <span className="text-[10px]">{t("puzzle.imagePicker.upload")}</span>
       </button>
 
       <input

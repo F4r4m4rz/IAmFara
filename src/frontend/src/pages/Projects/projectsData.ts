@@ -5,7 +5,8 @@ export type ProjectKind = "experiment" | "project";
 export type ProjectEntry = {
   id: string;
   title: string;
-  description: string;
+  /** i18n key for the (translated) description — see i18n/index.tsx. */
+  descriptionKey: string;
   tech: string;
   href: string;
   kind: ProjectKind;
@@ -26,8 +27,7 @@ export const PROJECTS: readonly ProjectEntry[] = [
   {
     id: "sliding-puzzle",
     title: "Sliding Puzzle",
-    description:
-      "A responsive image puzzle built with TypeScript and the Canvas API. It uses a testable game engine separated from rendering and input, and supports both built-in images and local image uploads.",
+    descriptionKey: "projects.slidingPuzzle.description",
     tech: "TypeScript · React · Canvas API",
     href: "/sliding-puzzle",
     kind: "experiment",

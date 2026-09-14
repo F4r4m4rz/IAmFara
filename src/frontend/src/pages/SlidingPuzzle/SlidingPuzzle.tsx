@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { dirFor, useLocale } from "../../i18n";
 import { CompletionDialog } from "./components/CompletionDialog";
 import { ImagePicker } from "./components/ImagePicker";
 import { PuzzleCanvas } from "./components/PuzzleCanvas";
@@ -8,7 +9,14 @@ import { PuzzleEngine } from "./engine/PuzzleEngine";
 import { BuiltInImage, Direction, GridSize, PuzzleState } from "./engine/puzzleTypes";
 import { targetPositionForDirection } from "./engine/puzzleUtils";
 import { BUILT_IN_IMAGES } from "./images/builtInImages";
-import { loadSquareImage, PuzzleImageError, SquareImage, validateUploadedFile } from "./images/imageLoading";
+import {
+  ImageErrorCode,
+  loadSquareImage,
+  MAX_UPLOAD_BYTES,
+  PuzzleImageError,
+  SquareImage,
+  validateUploadedFile,
+} from "./images/imageLoading";
 
 const IMAGE_TARGET_SIZE = 900;
 const TIMER_TICK_MS = 250;
@@ -19,10 +27,18 @@ function closeIfBitmap(image: SquareImage | null): void {
   if (image && "close" in image) image.close();
 }
 
-// All user-facing content on this page is deliberately English-only, per
-// this experiment's own spec, regardless of the site's selected language —
-// so this page intentionally does not use the site-wide i18n system.
+const IMAGE_ERROR_KEY: Record<ImageErrorCode, string> = {
+  "svg-not-supported": "puzzle.error.svgNotSupported",
+  "invalid-type": "puzzle.error.invalidType",
+  "too-large": "puzzle.error.tooLarge",
+  "decode-failed": "puzzle.error.decodeFailed",
+  "network-failed": "puzzle.error.networkFailed",
+  unsupported: "puzzle.error.unsupported",
+};
+
 function SlidingPuzzle() {
+  const { t, locale } = useLocale();
+  const dir = dirFor(locale);
   const engineRef = useRef<PuzzleEngine>(new PuzzleEngine(3));
   const [grid, setGrid] = useState<GridSize>(3);
   const [puzzleState, setPuzzleState] = useState<PuzzleState>(() => engineRef.current.getState());
@@ -113,9 +129,16 @@ function SlidingPuzzle() {
     return puzzleState.moveCount > 0 && !puzzleState.isSolved;
   }
 
-  function confirmIfProgressWouldBeLost(message: string): boolean {
+  function confirmIfProgressWouldBeLost(messageKey: string): boolean {
     if (!hasUnsavedProgress()) return true;
-    return window.confirm(message);
+    return window.confirm(t(messageKey));
+  }
+
+  function translateImageError(err: unknown): string {
+    if (err instanceof PuzzleImageError) {
+      return t(IMAGE_ERROR_KEY[err.code], { mb: Math.round(MAX_UPLOAD_BYTES / (1024 * 1024)) });
+    }
+    return t("puzzle.error.generic");
   }
 
   function tryMove(position: number): void {
@@ -155,7 +178,7 @@ function SlidingPuzzle() {
 
   function handleGridChange(nextGrid: GridSize): void {
     if (nextGrid === grid) return;
-    if (!confirmIfProgressWouldBeLost("Changing difficulty will reset your current progress. Continue?")) {
+    if (!confirmIfProgressWouldBeLost("puzzle.confirmDifficultyChange")) {
       return;
     }
     setGrid(nextGrid);
@@ -167,17 +190,14 @@ function SlidingPuzzle() {
   }
 
   async function selectBuiltInImage(image: BuiltInImage, opts?: { skipConfirm?: boolean }): Promise<void> {
-    if (
-      !opts?.skipConfirm &&
-      !confirmIfProgressWouldBeLost("Starting a new image will reset your current progress. Continue?")
-    ) {
+    if (!opts?.skipConfirm && !confirmIfProgressWouldBeLost("puzzle.confirmImageChange")) {
       return;
     }
     await loadAndApplyImage(image.src, image.id);
   }
 
   async function selectUploadedFile(file: File): Promise<void> {
-    if (!confirmIfProgressWouldBeLost("Starting a new image will reset your current progress. Continue?")) {
+    if (!confirmIfProgressWouldBeLost("puzzle.confirmImageChange")) {
       return;
     }
 
@@ -185,7 +205,7 @@ function SlidingPuzzle() {
       validateUploadedFile(file);
     } catch (err) {
       setImageStatus("error");
-      setImageError(err instanceof PuzzleImageError ? err.message : "That file couldn't be used.");
+      setImageError(err instanceof PuzzleImageError ? translateImageError(err) : t("puzzle.error.fileUnusable"));
       return;
     }
 
@@ -214,9 +234,7 @@ function SlidingPuzzle() {
     } catch (err) {
       if (token !== loadTokenRef.current) return;
       setImageStatus("error");
-      setImageError(
-        err instanceof PuzzleImageError ? err.message : "Something went wrong loading that image."
-      );
+      setImageError(translateImageError(err));
     }
   }
 
@@ -239,9 +257,7 @@ function SlidingPuzzle() {
         hintClearTimeoutRef.current = null;
       }, 1800);
     } else {
-      setHintMessage(
-        "Couldn't find a quick hint for this one — it happens on harder boards. Try again, or switch to an easier difficulty."
-      );
+      setHintMessage(t("puzzle.hintNotFound"));
       hintClearTimeoutRef.current = window.setTimeout(() => {
         setHintMessage(null);
         hintClearTimeoutRef.current = null;
@@ -263,13 +279,11 @@ function SlidingPuzzle() {
           <span className="text-term-green">$</span>
           <span>./sliding-puzzle.sh</span>
         </div>
-        <h1 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-term-text">
-          Sliding Puzzle
+        <h1 dir={dir} className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-term-text">
+          {t("puzzle.heading")}
         </h1>
-        <p className="mt-3 max-w-xl text-term-muted leading-relaxed">
-          A small experiment in TypeScript, React, and the Canvas API: a classic
-          15-puzzle with a testable game engine kept separate from rendering
-          and input. Pick an image, choose a difficulty, and reassemble it.
+        <p dir={dir} className="mt-3 max-w-xl text-term-muted leading-relaxed">
+          {t("puzzle.intro")}
         </p>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
@@ -281,37 +295,36 @@ function SlidingPuzzle() {
                 animate={animateNext}
                 disabled={puzzleState.isSolved || imageStatus !== "ready" || hintThinking}
                 hintPosition={hintPosition}
-                ariaLabel={`${grid} by ${grid} sliding puzzle board, ${puzzleState.moveCount} moves so far`}
+                ariaLabel={t("puzzle.boardAriaLabel", { grid, moves: puzzleState.moveCount })}
                 instructionsId={instructionsId}
                 onActivate={tryMove}
                 onArrowKey={handleArrowKey}
               />
               {imageStatus === "loading" && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-term-bg/70 text-sm text-term-muted">
-                  Loading image…
+                <div dir={dir} className="absolute inset-0 flex items-center justify-center rounded-lg bg-term-bg/70 text-sm text-term-muted">
+                  {t("puzzle.loadingImage")}
                 </div>
               )}
               {showCelebration && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <span className="animate-pop-in rounded-full border border-term-green/50 bg-term-bg/90 px-6 py-2.5 text-xl font-bold text-term-green shadow-lg">
-                    Good job!
+                  <span dir={dir} className="animate-pop-in rounded-full border border-term-green/50 bg-term-bg/90 px-6 py-2.5 text-xl font-bold text-term-green shadow-lg">
+                    {t("puzzle.goodJob")}
                   </span>
                 </div>
               )}
             </div>
-            <p id={instructionsId} className="sr-only">
-              Use the arrow keys, or tap or click a tile, to slide it into the
-              empty space and reconstruct the image.
+            <p id={instructionsId} dir={dir} className="sr-only">
+              {t("puzzle.instructions")}
             </p>
 
             {imageStatus === "error" && imageError && (
-              <p role="alert" className="mt-3 text-sm text-term-pink">
+              <p role="alert" dir={dir} className="mt-3 text-sm text-term-pink">
                 {imageError}
               </p>
             )}
 
             {hintMessage && (
-              <p role="status" className="mt-3 text-sm text-term-muted">
+              <p role="status" dir={dir} className="mt-3 text-sm text-term-muted">
                 {hintMessage}
               </p>
             )}
@@ -339,8 +352,8 @@ function SlidingPuzzle() {
             />
 
             <div ref={imagePickerRef}>
-              <h2 id={imagePickerHeadingId} className="text-sm text-term-muted mb-2">
-                Image
+              <h2 id={imagePickerHeadingId} dir={dir} className="text-sm text-term-muted mb-2">
+                {t("puzzle.imageLabel")}
               </h2>
               <ImagePicker
                 images={BUILT_IN_IMAGES}
@@ -348,9 +361,8 @@ function SlidingPuzzle() {
                 onSelectBuiltIn={(image) => void selectBuiltInImage(image)}
                 onSelectFile={(file) => void selectUploadedFile(file)}
               />
-              <p className="mt-2 text-xs text-term-muted">
-                Uploaded images stay in your browser — they're never sent
-                anywhere.
+              <p dir={dir} className="mt-2 text-xs text-term-muted">
+                {t("puzzle.uploadNote")}
               </p>
             </div>
           </div>
