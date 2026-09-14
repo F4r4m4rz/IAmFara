@@ -1,0 +1,375 @@
+import { useEffect, useId, useRef, useState } from "react";
+import { dirFor, useLocale } from "../../i18n";
+import { CompletionDialog } from "./components/CompletionDialog";
+import { ImagePicker } from "./components/ImagePicker";
+import { PuzzleCanvas } from "./components/PuzzleCanvas";
+import { PuzzleControls } from "./components/PuzzleControls";
+import { HintClient } from "./engine/hintClient";
+import { PuzzleEngine } from "./engine/PuzzleEngine";
+import { BuiltInImage, Direction, GridSize, PuzzleState } from "./engine/puzzleTypes";
+import { targetPositionForDirection } from "./engine/puzzleUtils";
+import { BUILT_IN_IMAGES } from "./images/builtInImages";
+import {
+  ImageErrorCode,
+  loadSquareImage,
+  MAX_UPLOAD_BYTES,
+  PuzzleImageError,
+  SquareImage,
+  validateUploadedFile,
+} from "./images/imageLoading";
+
+const IMAGE_TARGET_SIZE = 900;
+const TIMER_TICK_MS = 250;
+
+type ImageStatus = "loading" | "ready" | "error";
+
+function closeIfBitmap(image: SquareImage | null): void {
+  if (image && "close" in image) image.close();
+}
+
+const IMAGE_ERROR_KEY: Record<ImageErrorCode, string> = {
+  "svg-not-supported": "puzzle.error.svgNotSupported",
+  "invalid-type": "puzzle.error.invalidType",
+  "too-large": "puzzle.error.tooLarge",
+  "decode-failed": "puzzle.error.decodeFailed",
+  "network-failed": "puzzle.error.networkFailed",
+  unsupported: "puzzle.error.unsupported",
+};
+
+function SlidingPuzzle() {
+  const { t, locale } = useLocale();
+  const dir = dirFor(locale);
+  const engineRef = useRef<PuzzleEngine>(new PuzzleEngine(3));
+  const [grid, setGrid] = useState<GridSize>(3);
+  const [puzzleState, setPuzzleState] = useState<PuzzleState>(() => engineRef.current.getState());
+  const [animateNext, setAnimateNext] = useState(false);
+
+  const [imageStatus, setImageStatus] = useState<ImageStatus>("loading");
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [squareImage, setSquareImage] = useState<SquareImage | null>(null);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const squareImageRef = useRef<SquareImage | null>(null);
+  squareImageRef.current = squareImage;
+  const loadTokenRef = useRef(0);
+
+  const startTimeRef = useRef<number | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const finalElapsedRef = useRef(0);
+
+  const [showCelebration, setShowCelebration] = useState(false);
+  const celebrationTimeoutRef = useRef<number | null>(null);
+
+  const hintClientRef = useRef<HintClient>(new HintClient());
+  const [hintPosition, setHintPosition] = useState<number | null>(null);
+  const [hintThinking, setHintThinking] = useState(false);
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const hintClearTimeoutRef = useRef<number | null>(null);
+
+  const instructionsId = useId();
+  const imagePickerHeadingId = useId();
+  const imagePickerRef = useRef<HTMLDivElement>(null);
+
+  // Load the first built-in image on mount.
+  useEffect(() => {
+    void selectBuiltInImage(BUILT_IN_IMAGES[0], { skipConfirm: true });
+    return () => {
+      // Release whatever image bitmap is current when the page unmounts.
+      closeIfBitmap(squareImageRef.current);
+      if (celebrationTimeoutRef.current !== null) {
+        window.clearTimeout(celebrationTimeoutRef.current);
+      }
+      if (hintClearTimeoutRef.current !== null) {
+        window.clearTimeout(hintClearTimeoutRef.current);
+      }
+      hintClientRef.current.destroy();
+    };
+  }, []);
+
+  // Tick the visible timer a few times a second — never on every animation frame.
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = window.setInterval(() => {
+      if (startTimeRef.current !== null) {
+        setElapsedSeconds((performance.now() - startTimeRef.current) / 1000);
+      }
+    }, TIMER_TICK_MS);
+    return () => window.clearInterval(id);
+  }, [isRunning]);
+
+  function startNewGame(nextGrid: GridSize, animate: boolean): void {
+    engineRef.current = new PuzzleEngine(nextGrid);
+    engineRef.current.shuffle();
+    setPuzzleState(engineRef.current.getState());
+    setAnimateNext(animate);
+    startTimeRef.current = null;
+    finalElapsedRef.current = 0;
+    setIsRunning(false);
+    setElapsedSeconds(0);
+
+    setShowCelebration(false);
+    if (celebrationTimeoutRef.current !== null) {
+      window.clearTimeout(celebrationTimeoutRef.current);
+      celebrationTimeoutRef.current = null;
+    }
+
+    clearHint();
+  }
+
+  function clearHint(): void {
+    setHintPosition(null);
+    setHintMessage(null);
+    if (hintClearTimeoutRef.current !== null) {
+      window.clearTimeout(hintClearTimeoutRef.current);
+      hintClearTimeoutRef.current = null;
+    }
+  }
+
+  function hasUnsavedProgress(): boolean {
+    return puzzleState.moveCount > 0 && !puzzleState.isSolved;
+  }
+
+  function confirmIfProgressWouldBeLost(messageKey: string): boolean {
+    if (!hasUnsavedProgress()) return true;
+    return window.confirm(t(messageKey));
+  }
+
+  function translateImageError(err: unknown): string {
+    if (err instanceof PuzzleImageError) {
+      return t(IMAGE_ERROR_KEY[err.code], { mb: Math.round(MAX_UPLOAD_BYTES / (1024 * 1024)) });
+    }
+    return t("puzzle.error.generic");
+  }
+
+  function tryMove(position: number): void {
+    if (puzzleState.isSolved || hintThinking) return;
+    const moved = engineRef.current.move(position);
+    if (!moved) return; // invalid input never starts the timer
+
+    if (hintPosition !== null) clearHint(); // the board changed, so any highlighted hint is now stale
+
+    if (startTimeRef.current === null) {
+      startTimeRef.current = performance.now();
+      setIsRunning(true);
+    }
+
+    const nextState = engineRef.current.getState();
+    setPuzzleState(nextState);
+    setAnimateNext(true);
+
+    if (nextState.isSolved) {
+      finalElapsedRef.current =
+        startTimeRef.current !== null ? (performance.now() - startTimeRef.current) / 1000 : 0;
+      setElapsedSeconds(finalElapsedRef.current);
+      setIsRunning(false);
+
+      setShowCelebration(true);
+      celebrationTimeoutRef.current = window.setTimeout(() => {
+        setShowCelebration(false);
+        celebrationTimeoutRef.current = null;
+      }, 2200);
+    }
+  }
+
+  function handleArrowKey(direction: Direction): void {
+    const target = targetPositionForDirection(puzzleState.emptyPosition, puzzleState.grid, direction);
+    if (target !== null) tryMove(target);
+  }
+
+  function handleGridChange(nextGrid: GridSize): void {
+    if (nextGrid === grid) return;
+    if (!confirmIfProgressWouldBeLost("puzzle.confirmDifficultyChange")) {
+      return;
+    }
+    setGrid(nextGrid);
+    startNewGame(nextGrid, false);
+  }
+
+  function handleRestart(): void {
+    startNewGame(grid, false);
+  }
+
+  async function selectBuiltInImage(image: BuiltInImage, opts?: { skipConfirm?: boolean }): Promise<void> {
+    if (!opts?.skipConfirm && !confirmIfProgressWouldBeLost("puzzle.confirmImageChange")) {
+      return;
+    }
+    await loadAndApplyImage(image.src, image.id);
+  }
+
+  async function selectUploadedFile(file: File): Promise<void> {
+    if (!confirmIfProgressWouldBeLost("puzzle.confirmImageChange")) {
+      return;
+    }
+
+    try {
+      validateUploadedFile(file);
+    } catch (err) {
+      setImageStatus("error");
+      setImageError(err instanceof PuzzleImageError ? translateImageError(err) : t("puzzle.error.fileUnusable"));
+      return;
+    }
+
+    await loadAndApplyImage(file, "upload");
+  }
+
+  async function loadAndApplyImage(source: string | File, id: string): Promise<void> {
+    const token = ++loadTokenRef.current;
+    setImageStatus("loading");
+    setImageError(null);
+
+    try {
+      const image = await loadSquareImage(source, IMAGE_TARGET_SIZE);
+
+      if (token !== loadTokenRef.current) {
+        // A newer selection started before this one finished — discard it.
+        closeIfBitmap(image);
+        return;
+      }
+
+      closeIfBitmap(squareImageRef.current);
+      setSquareImage(image);
+      setSelectedImageId(id);
+      setImageStatus("ready");
+      startNewGame(grid, false);
+    } catch (err) {
+      if (token !== loadTokenRef.current) return;
+      setImageStatus("error");
+      setImageError(translateImageError(err));
+    }
+  }
+
+  function focusImagePicker(): void {
+    imagePickerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function handleHint(): Promise<void> {
+    if (puzzleState.isSolved || hintThinking) return;
+    clearHint();
+    setHintThinking(true);
+
+    const move = await hintClientRef.current.requestHint(puzzleState.tiles, puzzleState.grid);
+
+    setHintThinking(false);
+    if (move !== null) {
+      setHintPosition(move);
+      hintClearTimeoutRef.current = window.setTimeout(() => {
+        setHintPosition(null);
+        hintClearTimeoutRef.current = null;
+      }, 1800);
+    } else {
+      setHintMessage(t("puzzle.hintNotFound"));
+      hintClearTimeoutRef.current = window.setTimeout(() => {
+        setHintMessage(null);
+        hintClearTimeoutRef.current = null;
+      }, 4000);
+    }
+  }
+
+  return (
+    <section className="rounded-lg border border-term-border bg-term-panel shadow-2xl overflow-hidden">
+      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-term-border bg-term-bg/60">
+        <span className="w-3 h-3 rounded-full bg-term-pink" />
+        <span className="w-3 h-3 rounded-full bg-term-orange" />
+        <span className="w-3 h-3 rounded-full bg-term-green" />
+        <span className="ml-2 text-xs text-term-muted">faramarz@iamfara: ~/projects/sliding-puzzle</span>
+      </div>
+
+      <div className="p-6 sm:p-10">
+        <div className="flex items-center gap-2 text-term-muted text-sm sm:text-base">
+          <span className="text-term-green">$</span>
+          <span>./sliding-puzzle.sh</span>
+        </div>
+        <h1 dir={dir} className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-term-text">
+          {t("puzzle.heading")}
+        </h1>
+        <p dir={dir} className="mt-3 max-w-xl text-term-muted leading-relaxed">
+          {t("puzzle.intro")}
+        </p>
+
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+          <div className="lg:col-span-3">
+            <div className="relative">
+              <PuzzleCanvas
+                state={puzzleState}
+                image={imageStatus === "ready" ? squareImage : null}
+                animate={animateNext}
+                disabled={puzzleState.isSolved || imageStatus !== "ready" || hintThinking}
+                hintPosition={hintPosition}
+                ariaLabel={t("puzzle.boardAriaLabel", { grid, moves: puzzleState.moveCount })}
+                instructionsId={instructionsId}
+                onActivate={tryMove}
+                onArrowKey={handleArrowKey}
+              />
+              {imageStatus === "loading" && (
+                <div dir={dir} className="absolute inset-0 flex items-center justify-center rounded-lg bg-term-bg/70 text-sm text-term-muted">
+                  {t("puzzle.loadingImage")}
+                </div>
+              )}
+              {showCelebration && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <span dir={dir} className="animate-pop-in rounded-full border border-term-green/50 bg-term-bg/90 px-6 py-2.5 text-xl font-bold text-term-green shadow-lg">
+                    {t("puzzle.goodJob")}
+                  </span>
+                </div>
+              )}
+            </div>
+            <p id={instructionsId} dir={dir} className="sr-only">
+              {t("puzzle.instructions")}
+            </p>
+
+            {imageStatus === "error" && imageError && (
+              <p role="alert" dir={dir} className="mt-3 text-sm text-term-pink">
+                {imageError}
+              </p>
+            )}
+
+            {hintMessage && (
+              <p role="status" dir={dir} className="mt-3 text-sm text-term-muted">
+                {hintMessage}
+              </p>
+            )}
+
+            {puzzleState.isSolved && (
+              <CompletionDialog
+                elapsedSeconds={finalElapsedRef.current}
+                moveCount={puzzleState.moveCount}
+                onPlayAgain={handleRestart}
+                onChooseImage={focusImagePicker}
+              />
+            )}
+          </div>
+
+          <div className="lg:col-span-2 flex flex-col gap-8">
+            <PuzzleControls
+              grid={grid}
+              onGridChange={handleGridChange}
+              onRestart={handleRestart}
+              onHint={() => void handleHint()}
+              hintThinking={hintThinking}
+              hintDisabled={puzzleState.isSolved || imageStatus !== "ready" || hintThinking}
+              elapsedSeconds={puzzleState.isSolved ? finalElapsedRef.current : elapsedSeconds}
+              moveCount={puzzleState.moveCount}
+            />
+
+            <div ref={imagePickerRef}>
+              <h2 id={imagePickerHeadingId} dir={dir} className="text-sm text-term-muted mb-2">
+                {t("puzzle.imageLabel")}
+              </h2>
+              <ImagePicker
+                images={BUILT_IN_IMAGES}
+                selectedId={selectedImageId}
+                onSelectBuiltIn={(image) => void selectBuiltInImage(image)}
+                onSelectFile={(file) => void selectUploadedFile(file)}
+              />
+              <p dir={dir} className="mt-2 text-xs text-term-muted">
+                {t("puzzle.uploadNote")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default SlidingPuzzle;
