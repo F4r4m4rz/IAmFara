@@ -18,7 +18,7 @@ export function Card({ icon, title, description, button }: CardProps) {
         <span className="w-2.5 h-2.5 rounded-full bg-term-orange" />
         <span className="w-2.5 h-2.5 rounded-full bg-term-green" />
         <span className="ml-2 text-xs text-term-muted truncate">
-          ./{title.toLowerCase()}.sh
+          ./{title.toLowerCase().replace(/\s+/g, "-")}.sh
         </span>
       </div>
       <div className="flex flex-col items-center p-8">
