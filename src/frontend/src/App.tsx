@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { useTrackPageView } from "./analytics/useTrackPageView";
 import Layout from "./components/layout/Layout";
 import Blogs from "./pages/Blogs/Blogs";
 import Contact from "./pages/Contact/Contact";
@@ -7,6 +8,8 @@ import Projects from "./pages/Projects/Projects";
 import SlidingPuzzle from "./pages/SlidingPuzzle/SlidingPuzzle";
 
 function App() {
+  useTrackPageView();
+
   return (
     <Layout>
       <Routes>
