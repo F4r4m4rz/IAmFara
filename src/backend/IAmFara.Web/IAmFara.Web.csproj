@@ -12,6 +12,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="IAmFara.Web.Tests" />
+  </ItemGroup>
+
+  <!--
+    DB-IP Country Lite (download.db-ip.com) — CC BY 4.0, attribution required
+    (see the report email footer). Not embedded in the assembly (it's ~8MB);
+    copied alongside the published app instead and read from disk by
+    GeoIpService. Refresh process: see docs/analytics.md.
+  -->
+  <ItemGroup>
+    <None Include="GeoIP\dbip-country-lite.mmdb" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaxMind.Db" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
