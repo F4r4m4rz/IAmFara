@@ -231,6 +231,27 @@ namespace IAmFara.Web
                 Results.Ok(new { remoteIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown" }))
                 .RequireRateLimiting("analytics-visit");
 
+            // Temporary diagnostic: reports whether each App Pool environment
+            // variable / config key the app depends on is actually reaching the
+            // running process — booleans only, never the values themselves. Lets
+            // us tell "not set" apart from "set but wrong" without exposing
+            // anything sensitive. Remove once secret delivery is confirmed working.
+            app.MapGet("/api/analytics/config-check", (
+                IConfiguration configuration,
+                IOptions<ResendOptions> resendOptions,
+                IOptions<AnalyticsOptions> analyticsOptions) =>
+                Results.Ok(new
+                {
+                    dbConnectionStringSet = !string.IsNullOrEmpty(configuration["DbConnectionString"]),
+                    emailApiKeySet = !string.IsNullOrEmpty(configuration["Email_ApiKey"]),
+                    resendApiKeySet = !string.IsNullOrEmpty(resendOptions.Value.ApiKey),
+                    resendFromEmailSet = !string.IsNullOrEmpty(resendOptions.Value.FromEmail),
+                    analyticsVisitorHmacKeySet = !string.IsNullOrEmpty(analyticsOptions.Value.VisitorHmacKey),
+                    analyticsReportSecretSet = !string.IsNullOrEmpty(analyticsOptions.Value.ReportSecret),
+                    analyticsReportToEmailSet = !string.IsNullOrEmpty(analyticsOptions.Value.ReportToEmail),
+                }))
+                .RequireRateLimiting("analytics-visit");
+
             app.MapPost("/api/analytics/report/run", async (
                 HttpContext httpContext,
                 AnalyticsReportService reportService,
