@@ -62,6 +62,8 @@ const translations: Record<Locale, Dictionary> = {
     "projects.viewProject": "view project",
     "projects.slidingPuzzle.description":
       "A responsive image puzzle built with TypeScript and the Canvas API. It uses a testable game engine separated from rendering and input, and supports both built-in images and local image uploads.",
+    "projects.detective.description":
+      "A browser-based detective game: investigate a disappearance entirely through a fictional internet — a fake browser, email, and photo archive. Case #001 is a work in progress.",
 
     "puzzle.heading": "Sliding Puzzle",
     "puzzle.intro":
@@ -155,6 +157,8 @@ const translations: Record<Locale, Dictionary> = {
     "projects.viewProject": "دیدن پروژه",
     "projects.slidingPuzzle.description":
       "یه پازل تصویری واکنش‌گرا که با TypeScript و Canvas API ساخته شده. از یه موتور بازی قابل‌تست استفاده می‌کنه که از رندر و ورودی جداست، و هم عکس‌های آماده رو پشتیبانی می‌کنه هم آپلود عکس دلخواه.",
+    "projects.detective.description":
+      "یه بازی کارآگاهی تحت مرورگر: یه ناپدید شدن رو کاملاً از طریق یه اینترنت تخیلی بررسی می‌کنی — مرورگر، ایمیل و آرشیو عکس ساختگی. پرونده شماره ۱ هنوز در حال ساخته.",
 
     "puzzle.heading": "پازل کشویی",
     "puzzle.intro":

@@ -1,4 +1,4 @@
-import { LucideIcon, Puzzle } from "lucide-react";
+import { LucideIcon, Puzzle, Search } from "lucide-react";
 
 export type ProjectKind = "experiment" | "project";
 
@@ -33,5 +33,15 @@ export const PROJECTS: readonly ProjectEntry[] = [
     kind: "experiment",
     icon: Puzzle,
     addedAt: "2026-09-14",
+  },
+  {
+    id: "internet-detective",
+    title: "Internet Detective",
+    descriptionKey: "projects.detective.description",
+    tech: "TypeScript · React · Context/useReducer",
+    href: "/detective",
+    kind: "experiment",
+    icon: Search,
+    addedAt: "2026-09-16",
   },
 ];
