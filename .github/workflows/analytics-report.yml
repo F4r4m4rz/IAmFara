@@ -1,0 +1,60 @@
+name: Send daily visitor analytics report
+
+on:
+  schedule:
+    # 02:00 UTC daily — comfortably after midnight in Europe/Oslo year-round
+    # (01:00 CET / 02:00 CEST), so "yesterday" is always fully complete by
+    # the time this runs. The report endpoint itself is idempotent per
+    # Oslo reporting date, so a late or re-run trigger is always safe.
+    # Scheduled runs always target prod — devtest is only ever reported for
+    # via a manual dispatch below.
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Site to send the report for"
+        required: true
+        type: choice
+        options:
+          - prod
+          - devtest
+        default: prod
+
+jobs:
+  trigger-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call the protected report endpoint
+        env:
+          # devtest doesn't have an SSL binding configured on SmarterASP.NET
+          # (HTTPS handshake fails there), so it's called over plain HTTP;
+          # prod is always HTTPS. devtest's report secret is independent of
+          # prod's — nothing else calls it, so it doesn't need to match.
+          IS_PROD: ${{ github.event_name == 'schedule' || inputs.target == 'prod' }}
+          REPORT_URL_PROD: https://iamfara.com/api/analytics/report/run
+          REPORT_URL_DEVTEST: http://devtest.iamfara.com/api/analytics/report/run
+          REPORT_SECRET_PROD: ${{ secrets.ANALYTICS_REPORT_SECRET }}
+          REPORT_SECRET_DEVTEST: ${{ secrets.ANALYTICS_REPORT_SECRET_DEVTEST }}
+        run: |
+          if [ "$IS_PROD" = "true" ]; then
+            url="$REPORT_URL_PROD"
+            secret="$REPORT_SECRET_PROD"
+          else
+            url="$REPORT_URL_DEVTEST"
+            secret="$REPORT_SECRET_DEVTEST"
+          fi
+
+          status=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "$url" \
+            -H "Authorization: Bearer $secret")
+
+          echo "Target: $([ "$IS_PROD" = "true" ] && echo prod || echo devtest)"
+          echo "HTTP status: $status"
+          cat /tmp/response.json
+          echo
+
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "Report trigger failed with status $status"
+            exit 1
+          fi
