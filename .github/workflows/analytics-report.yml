@@ -45,9 +45,13 @@ jobs:
             secret="$REPORT_SECRET_DEVTEST"
           fi
 
+          # -d '' forces curl to send Content-Length: 0; without it, a
+          # bodyless POST omits the header entirely and the server rejects
+          # the request with 411 Length Required before auth is even checked.
           status=$(curl -s -o /tmp/response.json -w "%{http_code}" \
             -X POST "$url" \
-            -H "Authorization: Bearer $secret")
+            -H "Authorization: Bearer $secret" \
+            -d '')
 
           echo "Target: $([ "$IS_PROD" = "true" ] && echo prod || echo devtest)"
           echo "HTTP status: $status"
