@@ -126,33 +126,45 @@ named `DbConnectionString` on the respective SmarterASP.NET site — the app
 reads it directly via `builder.Configuration["DbConnectionString"]`, no
 further setup needed there.
 
-**Schema changes are never auto-applied to production.** EF Core migrations
-live in `src/backend/IAmFara.Web/Data/Migrations/`, and an idempotent SQL
-script is generated alongside them:
+EF Core migrations live in `src/backend/IAmFara.Web/Data/Migrations/`. The
+schema was deliberately bootstrapped as two migrations rather than one:
+`InitialCreate` (empty — just proves the pipeline works) landed and was
+applied first, on its own, before any application tables existed; this
+feature's actual tables come from a second migration, `AddAnalyticsTables`,
+layered on top of it. Any future schema change is a new migration the same
+way.
 
-```
-src/backend/IAmFara.Web/Data/Migrations/Scripts/InitialCreate.idempotent.sql
-```
+**Schema changes are never applied as an unreviewed side effect** — but
+"applied" now happens automatically once a migration lands via the normal
+PR/merge process, not as a separate manual step:
 
-To apply the current schema (or any future migration) to a database:
-
-1. Regenerate the script after adding a new migration:
-   ```bash
-   cd src/backend/IAmFara.Web
-   dotnet ef migrations script --context AnalyticsDbContext --idempotent \
-     -o Data/Migrations/Scripts/<MigrationName>.idempotent.sql
-   ```
-2. Review the generated SQL.
-3. Run it yourself via the SmarterASP.NET control panel's SQL query tool,
-   once against `devtest`, then once against `prod`. The script is
-   idempotent (checks `__EFMigrationsHistory` before each step), so re-running
-   it is always safe.
+- **`deploy-prod.yml` / `deploy-test.yml`**: both run a `migrate` job
+  (`dotnet ef database update`) before the `deploy` job, so a merged/deployed
+  migration is always in place before the app code that depends on it goes
+  live. Merging the PR (or, for the test workflow, manually triggering it)
+  is the explicit approval — there's no second gate.
+- **`.github/workflows/run-db-migrations.yml`**: a `workflow_dispatch`-only
+  workflow for applying migrations out of band — e.g. to a specific past ref,
+  or to `devtest` without doing a full deploy. Pick a target (`devtest`/
+  `prod`), it prints pending migrations first, then applies them.
+- **Manual SQL via the SmarterASP.NET panel**: a fallback for when neither of
+  the above is usable (e.g. the database isn't reachable from GitHub's
+  runners). An idempotent script covering the full chain up to the latest
+  migration is regenerated alongside each migration:
+  ```
+  src/backend/IAmFara.Web/Data/Migrations/Scripts/AddAnalyticsTables.idempotent.sql
+  ```
+  It's idempotent (checks `__EFMigrationsHistory` per migration), so running
+  it against a database that already has some or all of the migrations
+  applied is always safe.
 
 To add a new migration during future development:
 
 ```bash
 cd src/backend/IAmFara.Web
 dotnet ef migrations add <MigrationName> --context AnalyticsDbContext -o Data/Migrations
+dotnet ef migrations script --context AnalyticsDbContext --idempotent \
+  -o Data/Migrations/Scripts/<MigrationName>.idempotent.sql
 ```
 
 ## Configuration keys
