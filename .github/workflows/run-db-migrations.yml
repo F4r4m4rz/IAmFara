@@ -1,0 +1,68 @@
+name: Run database migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Database to migrate"
+        required: true
+        type: choice
+        options:
+          - devtest
+          - prod
+      branch:
+        description: "Branch/ref whose migrations to apply"
+        required: true
+        type: string
+        default: main
+
+# Manual-only, never triggered by a push: applying schema changes to a
+# shared-hosting database is something a human should explicitly choose to
+# do, not something that happens as a side effect of merging code. The
+# connection string is passed straight to `dotnet ef` for this one command
+# — it's never written into app configuration or logged (GitHub masks any
+# log line that contains a registered secret's value).
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install EF Core CLI tool
+        run: dotnet tool install --global dotnet-ef --version 8.*
+
+      - name: Select connection string for target environment
+        id: select-connection
+        run: |
+          if [ "${{ inputs.target }}" = "prod" ]; then
+            echo "connection_secret_set=${{ secrets.DB_CONNECTION_STRING_PROD != '' }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "connection_secret_set=${{ secrets.DB_CONNECTION_STRING_DEVTEST != '' }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail early if the target secret isn't set
+        if: steps.select-connection.outputs.connection_secret_set != 'true'
+        run: |
+          echo "::error::Repo secret for target '${{ inputs.target }}' is not set (DB_CONNECTION_STRING_PROD / DB_CONNECTION_STRING_DEVTEST)."
+          exit 1
+
+      - name: Show pending migrations
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: dotnet ef migrations list --context AnalyticsDbContext --connection "$CONNECTION_STRING"
+
+      - name: Apply migrations to ${{ inputs.target }}
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: dotnet ef database update --context AnalyticsDbContext --connection "$CONNECTION_STRING"

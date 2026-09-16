@@ -1,8 +1,10 @@
 using System.Threading.RateLimiting;
 using IAmFara.Web.Contracts;
+using IAmFara.Web.Data;
 using IAmFara.Web.Options;
 using IAmFara.Web.Services;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 
 namespace IAmFara.Web
 {
@@ -32,6 +34,13 @@ namespace IAmFara.Web
             builder.Services.Configure<ContactOptions>(builder.Configuration.GetSection("Contact"));
             builder.Services.AddSingleton<HttpClient>();
             builder.Services.AddSingleton<ContactEmailSender>();
+
+            // The connection string is set directly as an App Pool environment
+            // variable ("DbConnectionString") on each SmarterASP.NET site, the
+            // same flat-key pattern used for "Email_ApiKey" above, so it's read
+            // straight from configuration rather than a bound options section.
+            builder.Services.AddDbContext<AnalyticsDbContext>(options =>
+                options.UseSqlServer(builder.Configuration["DbConnectionString"]));
 
             builder.Services.AddRateLimiter(options =>
             {
