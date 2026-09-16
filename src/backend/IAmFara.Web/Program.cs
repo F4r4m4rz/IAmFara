@@ -45,13 +45,22 @@ namespace IAmFara.Web
             builder.Services.AddDbContext<AnalyticsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration["DbConnectionString"]));
 
-            // Analytics__VisitorHmacKey / Analytics__ReportSecret are set the
-            // same way as "DbConnectionString" above: directly as App Pool
-            // environment variables in the SmarterASP.NET panel, not via CI.
-            // The double-underscore naming lets the default environment-variable
-            // configuration provider bind them straight into the "Analytics"
-            // section below with no extra PostConfigure needed.
+            // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
+            // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
+            // App Pool environment variables in the SmarterASP.NET panel.
+            // (An earlier double-underscore "Analytics__VisitorHmacKey" naming,
+            // meant to bind straight into the "Analytics" section below via the
+            // default environment-variable provider's "__" convention, turned
+            // out not to survive SmarterASP.NET's panel — verified via the
+            // config-check diagnostic below, where "DbConnectionString" and
+            // "Email_ApiKey" read as set but the double-underscore keys didn't.
+            // Flat keys read explicitly here avoid relying on that convention.)
             builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection("Analytics"));
+            builder.Services.PostConfigure<AnalyticsOptions>(options =>
+            {
+                options.VisitorHmacKey = builder.Configuration["AnalyticsVisitorHmacKey"] ?? options.VisitorHmacKey;
+                options.ReportSecret = builder.Configuration["AnalyticsReportSecret"] ?? options.ReportSecret;
+            });
             builder.Services.AddSingleton<GeoIpService>();
             builder.Services.AddSingleton<VisitorKeyService>();
             builder.Services.AddScoped<AnalyticsReportService>();

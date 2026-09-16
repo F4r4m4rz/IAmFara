@@ -176,11 +176,22 @@ described below.
 | Key | Purpose | How it's supplied |
 |---|---|---|
 | `DbConnectionString` | SQL Server connection string | SmarterASP.NET App Pool environment variable (flat key, both prod and devtest) |
-| `Analytics:VisitorHmacKey` | HMAC key for the daily-rotating visitor identifier | SmarterASP.NET App Pool environment variable `Analytics__VisitorHmacKey` (double underscore — binds to the nested config key) |
+| `Analytics:VisitorHmacKey` | HMAC key for the daily-rotating visitor identifier | SmarterASP.NET App Pool environment variable `AnalyticsVisitorHmacKey` (flat key, read explicitly in `Program.cs` — see note below) |
 | `Analytics:ReportToEmail` | Recipient address for the daily report | `appsettings.json` (non-secret) or an env var override if you'd rather not commit it |
-| `Analytics:ReportSecret` | Bearer secret required to call `/api/analytics/report/run` | SmarterASP.NET App Pool environment variable `Analytics__ReportSecret` **and** the GitHub Actions repo secret `ANALYTICS_REPORT_SECRET` — must be the exact same value |
+| `Analytics:ReportSecret` | Bearer secret required to call `/api/analytics/report/run` | SmarterASP.NET App Pool environment variable `AnalyticsReportSecret` (flat key). For **prod only**, must also exactly match the GitHub Actions repo secret `ANALYTICS_REPORT_SECRET` — devtest's value is independent since nothing automated calls its report endpoint. |
 | `Resend:ApiKey` | Resend API key (reused from the contact form) | SmarterASP.NET App Pool environment variable `Email_ApiKey` (already set up) |
 | `Resend:FromEmail` | Sender address (reused from the contact form) | Already delivered via CI (`WebConfigEnvironmentVariables`) |
+
+`AnalyticsVisitorHmacKey`/`AnalyticsReportSecret` were originally named with a
+double underscore (`Analytics__VisitorHmacKey`) to bind automatically into
+the nested `Analytics:*` config keys via .NET's default environment-variable
+convention. In practice, SmarterASP.NET's App Pool environment variable panel
+didn't preserve the double underscore — confirmed via the temporary
+`/api/analytics/config-check` diagnostic (see Troubleshooting), which showed
+`DbConnectionString`/`Email_ApiKey` (flat keys, no double underscore) reading
+as set while the double-underscore keys read as empty even after a recycle.
+Both are now flat keys, read explicitly in `Program.cs` the same way
+`Email_ApiKey` already was.
 
 ### Local development
 
@@ -242,6 +253,12 @@ handful of rows per day) and contain no IP-derived data.
 
 ## Troubleshooting
 
+- **A config value doesn't seem to be reaching the app**: hit
+  `GET /api/analytics/config-check` — a temporary diagnostic (remove once no
+  longer needed) that reports, as booleans only (never the actual values),
+  whether each config key/env var the app depends on is populated in the
+  running process. Useful for telling "not set" apart from "set but wrong"
+  without exposing anything sensitive.
 - **A visit isn't showing up**: check whether the User-Agent looks like a
   bot (`Services/BotFilter.cs`) or the path failed validation
   (`Services/PathNormalizer.cs`) — both cases return `200 OK` from
