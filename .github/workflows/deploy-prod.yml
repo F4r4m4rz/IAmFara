@@ -5,7 +5,35 @@ on:
     branches: ["main"]
 
 jobs:
+  # Runs before `deploy` so schema changes are always in place before the new
+  # app code that depends on them goes live — merging (and thus approving)
+  # the PR is the explicit approval for this; there's no separate manual gate.
+  # `dotnet ef database update` only applies migrations not already recorded
+  # in `__EFMigrationsHistory`, so this is a safe no-op when there's nothing
+  # pending.
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install EF Core CLI tool
+        run: dotnet tool install --global dotnet-ef --version 8.*
+
+      - name: Apply pending migrations
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
+        run: dotnet ef database update --context AnalyticsDbContext --connection "$CONNECTION_STRING"
+
   deploy:
+    needs: migrate
     runs-on: windows-latest
 
     steps:
