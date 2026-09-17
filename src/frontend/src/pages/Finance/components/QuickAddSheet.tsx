@@ -95,22 +95,32 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
     }
 
     const input = { type, amountMinor, date, categoryId, note: note.trim() || undefined };
-    if (editingTransaction) {
-      await updateTransaction.mutateAsync({ id: editingTransaction.id, input });
-    } else {
-      await addTransaction.mutateAsync(input);
+    try {
+      if (editingTransaction) {
+        await updateTransaction.mutateAsync({ id: editingTransaction.id, input });
+      } else {
+        await addTransaction.mutateAsync(input);
+      }
+      recordCategoryUsed(categoryId);
+      onSaved();
+      onClose();
+    } catch {
+      // A failure here must be visible, not a silently-unresponsive Save
+      // button — surface it the same way as a validation error.
+      setError(t("finance.quickAdd.error.saveFailed"));
     }
-    recordCategoryUsed(categoryId);
-    onSaved();
-    onClose();
   };
 
   const handleDelete = async () => {
     if (!editingTransaction) return;
     if (!window.confirm(t("finance.quickAdd.confirmDelete"))) return;
-    await deleteTransaction.mutateAsync(editingTransaction.id);
-    onDeleted();
-    onClose();
+    try {
+      await deleteTransaction.mutateAsync(editingTransaction.id);
+      onDeleted();
+      onClose();
+    } catch {
+      setError(t("finance.quickAdd.error.saveFailed"));
+    }
   };
 
   return (

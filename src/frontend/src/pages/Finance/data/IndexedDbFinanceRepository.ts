@@ -1,6 +1,7 @@
 import { defaultCategories } from "./defaultCategories";
 import { FinanceDb } from "./db";
 import { FinanceRepository } from "./FinanceRepository";
+import { generateId } from "../domain/id";
 import {
   CategoryInUseError,
   Category,
@@ -52,7 +53,7 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
   async addTransaction(input: CreateTransactionInput): Promise<Transaction> {
     await this.seeded;
     const now = new Date().toISOString();
-    const transaction: Transaction = { ...input, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
+    const transaction: Transaction = { ...input, id: generateId(), createdAt: now, updatedAt: now };
     await this.db.transactions.add(transaction);
     return transaction;
   }
@@ -80,7 +81,7 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
   async addCategory(input: CreateCategoryInput): Promise<Category> {
     await this.seeded;
     const category: Category = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       type: input.type,
       labelKey: null,
       name: input.name,
@@ -130,7 +131,7 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
     const now = new Date().toISOString();
     const transactions: Transaction[] = inputs.map((input) => ({
       ...input,
-      id: crypto.randomUUID(),
+      id: generateId(),
       createdAt: now,
       updatedAt: now,
     }));

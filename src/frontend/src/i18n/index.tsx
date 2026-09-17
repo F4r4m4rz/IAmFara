@@ -153,6 +153,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.confirmDelete": "Delete this transaction? This can't be undone.",
     "finance.quickAdd.error.amount": "Enter a valid amount.",
     "finance.quickAdd.error.category": "Choose a category.",
+    "finance.quickAdd.error.saveFailed": "Something went wrong saving this. Please try again.",
 
     "finance.dashboard.viewTransactions": "View all transactions",
     "finance.dashboard.empty": "No transactions yet this month. Add your first one.",
@@ -320,6 +321,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.confirmDelete": "این تراکنش حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.quickAdd.error.amount": "یه مبلغ معتبر وارد کن.",
     "finance.quickAdd.error.category": "یه دسته‌بندی انتخاب کن.",
+    "finance.quickAdd.error.saveFailed": "یه مشکلی توی ذخیره‌سازی پیش اومد. دوباره امتحان کن.",
 
     "finance.dashboard.viewTransactions": "دیدن همه تراکنش‌ها",
     "finance.dashboard.empty": "هنوز تراکنشی توی این ماه نیست. اولین تراکنش رو اضافه کن.",
