@@ -12,7 +12,7 @@ const TABS = [
   { to: `${BASE}/settings`, end: false, icon: SettingsIcon, labelKey: "finance.nav.settings" },
 ];
 
-export default function BottomNav() {
+export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
@@ -23,6 +23,7 @@ export default function BottomNav() {
 
       <button
         type="button"
+        onClick={onAdd}
         aria-label={t("finance.nav.addTransaction")}
         className="-mt-8 flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-finance-accent text-white shadow-lg shadow-finance-accent/30 transition-transform active:scale-95"
       >

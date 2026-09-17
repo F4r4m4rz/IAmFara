@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { dirFor, useLocale } from "../../i18n";
 import BottomNav from "./components/BottomNav";
+import QuickAddSheet from "./components/QuickAddSheet";
+import Toast from "./components/Toast";
 import { IndexedDbFinanceRepository } from "./data/IndexedDbFinanceRepository";
 import Categories from "./pages/Categories";
 import Dashboard from "./pages/Dashboard";
@@ -17,19 +19,30 @@ import { RepositoryProvider } from "./RepositoryContext";
  * rather than a section of the portfolio.
  */
 export default function FinanceApp() {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   // Created once per mount, not at module scope — avoids holding a Dexie
   // connection open for the lifetime of the whole site when the user has
   // never visited the finance app.
   const [queryClient] = useState(() => new QueryClient());
   const [repository] = useState(() => new IndexedDbFinanceRepository());
 
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Auto-dismisses the success toast — deliberately not a dialog the user
+  // has to acknowledge (see Toast.tsx).
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timeout = setTimeout(() => setToastMessage(null), 1800);
+    return () => clearTimeout(timeout);
+  }, [toastMessage]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <RepositoryProvider repository={repository}>
         <div
           dir={dirFor(locale)}
-          className="flex h-screen w-screen flex-col bg-finance-bg font-sans text-finance-text"
+          className="relative flex h-screen w-screen flex-col bg-finance-bg font-sans text-finance-text"
         >
           <div className="flex-1 overflow-y-auto">
             <Routes>
@@ -39,7 +52,14 @@ export default function FinanceApp() {
               <Route path="settings" element={<Settings />} />
             </Routes>
           </div>
-          <BottomNav />
+          <BottomNav onAdd={() => setQuickAddOpen(true)} />
+
+          <QuickAddSheet
+            open={quickAddOpen}
+            onClose={() => setQuickAddOpen(false)}
+            onSaved={() => setToastMessage(t("finance.quickAdd.saved"))}
+          />
+          {toastMessage && <Toast message={toastMessage} />}
         </div>
       </RepositoryProvider>
     </QueryClientProvider>

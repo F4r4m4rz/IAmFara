@@ -142,6 +142,14 @@ const translations: Record<Locale, Dictionary> = {
     "finance.transactions.heading": "Transactions",
     "finance.categories.heading": "Categories",
     "finance.settings.heading": "Settings",
+
+    "finance.quickAdd.type.expense": "Expense",
+    "finance.quickAdd.type.income": "Income",
+    "finance.quickAdd.notePlaceholder": "Note (optional)",
+    "finance.quickAdd.save": "Save",
+    "finance.quickAdd.saved": "Saved",
+    "finance.quickAdd.error.amount": "Enter a valid amount.",
+    "finance.quickAdd.error.category": "Choose a category.",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -267,6 +275,14 @@ const translations: Record<Locale, Dictionary> = {
     "finance.transactions.heading": "تراکنش‌ها",
     "finance.categories.heading": "دسته‌بندی‌ها",
     "finance.settings.heading": "تنظیمات",
+
+    "finance.quickAdd.type.expense": "هزینه",
+    "finance.quickAdd.type.income": "درآمد",
+    "finance.quickAdd.notePlaceholder": "یادداشت (اختیاری)",
+    "finance.quickAdd.save": "ذخیره",
+    "finance.quickAdd.saved": "ذخیره شد",
+    "finance.quickAdd.error.amount": "یه مبلغ معتبر وارد کن.",
+    "finance.quickAdd.error.category": "یه دسته‌بندی انتخاب کن.",
   },
 };
 
