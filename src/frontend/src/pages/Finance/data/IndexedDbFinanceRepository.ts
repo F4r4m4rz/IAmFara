@@ -124,4 +124,16 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
     const missing = defaultCategories(new Date().toISOString()).filter((c) => !existingIds.has(c.id));
     if (missing.length > 0) await this.db.categories.bulkAdd(missing);
   }
+
+  async importTransactions(inputs: CreateTransactionInput[]): Promise<void> {
+    await this.seeded;
+    const now = new Date().toISOString();
+    const transactions: Transaction[] = inputs.map((input) => ({
+      ...input,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    }));
+    await this.db.transactions.bulkAdd(transactions);
+  }
 }

@@ -162,4 +162,27 @@ describe("IndexedDbFinanceRepository — demo utilities", () => {
     expect(categories.some((c) => c.id === "groceries")).toBe(true);
     expect(categories.some((c) => c.name === "Custom")).toBe(true);
   });
+
+  it("importTransactions bulk-persists generated transactions with fresh ids/timestamps", async () => {
+    const repo = createRepository();
+    await repo.importTransactions([
+      { type: "expense", amountMinor: 1000, date: "2026-09-01", categoryId: "groceries" },
+      { type: "income", amountMinor: 4000000, date: "2026-09-01", categoryId: "salary" },
+    ]);
+
+    const transactions = await repo.getTransactions();
+    expect(transactions).toHaveLength(2);
+    expect(new Set(transactions.map((t) => t.id)).size).toBe(2); // ids are unique
+    expect(transactions.every((t) => t.createdAt && t.updatedAt)).toBe(true);
+  });
+
+  it("importTransactions adds to, rather than replaces, existing transactions", async () => {
+    const repo = createRepository();
+    await repo.addTransaction({ type: "expense", amountMinor: 500, date: "2026-09-01", categoryId: "groceries" });
+    await repo.importTransactions([
+      { type: "expense", amountMinor: 1000, date: "2026-09-02", categoryId: "groceries" },
+    ]);
+
+    expect(await repo.getTransactions()).toHaveLength(2);
+  });
 });

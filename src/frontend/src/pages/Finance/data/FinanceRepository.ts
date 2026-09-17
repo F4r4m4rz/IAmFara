@@ -33,4 +33,6 @@ export interface FinanceRepository {
   /** Demo-only utilities — a future ApiFinanceRepository is free to not implement these meaningfully. */
   resetAll(): Promise<void>;
   restoreDefaultCategories(): Promise<void>;
+  /** Bulk-persists generated sample transactions (see domain/sampleData.ts). */
+  importTransactions(inputs: CreateTransactionInput[]): Promise<void>;
 }

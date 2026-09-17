@@ -174,6 +174,16 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.namePlaceholder": "Category name",
     "finance.categories.confirmDelete": "Delete this category? This can't be undone.",
     "finance.categories.error.inUse": "Used by {count} transaction(s) — can't be deleted.",
+
+    "finance.settings.demoData": "Demo & Data",
+    "finance.settings.loadSampleData": "Load sample data",
+    "finance.settings.restoreDefaultCategories": "Restore default categories",
+    "finance.settings.resetDemo": "Reset demo",
+    "finance.settings.demoDataHint": "These only affect the data stored on this device.",
+    "finance.settings.confirmReset": "Reset all demo data? This deletes every transaction and custom category and can't be undone.",
+    "finance.settings.sampleDataLoaded": "Sample data loaded",
+    "finance.settings.resetDone": "Demo reset",
+    "finance.settings.categoriesRestored": "Default categories restored",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -331,6 +341,16 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.namePlaceholder": "نام دسته‌بندی",
     "finance.categories.confirmDelete": "این دسته‌بندی حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.categories.error.inUse": "توسط {count} تراکنش استفاده شده — قابل حذف نیست.",
+
+    "finance.settings.demoData": "دمو و داده‌ها",
+    "finance.settings.loadSampleData": "بارگذاری داده نمونه",
+    "finance.settings.restoreDefaultCategories": "بازیابی دسته‌بندی‌های پیش‌فرض",
+    "finance.settings.resetDemo": "بازنشانی دمو",
+    "finance.settings.demoDataHint": "این‌ها فقط روی اطلاعات ذخیره‌شده روی همین دستگاه تأثیر می‌ذارن.",
+    "finance.settings.confirmReset": "همه داده‌های دمو بازنشانی بشه؟ همه تراکنش‌ها و دسته‌بندی‌های سفارشی حذف می‌شن و قابل برگشت نیست.",
+    "finance.settings.sampleDataLoaded": "داده نمونه بارگذاری شد",
+    "finance.settings.resetDone": "دمو بازنشانی شد",
+    "finance.settings.categoriesRestored": "دسته‌بندی‌های پیش‌فرض بازیابی شدن",
   },
 };
 

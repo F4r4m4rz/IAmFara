@@ -50,6 +50,7 @@ export default function FinanceApp() {
     setEditingTransaction(transaction);
     setSheetOpen(true);
   };
+  const showToast = (message: string) => setToastMessage(message);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,7 +64,7 @@ export default function FinanceApp() {
               <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
               <Route path="categories" element={<Categories />} />
-              <Route path="settings" element={<Settings />} />
+              <Route path="settings" element={<Settings showToast={showToast} />} />
             </Routes>
           </div>
           <BottomNav onAdd={openAdd} />
@@ -72,8 +73,8 @@ export default function FinanceApp() {
             open={sheetOpen}
             editingTransaction={editingTransaction}
             onClose={closeSheet}
-            onSaved={() => setToastMessage(t("finance.quickAdd.saved"))}
-            onDeleted={() => setToastMessage(t("finance.quickAdd.deleted"))}
+            onSaved={() => showToast(t("finance.quickAdd.saved"))}
+            onDeleted={() => showToast(t("finance.quickAdd.deleted"))}
           />
           {toastMessage && <Toast message={toastMessage} />}
         </div>
