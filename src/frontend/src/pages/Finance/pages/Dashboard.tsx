@@ -1,22 +1,19 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { dirFor, T, useLocale } from "../../../i18n";
 import { monthlyTotals } from "../domain/calculations";
-import { addMonths, currentMonthKey, formatMonthLabel } from "../domain/dates";
+import { currentMonthKey } from "../domain/dates";
 import { formatMoney } from "../domain/money";
 import DemoModeBadge from "../components/DemoModeBadge";
-import { useCategories } from "../queries/useCategories";
+import MonthSelector from "../components/MonthSelector";
 import { useTransactions } from "../queries/useTransactions";
 
 export default function Dashboard() {
-  const { locale, t } = useLocale();
+  const { locale } = useLocale();
   const [month, setMonth] = useState(currentMonthKey());
 
   const { data: transactions = [] } = useTransactions({ month });
-  const { data: categories = [] } = useCategories();
-
   const totals = monthlyTotals(transactions, month);
-  const isCurrentMonth = month === currentMonthKey();
 
   return (
     <div dir={dirFor(locale)} className="mx-auto max-w-lg px-4 py-6">
@@ -27,31 +24,8 @@ export default function Dashboard() {
         <DemoModeBadge />
       </div>
 
-      <div className="mb-6 flex items-center justify-between rounded-xl border border-finance-border bg-finance-surface px-3 py-2">
-        <button
-          type="button"
-          onClick={() => setMonth((m) => addMonths(m, -1))}
-          aria-label={t("finance.dashboard.month.previous")}
-          className="rounded-lg p-1.5 text-finance-muted hover:text-finance-text"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => setMonth(currentMonthKey())}
-          className="text-sm font-medium disabled:text-finance-text"
-          disabled={isCurrentMonth}
-        >
-          <span dir="ltr">{formatMonthLabel(month, locale)}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setMonth((m) => addMonths(m, 1))}
-          aria-label={t("finance.dashboard.month.next")}
-          className="rounded-lg p-1.5 text-finance-muted hover:text-finance-text"
-        >
-          <ChevronRight size={18} />
-        </button>
+      <div className="mb-6">
+        <MonthSelector month={month} onChange={setMonth} />
       </div>
 
       <div className="mb-4 rounded-2xl border border-finance-border bg-finance-surfaceElevated p-5">
@@ -82,12 +56,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Sanity check for this phase — proves the repository/seed/query
-          pipeline actually works end to end. Replaced by real content
-          (recent transactions, category breakdown) in later phases. */}
-      <p className="mt-6 text-center text-xs text-finance-muted">
-        {categories.length} categories loaded &middot; {transactions.length} transactions this month
-      </p>
+      <Link to="/expenses/demo/transactions" className="mt-6 block text-center text-sm text-finance-accent">
+        <T k="finance.dashboard.viewTransactions" />
+      </Link>
     </div>
   );
 }

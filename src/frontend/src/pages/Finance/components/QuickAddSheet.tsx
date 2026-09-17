@@ -1,24 +1,32 @@
+import { Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { dirFor, useLocale } from "../../../i18n";
 import { recordCategoryUsed } from "../data/recentCategories";
-import { parseAmountInput } from "../domain/money";
-import { TransactionType } from "../domain/types";
 import { todayLocalDate } from "../domain/dates";
+import { parseAmountInput, minorToMajor } from "../domain/money";
+import { Transaction, TransactionType } from "../domain/types";
 import { useAddTransaction } from "../queries/useAddTransaction";
 import { useCategories } from "../queries/useCategories";
+import { useDeleteTransaction } from "../queries/useDeleteTransaction";
+import { useUpdateTransaction } from "../queries/useUpdateTransaction";
 import AmountInput from "./AmountInput";
 import CategoryPicker from "./CategoryPicker";
 
 interface QuickAddSheetProps {
   open: boolean;
+  /** null = adding a new transaction; a Transaction = editing that one. */
+  editingTransaction: Transaction | null;
   onClose: () => void;
   onSaved: () => void;
+  onDeleted: () => void;
 }
 
-export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetProps) {
+export default function QuickAddSheet({ open, editingTransaction, onClose, onSaved, onDeleted }: QuickAddSheetProps) {
   const { locale, t } = useLocale();
   const { data: categories = [] } = useCategories();
   const addTransaction = useAddTransaction();
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
   const [type, setType] = useState<TransactionType>("expense");
   const [amountInput, setAmountInput] = useState("");
@@ -30,17 +38,26 @@ export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetP
 
   const amountRef = useRef<HTMLInputElement>(null);
   const errorId = useId();
+  const isSaving = addTransaction.isPending || updateTransaction.isPending;
 
-  // Reset to a clean, fast-path state every time the sheet opens, and
-  // auto-focus the amount field — the whole point of "quick add" is that
-  // amount entry starts immediately with no extra taps.
+  // Reset (or pre-fill, for edit) every time the sheet opens, and auto-focus
+  // the amount field — the whole point of "quick add" is that amount entry
+  // starts immediately with no extra taps.
   useEffect(() => {
     if (!open) return;
-    setType("expense");
-    setAmountInput("");
-    setCategoryId(null);
-    setDate(todayLocalDate());
-    setNote("");
+    if (editingTransaction) {
+      setType(editingTransaction.type);
+      setAmountInput(String(minorToMajor(editingTransaction.amountMinor)));
+      setCategoryId(editingTransaction.categoryId);
+      setDate(editingTransaction.date);
+      setNote(editingTransaction.note ?? "");
+    } else {
+      setType("expense");
+      setAmountInput("");
+      setCategoryId(null);
+      setDate(todayLocalDate());
+      setNote("");
+    }
     setError(null);
     const raf = requestAnimationFrame(() => {
       setVisible(true);
@@ -50,7 +67,7 @@ export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetP
       cancelAnimationFrame(raf);
       setVisible(false);
     };
-  }, [open]);
+  }, [open, editingTransaction]);
 
   useEffect(() => {
     if (!open) return;
@@ -77,15 +94,22 @@ export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetP
       return;
     }
 
-    await addTransaction.mutateAsync({
-      type,
-      amountMinor,
-      date,
-      categoryId,
-      note: note.trim() || undefined,
-    });
+    const input = { type, amountMinor, date, categoryId, note: note.trim() || undefined };
+    if (editingTransaction) {
+      await updateTransaction.mutateAsync({ id: editingTransaction.id, input });
+    } else {
+      await addTransaction.mutateAsync(input);
+    }
     recordCategoryUsed(categoryId);
     onSaved();
+    onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!editingTransaction) return;
+    if (!window.confirm(t("finance.quickAdd.confirmDelete"))) return;
+    await deleteTransaction.mutateAsync(editingTransaction.id);
+    onDeleted();
     onClose();
   };
 
@@ -105,22 +129,34 @@ export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetP
           visible ? "translate-y-0" : "translate-y-full"
         }`}
       >
-        <div className="mb-4 flex justify-center gap-1 rounded-full bg-finance-bg p-1">
-          {(["expense", "income"] as const).map((option) => (
+        <div className="mb-4 flex items-center gap-1">
+          <div className="flex flex-1 justify-center gap-1 rounded-full bg-finance-bg p-1">
+            {(["expense", "income"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => {
+                  setType(option);
+                  setCategoryId(null);
+                }}
+                className={`flex-1 rounded-full py-2 text-sm font-medium transition-colors ${
+                  type === option ? "bg-finance-accent text-white" : "text-finance-muted"
+                }`}
+              >
+                {t(`finance.quickAdd.type.${option}`)}
+              </button>
+            ))}
+          </div>
+          {editingTransaction && (
             <button
-              key={option}
               type="button"
-              onClick={() => {
-                setType(option);
-                setCategoryId(null);
-              }}
-              className={`flex-1 rounded-full py-2 text-sm font-medium transition-colors ${
-                type === option ? "bg-finance-accent text-white" : "text-finance-muted"
-              }`}
+              onClick={handleDelete}
+              aria-label={t("finance.quickAdd.delete")}
+              className="flex-shrink-0 rounded-full p-2.5 text-finance-expense hover:bg-finance-expense/10"
             >
-              {t(`finance.quickAdd.type.${option}`)}
+              <Trash2 size={18} />
             </button>
-          ))}
+          )}
         </div>
 
         <AmountInput
@@ -160,7 +196,7 @@ export default function QuickAddSheet({ open, onClose, onSaved }: QuickAddSheetP
         <button
           type="button"
           onClick={handleSave}
-          disabled={addTransaction.isPending}
+          disabled={isSaving}
           className="mt-4 w-full rounded-xl bg-finance-accent py-3 text-center font-semibold text-white disabled:opacity-60"
         >
           {t("finance.quickAdd.save")}

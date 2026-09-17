@@ -6,6 +6,7 @@ import BottomNav from "./components/BottomNav";
 import QuickAddSheet from "./components/QuickAddSheet";
 import Toast from "./components/Toast";
 import { IndexedDbFinanceRepository } from "./data/IndexedDbFinanceRepository";
+import { Transaction } from "./domain/types";
 import Categories from "./pages/Categories";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
@@ -26,7 +27,10 @@ export default function FinanceApp() {
   const [queryClient] = useState(() => new QueryClient());
   const [repository] = useState(() => new IndexedDbFinanceRepository());
 
-  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  // null sheetOpen + null editingTransaction = closed. editingTransaction
+  // set = edit mode; sheetOpen true with editingTransaction null = add mode.
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Auto-dismisses the success toast — deliberately not a dialog the user
@@ -36,6 +40,11 @@ export default function FinanceApp() {
     const timeout = setTimeout(() => setToastMessage(null), 1800);
     return () => clearTimeout(timeout);
   }, [toastMessage]);
+
+  const closeSheet = () => {
+    setSheetOpen(false);
+    setEditingTransaction(null);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -47,17 +56,29 @@ export default function FinanceApp() {
           <div className="flex-1 overflow-y-auto">
             <Routes>
               <Route index element={<Dashboard />} />
-              <Route path="transactions" element={<TransactionHistory />} />
+              <Route
+                path="transactions"
+                element={
+                  <TransactionHistory
+                    onEditTransaction={(transaction) => {
+                      setEditingTransaction(transaction);
+                      setSheetOpen(true);
+                    }}
+                  />
+                }
+              />
               <Route path="categories" element={<Categories />} />
               <Route path="settings" element={<Settings />} />
             </Routes>
           </div>
-          <BottomNav onAdd={() => setQuickAddOpen(true)} />
+          <BottomNav onAdd={() => setSheetOpen(true)} />
 
           <QuickAddSheet
-            open={quickAddOpen}
-            onClose={() => setQuickAddOpen(false)}
+            open={sheetOpen}
+            editingTransaction={editingTransaction}
+            onClose={closeSheet}
             onSaved={() => setToastMessage(t("finance.quickAdd.saved"))}
+            onDeleted={() => setToastMessage(t("finance.quickAdd.deleted"))}
           />
           {toastMessage && <Toast message={toastMessage} />}
         </div>

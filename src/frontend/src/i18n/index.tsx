@@ -148,8 +148,28 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.notePlaceholder": "Note (optional)",
     "finance.quickAdd.save": "Save",
     "finance.quickAdd.saved": "Saved",
+    "finance.quickAdd.deleted": "Deleted",
+    "finance.quickAdd.delete": "Delete",
+    "finance.quickAdd.confirmDelete": "Delete this transaction? This can't be undone.",
     "finance.quickAdd.error.amount": "Enter a valid amount.",
     "finance.quickAdd.error.category": "Choose a category.",
+
+    "finance.dashboard.viewTransactions": "View all transactions",
+
+    "finance.transactions.filter.all": "All",
+    "finance.transactions.filter.expense": "Expense",
+    "finance.transactions.filter.income": "Income",
+    "finance.transactions.filter.allCategories": "All categories",
+    "finance.transactions.empty": "No transactions yet. Add your first one.",
+
+    "finance.categories.rename": "Rename",
+    "finance.categories.delete": "Delete",
+    "finance.categories.save": "Save",
+    "finance.categories.cancel": "Cancel",
+    "finance.categories.add": "Add category",
+    "finance.categories.namePlaceholder": "Category name",
+    "finance.categories.confirmDelete": "Delete this category? This can't be undone.",
+    "finance.categories.error.inUse": "Used by {count} transaction(s) — can't be deleted.",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -281,8 +301,28 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.notePlaceholder": "یادداشت (اختیاری)",
     "finance.quickAdd.save": "ذخیره",
     "finance.quickAdd.saved": "ذخیره شد",
+    "finance.quickAdd.deleted": "حذف شد",
+    "finance.quickAdd.delete": "حذف",
+    "finance.quickAdd.confirmDelete": "این تراکنش حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.quickAdd.error.amount": "یه مبلغ معتبر وارد کن.",
     "finance.quickAdd.error.category": "یه دسته‌بندی انتخاب کن.",
+
+    "finance.dashboard.viewTransactions": "دیدن همه تراکنش‌ها",
+
+    "finance.transactions.filter.all": "همه",
+    "finance.transactions.filter.expense": "هزینه",
+    "finance.transactions.filter.income": "درآمد",
+    "finance.transactions.filter.allCategories": "همه دسته‌بندی‌ها",
+    "finance.transactions.empty": "هنوز تراکنشی نیست. اولین تراکنش رو اضافه کن.",
+
+    "finance.categories.rename": "تغییر نام",
+    "finance.categories.delete": "حذف",
+    "finance.categories.save": "ذخیره",
+    "finance.categories.cancel": "لغو",
+    "finance.categories.add": "افزودن دسته‌بندی",
+    "finance.categories.namePlaceholder": "نام دسته‌بندی",
+    "finance.categories.confirmDelete": "این دسته‌بندی حذف بشه؟ این کار قابل برگشت نیست.",
+    "finance.categories.error.inUse": "توسط {count} تراکنش استفاده شده — قابل حذف نیست.",
   },
 };
 
