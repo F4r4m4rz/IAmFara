@@ -155,6 +155,10 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.error.category": "Choose a category.",
 
     "finance.dashboard.viewTransactions": "View all transactions",
+    "finance.dashboard.empty": "No transactions yet this month. Add your first one.",
+    "finance.dashboard.noExpenses": "No expenses yet this month.",
+    "finance.dashboard.byCategory": "By category",
+    "finance.dashboard.recent": "Recent transactions",
 
     "finance.transactions.filter.all": "All",
     "finance.transactions.filter.expense": "Expense",
@@ -308,6 +312,10 @@ const translations: Record<Locale, Dictionary> = {
     "finance.quickAdd.error.category": "یه دسته‌بندی انتخاب کن.",
 
     "finance.dashboard.viewTransactions": "دیدن همه تراکنش‌ها",
+    "finance.dashboard.empty": "هنوز تراکنشی توی این ماه نیست. اولین تراکنش رو اضافه کن.",
+    "finance.dashboard.noExpenses": "هنوز هزینه‌ای توی این ماه نیست.",
+    "finance.dashboard.byCategory": "بر اساس دسته‌بندی",
+    "finance.dashboard.recent": "تراکنش‌های اخیر",
 
     "finance.transactions.filter.all": "همه",
     "finance.transactions.filter.expense": "هزینه",

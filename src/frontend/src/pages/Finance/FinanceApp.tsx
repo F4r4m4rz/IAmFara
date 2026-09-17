@@ -45,6 +45,11 @@ export default function FinanceApp() {
     setSheetOpen(false);
     setEditingTransaction(null);
   };
+  const openAdd = () => setSheetOpen(true);
+  const openEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setSheetOpen(true);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,23 +60,13 @@ export default function FinanceApp() {
         >
           <div className="flex-1 overflow-y-auto">
             <Routes>
-              <Route index element={<Dashboard />} />
-              <Route
-                path="transactions"
-                element={
-                  <TransactionHistory
-                    onEditTransaction={(transaction) => {
-                      setEditingTransaction(transaction);
-                      setSheetOpen(true);
-                    }}
-                  />
-                }
-              />
+              <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} />} />
+              <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
               <Route path="categories" element={<Categories />} />
               <Route path="settings" element={<Settings />} />
             </Routes>
           </div>
-          <BottomNav onAdd={() => setSheetOpen(true)} />
+          <BottomNav onAdd={openAdd} />
 
           <QuickAddSheet
             open={sheetOpen}
