@@ -11,6 +11,17 @@ module.exports = {
           "Menlo",
           "monospace",
         ],
+        // Used only within the finance app (see pages/Finance) — the rest
+        // of the site is deliberately monospace/terminal-styled, but the
+        // finance app has its own "premium finance app" visual identity,
+        // not the portfolio's hacker aesthetic. Persian text still swaps to
+        // Vazirmatn via the existing [dir="rtl"] rule in index.css.
+        sans: [
+          '"Inter"',
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       colors: {
         term: {
@@ -24,6 +35,19 @@ module.exports = {
           purple: "#d2a8ff",
           orange: "#e3b341",
           pink: "#ff7b72",
+        },
+        // The finance app's own palette — deliberately distinct from term-*
+        // (see fontFamily.sans comment above for why).
+        finance: {
+          bg: "#0b0f14",
+          surface: "#131a23",
+          surfaceElevated: "#182029",
+          border: "#232b36",
+          text: "#eef2f6",
+          muted: "#8996a6",
+          accent: "#6366f1",
+          income: "#34d399",
+          expense: "#f87171",
         },
       },
       keyframes: {

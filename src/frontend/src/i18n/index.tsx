@@ -108,6 +108,40 @@ const translations: Record<Locale, Dictionary> = {
     "puzzle.error.fileUnusable": "That file couldn't be used.",
     "puzzle.canvasUnsupported":
       "This browser doesn't support the 2D canvas features this game needs.",
+
+    "finance.nav.dashboard": "Dashboard",
+    "finance.nav.transactions": "Transactions",
+    "finance.nav.categories": "Categories",
+    "finance.nav.settings": "Settings",
+    "finance.nav.addTransaction": "Add transaction",
+
+    "finance.demoMode.badge": "Demo Mode — data is stored only on this device.",
+
+    "finance.category.groceries": "Groceries",
+    "finance.category.house": "House",
+    "finance.category.car": "Car",
+    "finance.category.restaurant": "Restaurant",
+    "finance.category.shopping": "Shopping",
+    "finance.category.child": "Child",
+    "finance.category.travel": "Travel",
+    "finance.category.health": "Health",
+    "finance.category.entertainment": "Entertainment",
+    "finance.category.other": "Other",
+    "finance.category.salary": "Salary",
+    "finance.category.rental-income": "Rental income",
+    "finance.category.other-income": "Other income",
+
+    "finance.dashboard.heading": "Dashboard",
+    "finance.dashboard.income": "Income",
+    "finance.dashboard.expenses": "Expenses",
+    "finance.dashboard.remaining": "Remaining",
+    "finance.dashboard.month.previous": "Previous month",
+    "finance.dashboard.month.next": "Next month",
+    "finance.dashboard.month.today": "This month",
+
+    "finance.transactions.heading": "Transactions",
+    "finance.categories.heading": "Categories",
+    "finance.settings.heading": "Settings",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -199,6 +233,40 @@ const translations: Record<Locale, Dictionary> = {
     "puzzle.error.fileUnusable": "نتونستم از این فایل استفاده کنم.",
     "puzzle.canvasUnsupported":
       "این مرورگر از قابلیت‌های Canvas دوبعدی که این بازی لازم داره پشتیبانی نمی‌کنه.",
+
+    "finance.nav.dashboard": "داشبورد",
+    "finance.nav.transactions": "تراکنش‌ها",
+    "finance.nav.categories": "دسته‌بندی‌ها",
+    "finance.nav.settings": "تنظیمات",
+    "finance.nav.addTransaction": "افزودن تراکنش",
+
+    "finance.demoMode.badge": "حالت دمو — اطلاعات فقط روی همین دستگاه ذخیره می‌شه.",
+
+    "finance.category.groceries": "مواد غذایی",
+    "finance.category.house": "خانه",
+    "finance.category.car": "ماشین",
+    "finance.category.restaurant": "رستوران",
+    "finance.category.shopping": "خرید",
+    "finance.category.child": "فرزند",
+    "finance.category.travel": "سفر",
+    "finance.category.health": "سلامت",
+    "finance.category.entertainment": "سرگرمی",
+    "finance.category.other": "متفرقه",
+    "finance.category.salary": "حقوق",
+    "finance.category.rental-income": "درآمد اجاره",
+    "finance.category.other-income": "درآمد متفرقه",
+
+    "finance.dashboard.heading": "داشبورد",
+    "finance.dashboard.income": "درآمد",
+    "finance.dashboard.expenses": "هزینه‌ها",
+    "finance.dashboard.remaining": "باقی‌مانده",
+    "finance.dashboard.month.previous": "ماه قبل",
+    "finance.dashboard.month.next": "ماه بعد",
+    "finance.dashboard.month.today": "این ماه",
+
+    "finance.transactions.heading": "تراکنش‌ها",
+    "finance.categories.heading": "دسته‌بندی‌ها",
+    "finance.settings.heading": "تنظیمات",
   },
 };
 
