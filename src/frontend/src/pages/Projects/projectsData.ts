@@ -1,4 +1,4 @@
-import { LucideIcon, Puzzle } from "lucide-react";
+import { LucideIcon, Puzzle, Wallet } from "lucide-react";
 
 export type ProjectKind = "experiment" | "project";
 
@@ -33,5 +33,15 @@ export const PROJECTS: readonly ProjectEntry[] = [
     kind: "experiment",
     icon: Puzzle,
     addedAt: "2026-09-14",
+  },
+  {
+    id: "finance-tracker",
+    title: "Finance Tracker",
+    descriptionKey: "projects.financeTracker.description",
+    tech: "TypeScript · React · Dexie (IndexedDB) · React Query · PWA",
+    href: "/expenses/demo",
+    kind: "project",
+    icon: Wallet,
+    addedAt: "2026-09-17",
   },
 ];
