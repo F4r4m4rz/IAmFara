@@ -62,6 +62,8 @@ const translations: Record<Locale, Dictionary> = {
     "projects.viewProject": "view project",
     "projects.slidingPuzzle.description":
       "A responsive image puzzle built with TypeScript and the Canvas API. It uses a testable game engine separated from rendering and input, and supports both built-in images and local image uploads.",
+    "projects.financeTracker.description":
+      "A mobile-first household finance tracker — public demo, runs entirely in the browser with data stored locally in IndexedDB. Installable as a PWA. Full English/Persian and LTR/RTL support.",
 
     "puzzle.heading": "Sliding Puzzle",
     "puzzle.intro":
@@ -236,6 +238,8 @@ const translations: Record<Locale, Dictionary> = {
     "projects.viewProject": "دیدن پروژه",
     "projects.slidingPuzzle.description":
       "یه پازل تصویری واکنش‌گرا که با TypeScript و Canvas API ساخته شده. از یه موتور بازی قابل‌تست استفاده می‌کنه که از رندر و ورودی جداست، و هم عکس‌های آماده رو پشتیبانی می‌کنه هم آپلود عکس دلخواه.",
+    "projects.financeTracker.description":
+      "یه ردیاب مالی خانواده موبایل-محور — نسخه دمو عمومی که کاملاً توی مرورگر اجرا می‌شه و داده‌ها به‌صورت محلی توی IndexedDB ذخیره می‌شن. قابل نصب به‌عنوان PWA. پشتیبانی کامل از فارسی/انگلیسی و راست‌به‌چپ/چپ‌به‌راست.",
 
     "puzzle.heading": "پازل کشویی",
     "puzzle.intro":
