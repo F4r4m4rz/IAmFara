@@ -30,7 +30,7 @@ export default function CategoryPicker({
             aria-pressed={selected}
             className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center transition-colors ${
               selected
-                ? "border-finance-accent bg-finance-accent/10 text-finance-accent"
+                ? "border-finance-accent bg-finance-accent/10 text-finance-accentText"
                 : "border-finance-border bg-finance-surface text-finance-muted hover:text-finance-text"
             }`}
           >

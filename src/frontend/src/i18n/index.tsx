@@ -145,6 +145,8 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.quickAdd.type.expense": "Expense",
     "finance.quickAdd.type.income": "Income",
+    "finance.quickAdd.amountLabel": "Amount",
+    "finance.quickAdd.dateLabel": "Date",
     "finance.quickAdd.notePlaceholder": "Note (optional)",
     "finance.quickAdd.save": "Save",
     "finance.quickAdd.saved": "Saved",
@@ -165,6 +167,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.transactions.filter.expense": "Expense",
     "finance.transactions.filter.income": "Income",
     "finance.transactions.filter.allCategories": "All categories",
+    "finance.transactions.filter.typeGroupLabel": "Filter by type",
     "finance.transactions.empty": "No transactions yet. Add your first one.",
 
     "finance.categories.rename": "Rename",
@@ -313,6 +316,8 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.quickAdd.type.expense": "هزینه",
     "finance.quickAdd.type.income": "درآمد",
+    "finance.quickAdd.amountLabel": "مبلغ",
+    "finance.quickAdd.dateLabel": "تاریخ",
     "finance.quickAdd.notePlaceholder": "یادداشت (اختیاری)",
     "finance.quickAdd.save": "ذخیره",
     "finance.quickAdd.saved": "ذخیره شد",
@@ -333,6 +338,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.transactions.filter.expense": "هزینه",
     "finance.transactions.filter.income": "درآمد",
     "finance.transactions.filter.allCategories": "همه دسته‌بندی‌ها",
+    "finance.transactions.filter.typeGroupLabel": "فیلتر بر اساس نوع",
     "finance.transactions.empty": "هنوز تراکنشی نیست. اولین تراکنش رو اضافه کن.",
 
     "finance.categories.rename": "تغییر نام",

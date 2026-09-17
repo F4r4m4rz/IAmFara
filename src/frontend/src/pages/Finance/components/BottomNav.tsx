@@ -44,7 +44,7 @@ function NavTab({ to, end, icon: Icon, labelKey }: (typeof TABS)[number]) {
       end={end}
       className={({ isActive }) =>
         `flex flex-1 flex-col items-center gap-1 rounded-lg py-1.5 text-xs ${
-          isActive ? "text-finance-accent" : "text-finance-muted"
+          isActive ? "text-finance-accentText" : "text-finance-muted"
         }`
       }
     >

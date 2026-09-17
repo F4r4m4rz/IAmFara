@@ -46,6 +46,13 @@ module.exports = {
           text: "#eef2f6",
           muted: "#8996a6",
           accent: "#6366f1",
+          // A lighter tint of `accent`, for accent-colored *text* on a dark
+          // background (links, active nav labels) — `accent` itself is
+          // ~4.3:1 against finance-bg, just under WCAG AA's 4.5:1 for
+          // normal text; this variant is ~6.4:1. `accent` stays as-is for
+          // solid fills (white text/icons on top of it already clears the
+          // non-text/large-text thresholds it's actually used for).
+          accentText: "#818cf8",
           income: "#34d399",
           expense: "#f87171",
         },

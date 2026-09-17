@@ -119,7 +119,7 @@ export default function Dashboard({
             ))}
           </ul>
 
-          <Link to="/expenses/demo/transactions" className="mt-4 block text-center text-sm text-finance-accent">
+          <Link to="/expenses/demo/transactions" className="mt-4 block text-center text-sm text-finance-accentText">
             <T k="finance.dashboard.viewTransactions" />
           </Link>
         </>

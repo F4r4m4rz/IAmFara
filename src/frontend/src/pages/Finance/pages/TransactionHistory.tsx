@@ -41,11 +41,12 @@ export default function TransactionHistory({
       </div>
 
       <div className="mb-4 flex gap-2">
-        <div className="flex flex-1 rounded-full bg-finance-surface p-1">
+        <div role="group" aria-label={t("finance.transactions.filter.typeGroupLabel")} className="flex flex-1 rounded-full bg-finance-surface p-1">
           {TYPE_FILTERS.map((option) => (
             <button
               key={option}
               type="button"
+              aria-pressed={type === option}
               onClick={() => {
                 setType(option);
                 setCategoryId("all");
@@ -61,6 +62,7 @@ export default function TransactionHistory({
         <select
           value={categoryId}
           onChange={(event) => setCategoryId(event.target.value)}
+          aria-label={t("finance.transactions.filter.allCategories")}
           className="rounded-full border border-finance-border bg-finance-surface px-3 text-xs text-finance-text outline-none focus:border-finance-accent"
         >
           <option value="all">{t("finance.transactions.filter.allCategories")}</option>

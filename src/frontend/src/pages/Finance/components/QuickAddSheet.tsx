@@ -78,6 +78,20 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
+  // Same lightweight pattern as Layout.tsx's mobile nav menu: no hard
+  // Tab-cycling focus trap, just capture whatever had focus before this
+  // opened (the FAB, or a tapped transaction row) and restore it on close,
+  // so keyboard/screen-reader users land back where they were instead of
+  // at the top of the document.
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (open) {
+      previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+    } else {
+      previouslyFocusedRef.current?.focus();
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const categoriesForType = categories.filter((c) => c.type === type);
@@ -126,7 +140,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
   return (
     <div className="fixed inset-0 z-20 flex items-end justify-center">
       <div
-        className={`absolute inset-0 bg-black/50 transition-opacity ${visible ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-black/50 transition-opacity motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -140,16 +154,26 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
         // keyboard immediately — without a scroll boundary here, the
         // keyboard can push the Save button (at the very bottom of this
         // panel) out of the reachable viewport on shorter phone screens.
-        className={`relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-y-auto rounded-t-2xl border-t border-finance-border bg-finance-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 transition-transform duration-200 ${
+        // motion-reduce:transition-none respects prefers-reduced-motion,
+        // same as the site's existing animate-pop-in/animate-puzzle-flash
+        // convention in index.css (this transition is hand-rolled rather
+        // than one of those Tailwind-config animations, so it needs its
+        // own guard).
+        className={`relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-y-auto rounded-t-2xl border-t border-finance-border bg-finance-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 transition-transform duration-200 motion-reduce:transition-none ${
           visible ? "translate-y-0" : "translate-y-full"
         }`}
       >
         <div className="mb-4 flex items-center gap-1">
-          <div className="flex flex-1 justify-center gap-1 rounded-full bg-finance-bg p-1">
+          <div
+            role="group"
+            aria-label={t("finance.transactions.filter.typeGroupLabel")}
+            className="flex flex-1 justify-center gap-1 rounded-full bg-finance-bg p-1"
+          >
             {(["expense", "income"] as const).map((option) => (
               <button
                 key={option}
                 type="button"
+                aria-pressed={type === option}
                 onClick={() => {
                   setType(option);
                   setCategoryId(null);
@@ -197,6 +221,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
+            aria-label={t("finance.quickAdd.dateLabel")}
             className="flex-1 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
           />
           <input
@@ -204,6 +229,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
             value={note}
             onChange={(event) => setNote(event.target.value)}
             placeholder={t("finance.quickAdd.notePlaceholder")}
+            aria-label={t("finance.quickAdd.notePlaceholder")}
             className="flex-[2] rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none placeholder:text-finance-muted focus:border-finance-accent"
           />
         </div>
