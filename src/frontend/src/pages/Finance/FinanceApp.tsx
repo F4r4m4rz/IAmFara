@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import TransactionHistory from "./pages/TransactionHistory";
 import { RepositoryProvider } from "./RepositoryContext";
+import { usePwaRegistration } from "./usePwaRegistration";
 
 /**
  * Top-level route for the finance demo (`/expenses/demo`). Deliberately not
@@ -21,6 +22,7 @@ import { RepositoryProvider } from "./RepositoryContext";
  */
 export default function FinanceApp() {
   const { locale, t } = useLocale();
+  usePwaRegistration();
   // Created once per mount, not at module scope — avoids holding a Dexie
   // connection open for the lifetime of the whole site when the user has
   // never visited the finance app.
