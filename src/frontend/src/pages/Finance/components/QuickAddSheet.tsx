@@ -125,7 +125,12 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
         role="dialog"
         aria-modal="true"
         aria-label={t("finance.nav.addTransaction")}
-        className={`relative w-full max-w-lg rounded-t-2xl border-t border-finance-border bg-finance-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 transition-transform duration-200 ${
+        // max-h + overflow-y-auto matters specifically because the amount
+        // field auto-focuses the instant this opens, which pops the mobile
+        // keyboard immediately — without a scroll boundary here, the
+        // keyboard can push the Save button (at the very bottom of this
+        // panel) out of the reachable viewport on shorter phone screens.
+        className={`relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-y-auto rounded-t-2xl border-t border-finance-border bg-finance-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 transition-transform duration-200 ${
           visible ? "translate-y-0" : "translate-y-full"
         }`}
       >
