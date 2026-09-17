@@ -119,6 +119,7 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.category.groceries": "Groceries",
     "finance.category.house": "House",
+    "finance.category.mortgage": "Mortgage",
     "finance.category.car": "Car",
     "finance.category.restaurant": "Restaurant",
     "finance.category.shopping": "Shopping",
@@ -290,6 +291,7 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.category.groceries": "مواد غذایی",
     "finance.category.house": "خانه",
+    "finance.category.mortgage": "وام مسکن",
     "finance.category.car": "ماشین",
     "finance.category.restaurant": "رستوران",
     "finance.category.shopping": "خرید",

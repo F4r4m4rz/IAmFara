@@ -16,6 +16,7 @@ const VALID_CATEGORY_IDS = new Set([
   "rental-income",
   "groceries",
   "house",
+  "mortgage",
   "car",
   "restaurant",
   "shopping",

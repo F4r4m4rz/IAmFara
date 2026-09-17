@@ -6,6 +6,7 @@ import {
   Film,
   HeartPulse,
   Home,
+  Landmark,
   LucideIcon,
   PlusCircle,
   ShoppingBag,
@@ -19,6 +20,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   groceries: ShoppingCart,
   house: Home,
+  mortgage: Landmark,
   car: Car,
   restaurant: UtensilsCrossed,
   shopping: ShoppingBag,

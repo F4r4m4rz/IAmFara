@@ -10,6 +10,7 @@ import { Category } from "../domain/types";
 const EXPENSE_CATEGORY_IDS = [
   "groceries",
   "house",
+  "mortgage",
   "car",
   "restaurant",
   "shopping",
