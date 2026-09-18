@@ -53,14 +53,22 @@ body {
 /*
  * iOS Safari (including installed PWAs) auto-zooms the whole page when a
  * focused form control's font-size is under 16px, so the text is legible
- * once the keyboard covers part of the screen. Several of this app's
- * compact fields (text-xs/text-sm inputs and selects) sat under that
- * threshold — the resulting zoomed-in scale isn't always reliably reset
- * once the field blurs, which is what caused the app to occasionally stay
- * visually "zoomed" after closing the keyboard. Forcing a 16px floor only
- * below the breakpoint touch devices actually use prevents the zoom from
- * ever triggering in the first place, without changing how any control
- * looks at desktop sizes or disabling user zoom.
+ * once the keyboard covers part of the screen; that zoom isn't always
+ * reliably reset once the field blurs, which is what caused the app to
+ * occasionally stay visually "zoomed" after closing the keyboard.
+ *
+ * This is a defensive floor, not the actual fix: a bare `input` selector
+ * (specificity 0,0,1) is lower-specificity than any Tailwind utility class
+ * like `.text-sm` (0,1,0), so it cannot override an explicit smaller
+ * text-* class applied directly to a field — every input/select that had
+ * one (Quick Add's date/note fields, the category filter, the fixed-
+ * expense forms, category rename) had to be fixed at the source instead,
+ * to `text-base sm:text-sm` (or `sm:text-xs`): 16px below the `sm`
+ * breakpoint, back to the original compact size at and above it. This
+ * rule only actually matters for a field with no explicit text-* class at
+ * all, where it prevents silently inheriting something smaller than 16px
+ * from an ancestor — a safety net for anything added later, not a
+ * substitute for sizing new fields correctly in the first place.
  */
 @media (max-width: 640px) {
   input,

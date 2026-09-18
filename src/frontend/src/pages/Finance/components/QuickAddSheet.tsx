@@ -218,7 +218,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
             value={date}
             onChange={(event) => setDate(event.target.value)}
             aria-label={t("finance.quickAdd.dateLabel")}
-            className="flex-1 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+            className="flex-1 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
           />
           <input
             type="text"
@@ -226,7 +226,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
             onChange={(event) => setNote(event.target.value)}
             placeholder={t("finance.quickAdd.notePlaceholder")}
             aria-label={t("finance.quickAdd.notePlaceholder")}
-            className="flex-[2] rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none placeholder:text-finance-muted focus:border-finance-accent"
+            className="flex-[2] rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none placeholder:text-finance-muted focus:border-finance-accent"
           />
         </div>
 

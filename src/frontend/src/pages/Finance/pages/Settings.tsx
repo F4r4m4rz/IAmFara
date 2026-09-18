@@ -117,7 +117,7 @@ function FinancialPeriodSetting() {
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             onBlur={(event) => commit(event.target.value)}
-            className="w-20 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+            className="w-20 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
           />
           <span className="text-xs text-finance-muted">
             <T k="finance.settings.financialPeriod.dayOfMonth" />

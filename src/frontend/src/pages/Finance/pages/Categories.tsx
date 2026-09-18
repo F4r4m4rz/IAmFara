@@ -26,7 +26,7 @@ function CategoryListItem({ category, onDelete }: { category: Category; onDelete
           onChange={(event) => setValue(event.target.value)}
           autoFocus
           aria-label={t("finance.categories.namePlaceholder")}
-          className="min-w-0 flex-1 bg-transparent text-sm text-finance-text outline-none"
+          className="min-w-0 flex-1 bg-transparent text-base sm:text-sm text-finance-text outline-none"
         />
         <button
           type="button"
@@ -109,7 +109,7 @@ function AddCategoryForm({ onAdd }: { onAdd: (name: string) => Promise<unknown> 
         autoFocus
         placeholder={t("finance.categories.namePlaceholder")}
         aria-label={t("finance.categories.namePlaceholder")}
-        className="min-w-0 flex-1 bg-transparent text-sm text-finance-text outline-none placeholder:text-finance-muted"
+        className="min-w-0 flex-1 bg-transparent text-base sm:text-sm text-finance-text outline-none placeholder:text-finance-muted"
       />
       <button
         type="button"
