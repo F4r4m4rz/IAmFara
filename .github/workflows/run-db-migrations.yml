@@ -55,14 +55,34 @@ jobs:
           echo "::error::Repo secret for target '${{ inputs.target }}' is not set (DB_CONNECTION_STRING_PROD / DB_CONNECTION_STRING_DEVTEST)."
           exit 1
 
-      - name: Show pending migrations
+      - name: Show pending migrations (Analytics)
         working-directory: src/backend/IAmFara.Web
         env:
           CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
         run: dotnet ef migrations list --context AnalyticsDbContext --connection "$CONNECTION_STRING"
 
-      - name: Apply migrations to ${{ inputs.target }}
+      - name: Apply migrations to ${{ inputs.target }} (Analytics)
         working-directory: src/backend/IAmFara.Web
         env:
           CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
         run: dotnet ef database update --context AnalyticsDbContext --connection "$CONNECTION_STRING"
+
+      # Same physical database as AnalyticsDbContext above (schema-separated),
+      # but its migrations live in IAmFara.Data.SqlServer, not IAmFara.Web.
+      - name: Show pending migrations (Identity)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: >
+          dotnet ef migrations list --context IdentityDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
+
+      - name: Apply migrations to ${{ inputs.target }} (Identity)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: >
+          dotnet ef database update --context IdentityDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"

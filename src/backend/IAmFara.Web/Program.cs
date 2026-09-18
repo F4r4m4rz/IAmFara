@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using IAmFara.Data.Abstractions.Identity;
+using IAmFara.Data.SqlServer.Identity;
 using IAmFara.Web.Contracts;
 using IAmFara.Web.Data;
 using IAmFara.Web.Options;
@@ -44,6 +46,14 @@ namespace IAmFara.Web
             // straight from configuration rather than a bound options section.
             builder.Services.AddDbContext<AnalyticsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration["DbConnectionString"]));
+
+            // Same physical database as AnalyticsDbContext above, schema-separated
+            // ("identity" vs. "dbo") rather than a second connection string.
+            builder.Services.AddDbContext<IdentityDbContext>(options =>
+                options.UseSqlServer(builder.Configuration["DbConnectionString"]));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IPasskeyCredentialRepository, PasskeyCredentialRepository>();
+            builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key

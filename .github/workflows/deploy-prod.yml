@@ -26,11 +26,22 @@ jobs:
       - name: Install EF Core CLI tool
         run: dotnet tool install --global dotnet-ef --version 10.*
 
-      - name: Apply pending migrations
+      - name: Apply pending migrations (Analytics)
         working-directory: src/backend/IAmFara.Web
         env:
           CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
         run: dotnet ef database update --context AnalyticsDbContext --connection "$CONNECTION_STRING"
+
+      # Same physical database as AnalyticsDbContext above (schema-separated),
+      # but its migrations live in IAmFara.Data.SqlServer, not IAmFara.Web.
+      - name: Apply pending migrations (Identity)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
+        run: >
+          dotnet ef database update --context IdentityDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
 
   deploy:
     needs: migrate
