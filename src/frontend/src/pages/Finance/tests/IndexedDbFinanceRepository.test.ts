@@ -209,4 +209,147 @@ describe("IndexedDbFinanceRepository — demo utilities", () => {
 
     expect(await repo.getTransactions()).toHaveLength(2);
   });
+
+  it("resetAll also clears fixed expenses and period overrides", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Internet", categoryId: "house", defaultAmountMinor: 50000 });
+    await repo.setPeriodOverride(expense.id, "2026-09", 60000);
+
+    await repo.resetAll();
+
+    expect(await repo.getFixedExpenses()).toHaveLength(0);
+    expect(await repo.getPeriodOverrides("2026-09")).toHaveLength(0);
+  });
+});
+
+describe("IndexedDbFinanceRepository — fixed expenses", () => {
+  it("adds a fixed expense, active by default", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000, dueDay: 15 });
+    expect(expense.isActive).toBe(true);
+    expect(expense.dueDay).toBe(15);
+
+    const all = await repo.getFixedExpenses();
+    expect(all.find((f) => f.id === expense.id)).toBeDefined();
+  });
+
+  it("updates a fixed expense and bumps updatedAt", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await new Promise((resolve) => setTimeout(resolve, 2));
+    const updated = await repo.updateFixedExpense(expense.id, { defaultAmountMinor: 90000 });
+
+    expect(updated.defaultAmountMinor).toBe(90000);
+    expect(updated.name).toBe("Electricity");
+    expect(new Date(updated.updatedAt).getTime()).toBeGreaterThan(new Date(expense.updatedAt).getTime());
+  });
+
+  it("archiving excludes a fixed expense from getFixedExpenses by default, but keeps it retrievable with includeInactive", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Old Subscription", categoryId: "entertainment", defaultAmountMinor: 10000 });
+    await repo.archiveFixedExpense(expense.id);
+
+    expect(await repo.getFixedExpenses()).toHaveLength(0);
+    const withInactive = await repo.getFixedExpenses(true);
+    expect(withInactive.find((f) => f.id === expense.id)?.isActive).toBe(false);
+  });
+
+  it("restoreFixedExpense reactivates an archived expense", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Gym", categoryId: "health", defaultAmountMinor: 5000 });
+    await repo.archiveFixedExpense(expense.id);
+    await repo.restoreFixedExpense(expense.id);
+
+    expect((await repo.getFixedExpenses()).find((f) => f.id === expense.id)).toBeDefined();
+  });
+});
+
+describe("IndexedDbFinanceRepository — period overrides", () => {
+  it("sets and retrieves a period override", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await repo.setPeriodOverride(expense.id, "2026-09", 95000);
+
+    const overrides = await repo.getPeriodOverrides("2026-09");
+    expect(overrides).toEqual([{ fixedExpenseId: expense.id, periodId: "2026-09", amountMinor: 95000 }]);
+  });
+
+  it("setPeriodOverride replaces rather than duplicates an existing override for the same expense+period", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await repo.setPeriodOverride(expense.id, "2026-09", 95000);
+    await repo.setPeriodOverride(expense.id, "2026-09", 99000);
+
+    const overrides = await repo.getPeriodOverrides("2026-09");
+    expect(overrides).toHaveLength(1);
+    expect(overrides[0].amountMinor).toBe(99000);
+  });
+
+  it("clearPeriodOverride removes it", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await repo.setPeriodOverride(expense.id, "2026-09", 95000);
+    await repo.clearPeriodOverride(expense.id, "2026-09");
+
+    expect(await repo.getPeriodOverrides("2026-09")).toHaveLength(0);
+  });
+});
+
+describe("IndexedDbFinanceRepository — mark fixed expense paid/unpaid", () => {
+  const PERIOD = { fromDate: "2026-09-01", toDate: "2026-09-30" };
+
+  it("creates a real expense transaction linked to the fixed expense", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+
+    const transaction = await repo.markFixedExpensePaid(expense.id, PERIOD, 82000, "2026-09-15");
+
+    expect(transaction.type).toBe("expense");
+    expect(transaction.amountMinor).toBe(82000);
+    expect(transaction.categoryId).toBe("house");
+    expect(transaction.fixedExpenseId).toBe(expense.id);
+
+    const transactions = await repo.getTransactions();
+    expect(transactions.find((t) => t.id === transaction.id)).toBeDefined();
+  });
+
+  it("is idempotent — a second call for the same period returns the existing transaction instead of duplicating it", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+
+    const first = await repo.markFixedExpensePaid(expense.id, PERIOD, 82000, "2026-09-15");
+    const second = await repo.markFixedExpensePaid(expense.id, PERIOD, 99999, "2026-09-16");
+
+    expect(second.id).toBe(first.id);
+    expect(await repo.getTransactions()).toHaveLength(1);
+  });
+
+  it("markFixedExpenseUnpaid deletes the linked transaction, allowing a fresh mark-as-paid afterward", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await repo.markFixedExpensePaid(expense.id, PERIOD, 82000, "2026-09-15");
+
+    await repo.markFixedExpenseUnpaid(expense.id, PERIOD);
+    expect(await repo.getTransactions()).toHaveLength(0);
+
+    const repaid = await repo.markFixedExpensePaid(expense.id, PERIOD, 85000, "2026-09-16");
+    expect(repaid.amountMinor).toBe(85000);
+    expect(await repo.getTransactions()).toHaveLength(1);
+  });
+
+  it("markFixedExpenseUnpaid is a no-op when nothing is paid for that period", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await expect(repo.markFixedExpenseUnpaid(expense.id, PERIOD)).resolves.toBeUndefined();
+  });
+
+  it("does not treat a payment in a different period as paid for this one", async () => {
+    const repo = createRepository();
+    const expense = await repo.addFixedExpense({ name: "Electricity", categoryId: "house", defaultAmountMinor: 80000 });
+    await repo.markFixedExpensePaid(expense.id, { fromDate: "2026-08-01", toDate: "2026-08-31" }, 80000, "2026-08-15");
+
+    const secondPeriodResult = await repo.markFixedExpensePaid(expense.id, PERIOD, 82000, "2026-09-15");
+    expect(secondPeriodResult.date).toBe("2026-09-15");
+    expect(await repo.getTransactions()).toHaveLength(2);
+  });
 });

@@ -1,16 +1,22 @@
 import { defaultCategories } from "./defaultCategories";
 import { FinanceDb } from "./db";
 import { FinanceRepository } from "./FinanceRepository";
+import { findPaidTransaction } from "../domain/fixedExpenses";
 import { generateId } from "../domain/id";
 import {
   CategoryInUseError,
   Category,
   CreateCategoryInput,
+  CreateFixedExpenseInput,
   CreateTransactionInput,
+  DateRange,
   FinanceSettings,
+  FixedExpensePeriodOverride,
+  FixedMonthlyExpense,
   Transaction,
   TransactionFilter,
   UpdateCategoryInput,
+  UpdateFixedExpenseInput,
   UpdateTransactionInput,
 } from "../domain/types";
 
@@ -124,6 +130,8 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
     await this.seeded;
     await this.db.transactions.clear();
     await this.db.categories.clear();
+    await this.db.fixedExpenses.clear();
+    await this.db.periodOverrides.clear();
     await this.db.categories.bulkAdd(defaultCategories(new Date().toISOString()));
   }
 
@@ -156,5 +164,88 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
     const updated: FinanceSettings = { ...current, ...input };
     await this.db.settings.put({ id: SETTINGS_ID, ...updated });
     return updated;
+  }
+
+  async getFixedExpenses(includeInactive = false): Promise<FixedMonthlyExpense[]> {
+    await this.seeded;
+    let fixedExpenses = await this.db.fixedExpenses.toArray();
+    if (!includeInactive) fixedExpenses = fixedExpenses.filter((f) => f.isActive);
+    return fixedExpenses.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async addFixedExpense(input: CreateFixedExpenseInput): Promise<FixedMonthlyExpense> {
+    await this.seeded;
+    const now = new Date().toISOString();
+    const fixedExpense: FixedMonthlyExpense = { ...input, id: generateId(), isActive: true, createdAt: now, updatedAt: now };
+    await this.db.fixedExpenses.add(fixedExpense);
+    return fixedExpense;
+  }
+
+  async updateFixedExpense(id: string, input: UpdateFixedExpenseInput): Promise<FixedMonthlyExpense> {
+    await this.seeded;
+    const existing = await this.db.fixedExpenses.get(id);
+    if (!existing) throw new Error(`Fixed expense "${id}" not found`);
+
+    const updated: FixedMonthlyExpense = { ...existing, ...input, updatedAt: new Date().toISOString() };
+    await this.db.fixedExpenses.put(updated);
+    return updated;
+  }
+
+  async archiveFixedExpense(id: string): Promise<void> {
+    await this.seeded;
+    await this.db.fixedExpenses.update(id, { isActive: false, updatedAt: new Date().toISOString() });
+  }
+
+  async restoreFixedExpense(id: string): Promise<void> {
+    await this.seeded;
+    await this.db.fixedExpenses.update(id, { isActive: true, updatedAt: new Date().toISOString() });
+  }
+
+  async getPeriodOverrides(periodId: string): Promise<FixedExpensePeriodOverride[]> {
+    await this.seeded;
+    return this.db.periodOverrides.where("periodId").equals(periodId).toArray();
+  }
+
+  async setPeriodOverride(fixedExpenseId: string, periodId: string, amountMinor: number): Promise<void> {
+    await this.seeded;
+    await this.db.periodOverrides.put({ fixedExpenseId, periodId, amountMinor });
+  }
+
+  async clearPeriodOverride(fixedExpenseId: string, periodId: string): Promise<void> {
+    await this.seeded;
+    await this.db.periodOverrides.delete([fixedExpenseId, periodId]);
+  }
+
+  async markFixedExpensePaid(fixedExpenseId: string, period: DateRange, amountMinor: number, date: string): Promise<Transaction> {
+    await this.seeded;
+    const fixedExpense = await this.db.fixedExpenses.get(fixedExpenseId);
+    if (!fixedExpense) throw new Error(`Fixed expense "${fixedExpenseId}" not found`);
+
+    // Idempotent — a repeated/racing call for a period that's already paid
+    // returns the existing transaction instead of creating a duplicate.
+    const transactions = await this.db.transactions.toArray();
+    const existing = findPaidTransaction(transactions, fixedExpenseId, period.fromDate, period.toDate);
+    if (existing) return existing;
+
+    const now = new Date().toISOString();
+    const transaction: Transaction = {
+      id: generateId(),
+      type: "expense",
+      amountMinor,
+      date,
+      categoryId: fixedExpense.categoryId,
+      fixedExpenseId,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await this.db.transactions.add(transaction);
+    return transaction;
+  }
+
+  async markFixedExpenseUnpaid(fixedExpenseId: string, period: DateRange): Promise<void> {
+    await this.seeded;
+    const transactions = await this.db.transactions.toArray();
+    const existing = findPaidTransaction(transactions, fixedExpenseId, period.fromDate, period.toDate);
+    if (existing) await this.db.transactions.delete(existing.id);
   }
 }
