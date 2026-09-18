@@ -2,7 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      viewport-fit=cover lets the page render edge-to-edge on notched/
+      home-indicator iPhones, which is what actually makes
+      env(safe-area-inset-*) resolve to a real, non-zero value instead of
+      0 (this is required for BOTH a regular Safari tab and an installed
+      PWA — standalone display mode does not populate it on its own).
+      Without this, every safe-area-aware padding in the app (the finance
+      bottom nav, its sheets) was silently computing against 0. Layout.tsx's
+      sticky top nav gets a matching safe-area-inset-top padding to avoid
+      sitting under the notch/status bar now that content extends there.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

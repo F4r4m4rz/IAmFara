@@ -89,7 +89,7 @@ function FixedExpenseForm({
         autoFocus
         placeholder={t("finance.fixedExpenses.namePlaceholder")}
         aria-label={t("finance.fixedExpenses.namePlaceholder")}
-        className="mb-3 w-full rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+        className="mb-3 w-full rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
       />
 
       <div className="mb-3">
@@ -108,7 +108,7 @@ function FixedExpenseForm({
           onChange={(event) => setAmountInput(event.target.value)}
           placeholder="0"
           aria-label={t("finance.quickAdd.amountLabel")}
-          className="w-28 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+          className="w-28 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
         />
       </div>
 
@@ -121,7 +121,7 @@ function FixedExpenseForm({
         onChange={(event) => setDueDayInput(event.target.value)}
         placeholder={t("finance.fixedExpenses.dueDayPlaceholder")}
         aria-label={t("finance.fixedExpenses.dueDayPlaceholder")}
-        className="mb-3 w-full rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+        className="mb-3 w-full rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
       />
 
       {error && (
@@ -282,7 +282,7 @@ function FixedExpenseListItem({
             value={overrideInput}
             onChange={(event) => setOverrideInput(event.target.value)}
             aria-label={t("finance.fixedExpenses.overrideAmount")}
-            className="w-24 rounded-lg border border-finance-border bg-finance-bg px-2 py-1 text-sm text-finance-text outline-none focus:border-finance-accent"
+            className="w-24 rounded-lg border border-finance-border bg-finance-bg px-2 py-1 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
           />
           <button type="button" onClick={handleSetOverride} aria-label={t("finance.categories.save")} className="text-finance-income">
             <Check size={16} />

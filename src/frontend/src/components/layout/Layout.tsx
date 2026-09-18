@@ -25,7 +25,7 @@ export default function Layout({ children }: Props) {
   return (
     <div className="min-h-screen bg-term-bg text-term-text font-mono">
       {/* Titlebar */}
-      <nav className="h-14 bg-term-panel/95 backdrop-blur-sm border-b border-term-border flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20">
+      <nav className="min-h-14 bg-term-panel/95 backdrop-blur-sm border-b border-term-border flex items-center justify-between px-4 sm:px-6 pt-[env(safe-area-inset-top)] sticky top-0 z-20">
         {/* Left (traffic lights + path) */}
         <div className="flex items-center gap-4 min-w-0">
           <div className="hidden sm:flex items-center gap-1.5 shrink-0">

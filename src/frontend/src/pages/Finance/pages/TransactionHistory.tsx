@@ -69,7 +69,7 @@ export default function TransactionHistory({
           value={categoryId}
           onChange={(event) => setCategoryId(event.target.value)}
           aria-label={t("finance.transactions.filter.allCategories")}
-          className="rounded-full border border-finance-border bg-finance-surface px-3 text-xs text-finance-text outline-none focus:border-finance-accent"
+          className="rounded-full border border-finance-border bg-finance-surface px-3 text-base sm:text-xs text-finance-text outline-none focus:border-finance-accent"
         >
           <option value="all">{t("finance.transactions.filter.allCategories")}</option>
           {categoryOptions.map((category) => (

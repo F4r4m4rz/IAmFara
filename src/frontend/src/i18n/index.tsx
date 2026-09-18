@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 
 export type Locale = "en" | "fa";
 
@@ -119,6 +120,8 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.demoMode.badge": "Demo Mode — data is stored only on this device.",
 
+    "finance.update.available": "Update available — tap to refresh",
+
     "finance.category.groceries": "Groceries",
     "finance.category.house": "House",
     "finance.category.mortgage": "Mortgage",
@@ -186,6 +189,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.confirmDelete": "Delete this category? This can't be undone.",
     "finance.categories.error.inUse": "Used by {count} transaction(s) — can't be deleted.",
 
+    "finance.settings.language.heading": "Language",
+
     "finance.settings.financialPeriod.heading": "Financial period",
     "finance.settings.financialPeriod.startsOn": "Financial month starts on",
     "finance.settings.financialPeriod.dayOfMonth": "day of the month",
@@ -230,6 +235,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.settings.sampleDataLoaded": "Sample data loaded",
     "finance.settings.resetDone": "Demo reset",
     "finance.settings.categoriesRestored": "Default categories restored",
+    "finance.settings.build": "Build",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -332,6 +338,8 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.demoMode.badge": "حالت دمو — اطلاعات فقط روی همین دستگاه ذخیره می‌شه.",
 
+    "finance.update.available": "نسخه جدید موجوده — برای به‌روزرسانی ضربه بزن",
+
     "finance.category.groceries": "مواد غذایی",
     "finance.category.house": "خانه",
     "finance.category.mortgage": "وام مسکن",
@@ -399,6 +407,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.confirmDelete": "این دسته‌بندی حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.categories.error.inUse": "توسط {count} تراکنش استفاده شده — قابل حذف نیست.",
 
+    "finance.settings.language.heading": "زبان",
+
     "finance.settings.financialPeriod.heading": "دوره مالی",
     "finance.settings.financialPeriod.startsOn": "ماه مالی از این روز شروع می‌شه",
     "finance.settings.financialPeriod.dayOfMonth": "روز از ماه",
@@ -443,6 +453,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.settings.sampleDataLoaded": "داده نمونه بارگذاری شد",
     "finance.settings.resetDone": "دمو بازنشانی شد",
     "finance.settings.categoriesRestored": "دسته‌بندی‌های پیش‌فرض بازیابی شدن",
+    "finance.settings.build": "بیلد",
   },
 };
 
@@ -474,12 +485,39 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }, [locale]);
 
+  // Switching locale flips every block's dir (LTR<->RTL, mirroring flex
+  // layouts) and swaps the font family — neither is something CSS can
+  // meaningfully transition (direction/font-family aren't interpolatable),
+  // so a straight setState makes the whole page mirror instantly, which
+  // reads as a jarring jump rather than a language change. The View
+  // Transitions API is built for exactly this: it snapshots the page
+  // before and after the update and cross-fades between them, without
+  // needing to animate the underlying layout properties at all. flushSync
+  // is required here — the callback given to startViewTransition must
+  // apply its DOM changes synchronously for the "after" snapshot to be
+  // taken at the right moment; a plain setState (batched, async) would
+  // let the transition capture stale content. Skipped under prefers-
+  // reduced-motion, and falls back to a plain update in browsers that
+  // don't support the API (Firefox, older Safari) — either way the
+  // language still switches, just without the crossfade.
+  const applyLocaleChange = (next: Locale) => {
+    const update = () => setLocaleState(next);
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (typeof document !== "undefined" && document.startViewTransition && !prefersReducedMotion) {
+      document.startViewTransition(() => flushSync(update));
+    } else {
+      update();
+    }
+  };
+
   const value = useMemo<LocaleContextValue>(
     () => ({
       locale,
-      setLocale: setLocaleState,
-      toggleLocale: () =>
-        setLocaleState((prev) => (prev === "en" ? "fa" : "en")),
+      setLocale: applyLocaleChange,
+      toggleLocale: () => applyLocaleChange(locale === "en" ? "fa" : "en"),
       t: (key: string, params?: Record<string, string | number>) => {
         const template = translations[locale][key] ?? key;
         if (!params) return template;

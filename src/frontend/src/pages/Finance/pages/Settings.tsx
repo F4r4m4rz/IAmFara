@@ -38,6 +38,49 @@ function SettingsButton({
   );
 }
 
+function LanguageSetting() {
+  const { locale, setLocale, t } = useLocale();
+
+  return (
+    <section className="mt-6">
+      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
+        <T k="finance.settings.language.heading" />
+      </h2>
+      {/* dir="ltr" pinned regardless of locale: this is the control that
+          picks the direction, so its own two options should stay in a
+          fixed physical order rather than swapping sides the moment
+          you've just tapped one of them. */}
+      <div
+        role="group"
+        dir="ltr"
+        aria-label={t("finance.settings.language.heading")}
+        className="flex rounded-xl bg-finance-surface p-1"
+      >
+        <button
+          type="button"
+          aria-pressed={locale === "en"}
+          onClick={() => setLocale("en")}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            locale === "en" ? "bg-finance-accent text-white" : "text-finance-muted"
+          }`}
+        >
+          English
+        </button>
+        <button
+          type="button"
+          aria-pressed={locale === "fa"}
+          onClick={() => setLocale("fa")}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            locale === "fa" ? "bg-finance-accent text-white" : "text-finance-muted"
+          }`}
+        >
+          فارسی
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function FinancialPeriodSetting() {
   const { locale } = useLocale();
   const { data: settings } = useSettings();
@@ -79,7 +122,7 @@ function FinancialPeriodSetting() {
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             onBlur={(event) => commit(event.target.value)}
-            className="w-20 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-sm text-finance-text outline-none focus:border-finance-accent"
+            className="w-20 rounded-lg border border-finance-border bg-finance-bg px-3 py-2 text-base sm:text-sm text-finance-text outline-none focus:border-finance-accent"
           />
           <span className="text-xs text-finance-muted">
             <T k="finance.settings.financialPeriod.dayOfMonth" />
@@ -122,6 +165,8 @@ export default function Settings({ showToast }: { showToast: (message: string) =
       </h1>
 
       <DemoModeBadge />
+
+      <LanguageSetting />
 
       <FinancialPeriodSetting />
 
@@ -167,6 +212,14 @@ export default function Settings({ showToast }: { showToast: (message: string) =
           <T k="finance.settings.demoDataHint" />
         </p>
       </section>
+
+      {/* Short (7-char) build SHA — lets you confirm the installed PWA is
+          actually running what was just deployed, without needing
+          ?debugLayout=1. __COMMIT_SHA__ is injected at build time (see
+          vite.config.ts's resolveCommitSha()). */}
+      <p className="mt-8 text-center text-[11px] text-finance-muted">
+        <T k="finance.settings.build" /> <span dir="ltr">{__COMMIT_SHA__.slice(0, 7)}</span>
+      </p>
     </div>
   );
 }

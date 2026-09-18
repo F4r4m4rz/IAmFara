@@ -1,6 +1,7 @@
 import { LayoutDashboard, List, Plus, Settings as SettingsIcon, Tag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { T, useLocale } from "../../../i18n";
+import { BOTTOM_NAV_ID } from "../domain/layoutDiagnostics";
 
 const BASE = "/expenses/demo";
 
@@ -16,7 +17,28 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
-    <nav className="relative flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+    // Its own `fixed; bottom: 0` element — not a flex child inside another
+    // `fixed` ancestor (see FinanceApp.tsx) — so its background extends to
+    // the true screen edge, with env(safe-area-inset-bottom) applied
+    // exactly once, inside that background via padding. (A prior attempt
+    // shifted `bottom` to a negative env() offset instead, on the theory
+    // that standalone mode pre-reserves the home-indicator strip on its
+    // own — that's backwards: an installed iOS PWA's content genuinely
+    // covers the full physical screen, and env(safe-area-inset-bottom) is
+    // the *only* signal reserving room for the indicator, confirmed
+    // against a real shipping PWA that hit and fixed this same bug. `bottom:
+    // 0` is correct.)
+    //
+    // A subsequent attempt wrapped env(safe-area-inset-bottom) in
+    // min(34px, …), on a theory about it reading inflated on cold launch —
+    // reverted without device evidence it was ever needed (see
+    // ?debugLayout=1, components/DebugLayoutPanel.tsx, which measures the
+    // real value instead of guessing at it). id is that panel's hook into
+    // this element's live rect/computed styles.
+    <nav
+      id={BOTTOM_NAV_ID}
+      className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2"
+    >
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}
