@@ -15,7 +15,7 @@ export default function FixedExpenseProgress({
 
   return (
     <div className="mb-2">
-      <div className="flex items-center justify-between text-xs text-finance-muted">
+      <div className="flex items-center justify-between text-xs text-finance-muted" aria-live="polite">
         <span>{t("finance.fixedExpenses.progress", { paid: paidCount, total: totalCount })}</span>
         <span dir="ltr">
           {formatMoney(remainingMinor, locale)} {t("finance.fixedExpenses.remaining")}

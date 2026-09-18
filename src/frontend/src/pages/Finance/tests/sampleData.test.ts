@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateSampleTransactions } from "../domain/sampleData";
+import { generateSampleFixedExpenses, generateSampleTransactions } from "../domain/sampleData";
 
 // A tiny deterministic LCG, same convention as the sliding-puzzle tests'
 // seededRandom — keeps this test reproducible instead of flaky.
@@ -79,6 +79,31 @@ describe("generateSampleTransactions", () => {
   it("is deterministic for a given seed", () => {
     const a = generateSampleTransactions(3, seededRandom(42));
     const b = generateSampleTransactions(3, seededRandom(42));
+    expect(a).toEqual(b);
+  });
+});
+
+describe("generateSampleFixedExpenses", () => {
+  it("generates a non-empty, clearly-fictional set of recurring bills", () => {
+    const fixedExpenses = generateSampleFixedExpenses(seededRandom(1));
+    expect(fixedExpenses.length).toBeGreaterThan(0);
+    for (const expense of fixedExpenses) {
+      expect(expense.name.length).toBeGreaterThan(0);
+      expect(VALID_CATEGORY_IDS.has(expense.categoryId)).toBe(true);
+    }
+  });
+
+  it("generates positive integer default amounts", () => {
+    const fixedExpenses = generateSampleFixedExpenses(seededRandom(2));
+    for (const expense of fixedExpenses) {
+      expect(Number.isInteger(expense.defaultAmountMinor)).toBe(true);
+      expect(expense.defaultAmountMinor).toBeGreaterThan(0);
+    }
+  });
+
+  it("is deterministic for a given seed", () => {
+    const a = generateSampleFixedExpenses(seededRandom(42));
+    const b = generateSampleFixedExpenses(seededRandom(42));
     expect(a).toEqual(b);
   });
 });

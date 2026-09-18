@@ -1,4 +1,4 @@
-import { CreateTransactionInput } from "./types";
+import { CreateFixedExpenseInput, CreateTransactionInput } from "./types";
 
 interface CategorySpec {
   categoryId: string;
@@ -80,4 +80,29 @@ export function generateSampleTransactions(
   }
 
   return transactions;
+}
+
+interface FixedExpenseSpec {
+  name: string;
+  categoryId: string;
+  minMajor: number;
+  maxMajor: number;
+  dueDay?: number;
+}
+
+/** A small, clearly-fictional set of recurring bills — enough to give the Dashboard's carousel/forecast something realistic to show. */
+const FIXED_EXPENSE_SPECS: FixedExpenseSpec[] = [
+  { name: "Electricity", categoryId: "house", minMajor: 800, maxMajor: 1600, dueDay: 15 },
+  { name: "Internet", categoryId: "house", minMajor: 400, maxMajor: 600, dueDay: 5 },
+  { name: "Home Insurance", categoryId: "house", minMajor: 300, maxMajor: 500, dueDay: 20 },
+  { name: "Streaming Subscription", categoryId: "entertainment", minMajor: 100, maxMajor: 200, dueDay: 1 },
+];
+
+export function generateSampleFixedExpenses(random: () => number = Math.random): CreateFixedExpenseInput[] {
+  return FIXED_EXPENSE_SPECS.map((spec) => ({
+    name: spec.name,
+    categoryId: spec.categoryId,
+    defaultAmountMinor: randomInt(random, spec.minMajor, spec.maxMajor) * 100,
+    dueDay: spec.dueDay,
+  }));
 }
