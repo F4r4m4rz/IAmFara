@@ -12,4 +12,8 @@ export const financeKeys = {
   allTransactions: () => ["finance", "transactions"] as const,
   transactions: (filter?: TransactionFilter) => ["finance", "transactions", filter ?? {}] as const,
   categories: () => ["finance", "categories"] as const,
+  settings: () => ["finance", "settings"] as const,
+  allFixedExpenses: () => ["finance", "fixedExpenses"] as const,
+  fixedExpenses: (includeInactive = false) => ["finance", "fixedExpenses", { includeInactive }] as const,
+  periodOverrides: (periodId: string) => ["finance", "periodOverrides", periodId] as const,
 };

@@ -1,18 +1,25 @@
-import { Plus, Wallet } from "lucide-react";
+import { CheckCircle2, Plus, Wallet } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { dirFor, T, useLocale } from "../../../i18n";
 import CategoryBreakdownChart from "../components/CategoryBreakdownChart";
 import DemoModeBadge from "../components/DemoModeBadge";
 import EmptyState from "../components/EmptyState";
+import FixedExpenseCarousel from "../components/FixedExpenseCarousel";
+import FixedExpenseProgress from "../components/FixedExpenseProgress";
+import ForecastSummary from "../components/ForecastSummary";
 import IncomeExpenseBar from "../components/IncomeExpenseBar";
-import MonthSelector from "../components/MonthSelector";
+import MarkAsPaidSheet, { MarkAsPaidTarget } from "../components/MarkAsPaidSheet";
+import PeriodSelector from "../components/PeriodSelector";
 import TransactionRow from "../components/TransactionRow";
-import { categoryBreakdown, monthlyTotals } from "../domain/calculations";
-import { currentMonthKey } from "../domain/dates";
-import { formatMoney } from "../domain/money";
+import { categoryBreakdown } from "../domain/calculations";
+import { fixedExpensesForPeriod, forecastSummary } from "../domain/fixedExpenses";
+import { currentPeriodId, periodDateRange } from "../domain/financialPeriod";
 import { Transaction } from "../domain/types";
 import { useCategories } from "../queries/useCategories";
+import { useFixedExpenses } from "../queries/useFixedExpenses";
+import { usePeriodOverrides } from "../queries/usePeriodOverrides";
+import { useSettings } from "../queries/useSettings";
 import { useTransactions } from "../queries/useTransactions";
 
 const RECENT_COUNT = 5;
@@ -20,20 +27,37 @@ const RECENT_COUNT = 5;
 export default function Dashboard({
   onAddTransaction,
   onEditTransaction,
+  showToast,
 }: {
   onAddTransaction: () => void;
   onEditTransaction: (transaction: Transaction) => void;
+  showToast: (message: string) => void;
 }) {
   const { locale, t } = useLocale();
-  const [month, setMonth] = useState(currentMonthKey());
+  const { data: settings } = useSettings();
+  const startDay = settings?.financialPeriodStartDay ?? 1;
+  // null = "follow the current period" (recomputed every render, so it
+  // corrects itself once the real startDay loads); a string = the user
+  // explicitly navigated away from "now".
+  const [periodOverride, setPeriodOverride] = useState<string | null>(null);
+  const period = periodOverride ?? currentPeriodId(startDay);
+  const { fromDate, toDate } = periodDateRange(period, startDay);
 
-  const { data: transactions = [] } = useTransactions({ month });
+  const { data: transactions = [] } = useTransactions({ fromDate, toDate });
   const { data: categories = [] } = useCategories();
+  const { data: fixedExpenses = [] } = useFixedExpenses();
+  const { data: overrides = [] } = usePeriodOverrides(period);
 
-  const totals = monthlyTotals(transactions, month);
-  const breakdown = categoryBreakdown(transactions, month);
+  const breakdown = categoryBreakdown(transactions, fromDate, toDate);
   const categoryById = new Map(categories.map((c) => [c.id, c]));
   const hasTransactions = transactions.length > 0;
+
+  const fixedExpenseStatuses = fixedExpensesForPeriod(fixedExpenses, overrides, transactions, fromDate, toDate);
+  const forecast = forecastSummary(transactions, fixedExpenseStatuses, fromDate, toDate);
+  const upcomingFixedExpenses = fixedExpenseStatuses.filter((s) => !s.isPaid);
+  const paidCount = fixedExpenseStatuses.length - upcomingFixedExpenses.length;
+
+  const [markingPaid, setMarkingPaid] = useState<MarkAsPaidTarget | null>(null);
 
   return (
     <div dir={dirFor(locale)} className="mx-auto max-w-lg px-4 py-6">
@@ -45,36 +69,29 @@ export default function Dashboard({
       </div>
 
       <div className="mb-6">
-        <MonthSelector month={month} onChange={setMonth} />
+        <PeriodSelector period={period} startDay={startDay} onChange={setPeriodOverride} />
       </div>
 
-      <div className="mb-4 rounded-2xl border border-finance-border bg-finance-surfaceElevated p-5">
-        <p className="text-xs text-finance-muted">
-          <T k="finance.dashboard.remaining" />
-        </p>
-        <p className="mt-1 text-3xl font-bold tracking-tight" dir="ltr">
-          {formatMoney(totals.remainingMinor, locale)}
-        </p>
-      </div>
+      <ForecastSummary forecast={forecast} />
 
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-finance-border bg-finance-surface p-4">
-          <p className="text-xs text-finance-muted">
-            <T k="finance.dashboard.income" />
-          </p>
-          <p className="mt-1 text-xl font-semibold text-finance-income" dir="ltr">
-            {formatMoney(totals.incomeMinor, locale)}
-          </p>
+      {fixedExpenseStatuses.length > 0 && (
+        <div className="mb-4">
+          <FixedExpenseProgress
+            paidCount={paidCount}
+            totalCount={fixedExpenseStatuses.length}
+            remainingMinor={forecast.upcomingFixedMinor}
+          />
+          {upcomingFixedExpenses.length > 0 ? (
+            <FixedExpenseCarousel
+              items={upcomingFixedExpenses}
+              categoryById={categoryById}
+              onMarkPaid={(status) => setMarkingPaid({ fixedExpense: status.fixedExpense, expectedAmountMinor: status.expectedAmountMinor })}
+            />
+          ) : (
+            <EmptyState icon={CheckCircle2} title={t("finance.fixedExpenses.allPaid")} />
+          )}
         </div>
-        <div className="rounded-2xl border border-finance-border bg-finance-surface p-4">
-          <p className="text-xs text-finance-muted">
-            <T k="finance.dashboard.expenses" />
-          </p>
-          <p className="mt-1 text-xl font-semibold text-finance-expense" dir="ltr">
-            {formatMoney(totals.expenseMinor, locale)}
-          </p>
-        </div>
-      </div>
+      )}
 
       {!hasTransactions ? (
         <EmptyState
@@ -94,7 +111,7 @@ export default function Dashboard({
       ) : (
         <>
           <div className="mb-4 rounded-2xl border border-finance-border bg-finance-surface p-4">
-            <IncomeExpenseBar incomeMinor={totals.incomeMinor} expenseMinor={totals.expenseMinor} />
+            <IncomeExpenseBar incomeMinor={forecast.incomeMinor} expenseMinor={forecast.paidExpenseMinor} />
           </div>
 
           <div className="mb-4 rounded-2xl border border-finance-border bg-finance-surface p-4">
@@ -124,6 +141,13 @@ export default function Dashboard({
           </Link>
         </>
       )}
+
+      <MarkAsPaidSheet
+        target={markingPaid}
+        period={{ fromDate, toDate }}
+        onClose={() => setMarkingPaid(null)}
+        onPaid={() => showToast(t("finance.fixedExpenses.markedPaid"))}
+      />
     </div>
   );
 }

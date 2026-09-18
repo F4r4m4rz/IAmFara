@@ -9,6 +9,7 @@ import { IndexedDbFinanceRepository } from "./data/IndexedDbFinanceRepository";
 import { Transaction } from "./domain/types";
 import Categories from "./pages/Categories";
 import Dashboard from "./pages/Dashboard";
+import FixedExpenses from "./pages/FixedExpenses";
 import Settings from "./pages/Settings";
 import TransactionHistory from "./pages/TransactionHistory";
 import { RepositoryProvider } from "./RepositoryContext";
@@ -63,9 +64,10 @@ export default function FinanceApp() {
         >
           <div className="flex-1 overflow-y-auto">
             <Routes>
-              <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} />} />
+              <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
               <Route path="categories" element={<Categories />} />
+              <Route path="fixed-expenses" element={<FixedExpenses showToast={showToast} />} />
               <Route path="settings" element={<Settings showToast={showToast} />} />
             </Routes>
           </div>

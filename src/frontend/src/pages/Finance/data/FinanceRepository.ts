@@ -1,10 +1,16 @@
 import {
   Category,
   CreateCategoryInput,
+  CreateFixedExpenseInput,
   CreateTransactionInput,
+  DateRange,
+  FinanceSettings,
+  FixedExpensePeriodOverride,
+  FixedMonthlyExpense,
   Transaction,
   TransactionFilter,
   UpdateCategoryInput,
+  UpdateFixedExpenseInput,
   UpdateTransactionInput,
 } from "../domain/types";
 
@@ -35,4 +41,32 @@ export interface FinanceRepository {
   restoreDefaultCategories(): Promise<void>;
   /** Bulk-persists generated sample transactions (see domain/sampleData.ts). */
   importTransactions(inputs: CreateTransactionInput[]): Promise<void>;
+
+  /** Currently just the financial-period start day — see domain/types.ts. Returns defaults if never set. */
+  getSettings(): Promise<FinanceSettings>;
+  updateSettings(input: Partial<FinanceSettings>): Promise<FinanceSettings>;
+
+  /** Active (isActive) fixed expenses only, unless includeInactive — archived ones are never hard-deleted. */
+  getFixedExpenses(includeInactive?: boolean): Promise<FixedMonthlyExpense[]>;
+  addFixedExpense(input: CreateFixedExpenseInput): Promise<FixedMonthlyExpense>;
+  updateFixedExpense(id: string, input: UpdateFixedExpenseInput): Promise<FixedMonthlyExpense>;
+  archiveFixedExpense(id: string): Promise<void>;
+  restoreFixedExpense(id: string): Promise<void>;
+
+  getPeriodOverrides(periodId: string): Promise<FixedExpensePeriodOverride[]>;
+  setPeriodOverride(fixedExpenseId: string, periodId: string, amountMinor: number): Promise<void>;
+  clearPeriodOverride(fixedExpenseId: string, periodId: string): Promise<void>;
+
+  /**
+   * Creates the real Expense transaction for a fixed expense's payment in
+   * the given period (linked via Transaction.fixedExpenseId) — idempotent:
+   * calling this again for a period that already has a linked transaction
+   * returns the existing one instead of creating a duplicate. `period` is
+   * the target period's own date range (see domain/financialPeriod.ts's
+   * periodDateRange), not an opaque period id — the repository has no
+   * other way to know which transactions fall within it.
+   */
+  markFixedExpensePaid(fixedExpenseId: string, period: DateRange, amountMinor: number, date: string): Promise<Transaction>;
+  /** Finds and deletes the transaction linked to this fixed expense within `period`, if any — the entire "undo" mechanism, see Transaction.fixedExpenseId. */
+  markFixedExpenseUnpaid(fixedExpenseId: string, period: DateRange): Promise<void>;
 }

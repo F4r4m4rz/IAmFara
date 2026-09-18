@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { categoryBreakdown, filterByCategory, filterByMonth, filterByType, monthlyTotals } from "../domain/calculations";
+import { categoryBreakdown, filterByCategory, filterByDateRange, filterByType, periodTotals } from "../domain/calculations";
 import { Transaction } from "../domain/types";
 
 function makeTransaction(overrides: Partial<Transaction>): Transaction {
@@ -15,15 +15,15 @@ function makeTransaction(overrides: Partial<Transaction>): Transaction {
   };
 }
 
-describe("filterByMonth", () => {
-  it("keeps only transactions in the given month", () => {
+describe("filterByDateRange", () => {
+  it("keeps only transactions within the inclusive range, including a range spanning two calendar months", () => {
     const transactions = [
-      makeTransaction({ date: "2026-09-01" }),
-      makeTransaction({ date: "2026-09-30" }),
-      makeTransaction({ date: "2026-10-01" }),
-      makeTransaction({ date: "2026-08-31" }),
+      makeTransaction({ date: "2026-09-10" }),
+      makeTransaction({ date: "2026-09-11" }),
+      makeTransaction({ date: "2026-10-10" }),
+      makeTransaction({ date: "2026-10-11" }),
     ];
-    expect(filterByMonth(transactions, "2026-09")).toHaveLength(2);
+    expect(filterByDateRange(transactions, "2026-09-11", "2026-10-10")).toHaveLength(2);
   });
 });
 
@@ -48,23 +48,23 @@ describe("filterByType", () => {
   });
 });
 
-describe("monthlyTotals", () => {
+describe("periodTotals", () => {
   it("sums income and expenses separately and computes remaining", () => {
     const transactions = [
       makeTransaction({ type: "income", amountMinor: 500000, date: "2026-09-01" }),
       makeTransaction({ type: "expense", amountMinor: 10000, date: "2026-09-05" }),
       makeTransaction({ type: "expense", amountMinor: 20000, date: "2026-09-10" }),
-      makeTransaction({ type: "expense", amountMinor: 99999, date: "2026-10-01" }), // different month, excluded
+      makeTransaction({ type: "expense", amountMinor: 99999, date: "2026-10-01" }), // outside range, excluded
     ];
 
-    const totals = monthlyTotals(transactions, "2026-09");
+    const totals = periodTotals(transactions, "2026-09-01", "2026-09-30");
     expect(totals.incomeMinor).toBe(500000);
     expect(totals.expenseMinor).toBe(30000);
     expect(totals.remainingMinor).toBe(470000);
   });
 
-  it("returns zeros for a month with no transactions", () => {
-    const totals = monthlyTotals([], "2026-09");
+  it("returns zeros for a range with no transactions", () => {
+    const totals = periodTotals([], "2026-09-01", "2026-09-30");
     expect(totals).toEqual({ incomeMinor: 0, expenseMinor: 0, remainingMinor: 0 });
   });
 
@@ -73,20 +73,31 @@ describe("monthlyTotals", () => {
       makeTransaction({ type: "income", amountMinor: 1000, date: "2026-09-01" }),
       makeTransaction({ type: "expense", amountMinor: 5000, date: "2026-09-02" }),
     ];
-    expect(monthlyTotals(transactions, "2026-09").remainingMinor).toBe(-4000);
+    expect(periodTotals(transactions, "2026-09-01", "2026-09-30").remainingMinor).toBe(-4000);
+  });
+
+  it("supports a range spanning two calendar months, as a financial period would", () => {
+    const transactions = [
+      makeTransaction({ type: "income", amountMinor: 500000, date: "2026-09-11" }),
+      makeTransaction({ type: "expense", amountMinor: 10000, date: "2026-10-10" }),
+      makeTransaction({ type: "expense", amountMinor: 99999, date: "2026-10-11" }), // outside range, excluded
+    ];
+    const totals = periodTotals(transactions, "2026-09-11", "2026-10-10");
+    expect(totals.incomeMinor).toBe(500000);
+    expect(totals.expenseMinor).toBe(10000);
   });
 });
 
 describe("categoryBreakdown", () => {
-  it("sums expenses per category for the given month, sorted largest first", () => {
+  it("sums expenses per category within the range, sorted largest first", () => {
     const transactions = [
       makeTransaction({ categoryId: "groceries", amountMinor: 5000, date: "2026-09-01" }),
       makeTransaction({ categoryId: "groceries", amountMinor: 3000, date: "2026-09-02" }),
       makeTransaction({ categoryId: "car", amountMinor: 20000, date: "2026-09-03" }),
-      makeTransaction({ categoryId: "car", amountMinor: 1000, date: "2026-10-01" }), // different month
+      makeTransaction({ categoryId: "car", amountMinor: 1000, date: "2026-10-01" }), // outside range
     ];
 
-    const breakdown = categoryBreakdown(transactions, "2026-09");
+    const breakdown = categoryBreakdown(transactions, "2026-09-01", "2026-09-30");
     expect(breakdown).toEqual([
       { categoryId: "car", totalMinor: 20000 },
       { categoryId: "groceries", totalMinor: 8000 },
@@ -98,10 +109,12 @@ describe("categoryBreakdown", () => {
       makeTransaction({ type: "income", categoryId: "salary", amountMinor: 500000, date: "2026-09-01" }),
       makeTransaction({ type: "expense", categoryId: "groceries", amountMinor: 5000, date: "2026-09-02" }),
     ];
-    expect(categoryBreakdown(transactions, "2026-09")).toEqual([{ categoryId: "groceries", totalMinor: 5000 }]);
+    expect(categoryBreakdown(transactions, "2026-09-01", "2026-09-30")).toEqual([
+      { categoryId: "groceries", totalMinor: 5000 },
+    ]);
   });
 
-  it("returns an empty array for a month with no expenses", () => {
-    expect(categoryBreakdown([], "2026-09")).toEqual([]);
+  it("returns an empty array for a range with no expenses", () => {
+    expect(categoryBreakdown([], "2026-09-01", "2026-09-30")).toEqual([]);
   });
 });
