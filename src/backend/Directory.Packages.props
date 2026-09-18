@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Central Package Management: every package version is pinned exactly
+    once here. Each project's own .csproj keeps `<PackageReference
+    Include="..." />` with no Version attribute — MSBuild resolves the
+    version from this file, so bumping a shared dependency (e.g. the EF
+    Core 8.0.x packages, used by both IAmFara.Web's existing
+    AnalyticsDbContext and the new IAmFara.Data.SqlServer) is a one-line
+    change instead of hunting across every project that references it.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="MaxMind.Db" Version="3.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="xunit" Version="2.5.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+</Project>
