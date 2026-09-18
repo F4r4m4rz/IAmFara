@@ -20,10 +20,13 @@ public class HouseholdMembershipRepository(FinanceDbContext db) : IHouseholdMemb
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemoveAsync(Guid householdId, Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> TryRemoveAsync(Guid householdId, Guid id, CancellationToken cancellationToken = default)
     {
-        await db.HouseholdMemberships
-            .Where(m => m.Id == id && m.HouseholdId == householdId)
+        var rowsDeleted = await db.HouseholdMemberships
+            .Where(m => m.Id == id && m.HouseholdId == householdId &&
+                (m.Role != HouseholdRole.Owner ||
+                 db.HouseholdMemberships.Count(x => x.HouseholdId == householdId && x.Role == HouseholdRole.Owner) > 1))
             .ExecuteDeleteAsync(cancellationToken);
+        return rowsDeleted == 1;
     }
 }

@@ -10,6 +10,8 @@ public class Invitation
 {
     public Guid Id { get; set; }
     public byte[] TokenHash { get; set; } = [];
+    /// <summary>Who this invitation is for — the new User's Email once activated.</summary>
+    public string Email { get; set; } = "";
     public DateTimeOffset ExpiresAt { get; set; }
     public DateTimeOffset? UsedAt { get; set; }
     public Guid? CreatedByUserId { get; set; }

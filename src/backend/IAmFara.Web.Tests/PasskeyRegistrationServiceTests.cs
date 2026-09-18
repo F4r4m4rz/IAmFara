@@ -2,6 +2,7 @@ using Fido2NetLib;
 using Fido2NetLib.Objects;
 using IAmFara.Data.Abstractions.Identity;
 using IAmFara.Data.SqlServer.Identity;
+using IAmFara.Identity.Invitations;
 using IAmFara.Identity.Passkeys;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ public class PasskeyRegistrationServiceTests : IDisposable
     private readonly SqliteConnection _connection;
     private readonly IdentityDbContext _db;
     private readonly PasskeyRegistrationService _registration;
+    private readonly InvitationService _invitationService;
 
     public PasskeyRegistrationServiceTests()
     {
@@ -39,7 +41,8 @@ public class PasskeyRegistrationServiceTests : IDisposable
         var cache = new MemoryCache(new MemoryCacheOptions());
         var users = new UserRepository(_db);
         var credentials = new PasskeyCredentialRepository(_db);
-        _registration = new PasskeyRegistrationService(fido2, cache, users, credentials);
+        _invitationService = new InvitationService(new InvitationRepository(_db));
+        _registration = new PasskeyRegistrationService(fido2, cache, users, credentials, _invitationService);
     }
 
     public void Dispose()
@@ -77,5 +80,52 @@ public class PasskeyRegistrationServiceTests : IDisposable
         var secondException = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _registration.CompleteAsync(user.Id, ceremonyId, GarbageAttestation()));
         Assert.Contains("expired or not found", secondException.Message);
+    }
+
+    [Fact]
+    public async Task BeginForNewUserAsync_WithAnUnknownToken_Throws()
+    {
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _registration.BeginForNewUserAsync("not-a-real-token", "New User"));
+    }
+
+    [Fact]
+    public async Task BeginForNewUserAsync_WithAnExpiredInvitation_Throws()
+    {
+        var (invitation, rawToken) = await _invitationService.CreateAsync("new-user@example.com", null);
+        await _db.Invitations
+            .Where(i => i.Id == invitation.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(i => i.ExpiresAt, DateTimeOffset.UtcNow.AddDays(-1)));
+        _db.ChangeTracker.Clear();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _registration.BeginForNewUserAsync(rawToken, "New User"));
+    }
+
+    [Fact]
+    public async Task CompleteForNewUserAsync_ReplayingTheSameCeremonyId_FailsWithCeremonyNotFound()
+    {
+        var (_, rawToken) = await _invitationService.CreateAsync("new-user@example.com", null);
+        var (ceremonyId, _) = await _registration.BeginForNewUserAsync(rawToken, "New User");
+
+        await Assert.ThrowsAnyAsync<Exception>(() => _registration.CompleteForNewUserAsync(ceremonyId, GarbageAttestation()));
+
+        var secondException = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _registration.CompleteForNewUserAsync(ceremonyId, GarbageAttestation()));
+        Assert.Contains("expired or not found", secondException.Message);
+    }
+
+    [Fact]
+    public async Task CompleteForNewUserAsync_WithAFailedAttestation_LeavesTheInvitationUnconsumed()
+    {
+        var (_, rawToken) = await _invitationService.CreateAsync("new-user@example.com", null);
+        var (ceremonyId, _) = await _registration.BeginForNewUserAsync(rawToken, "New User");
+
+        await Assert.ThrowsAnyAsync<Exception>(() => _registration.CompleteForNewUserAsync(ceremonyId, GarbageAttestation()));
+
+        // A failed ceremony must not burn the invitation — the user can retry
+        // with a fresh ceremony using the same link rather than needing a new one.
+        var stillValid = await _invitationService.ValidateAsync(rawToken);
+        Assert.NotNull(stillValid);
     }
 }

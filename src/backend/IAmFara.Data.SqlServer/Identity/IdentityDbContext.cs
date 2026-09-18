@@ -41,6 +41,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             entity.ToTable("Invitations");
             entity.HasKey(i => i.Id);
+            entity.Property(i => i.Email).HasMaxLength(320).IsRequired();
             entity.HasIndex(i => i.TokenHash).IsUnique();
 
             // CreatedByUserId is audit-only (never an authorization basis), so

@@ -8,6 +8,8 @@ using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.Abstractions.Identity;
 using IAmFara.Data.SqlServer.Finance;
 using IAmFara.Data.SqlServer.Identity;
+using IAmFara.Finance.Households;
+using IAmFara.Identity.Invitations;
 using IAmFara.Identity.Passkeys;
 using IAmFara.Web.Contracts;
 using IAmFara.Web.Data;
@@ -136,9 +138,11 @@ namespace IAmFara.Web
                     : new HashSet<string> { $"https://{webAuthnServerDomain}" };
             });
             builder.Services.AddMemoryCache();
+            builder.Services.AddScoped<InvitationService>();
             builder.Services.AddScoped<PasskeyRegistrationService>();
             builder.Services.AddScoped<PasskeyAuthenticationService>();
             builder.Services.AddScoped<PasskeyManagementService>();
+            builder.Services.AddScoped<HouseholdFacade>();
 
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
@@ -533,6 +537,164 @@ namespace IAmFara.Web
                 catch (InvalidOperationException ex)
                 {
                     return Results.BadRequest(new { error = ex.Message });
+                }
+            }).RequireAntiforgeryValidation();
+
+            // Passkey registration for a brand-new user, authorized by a valid
+            // identity invitation instead of an existing session — the second
+            // (and only other) way a passkey can be registered at all, per
+            // PasskeyRegistrationService's own summary.
+            app.MapPost("/api/auth/passkeys/register-new-user/begin", async (
+                PasskeyRegistrationService registration,
+                RegisterNewUserBeginRequest request,
+                HttpContext context,
+                ILogger<Program> logger,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var (ceremonyId, options) = await registration.BeginForNewUserAsync(request.Token, request.DisplayName, ct);
+                    context.Response.Headers["X-Ceremony-Id"] = ceremonyId;
+                    return Results.Ok(options);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    logger.LogWarning(ex, "New-user passkey registration begin failed.");
+                    return Results.BadRequest(new { error = "This invitation link is invalid or has expired." });
+                }
+            }).RequireRateLimiting("passkey-ceremony").AllowAnonymous();
+
+            // On success, joins the household linked to the invitation (the
+            // "existing household, new user" flow) or creates a new one (the
+            // "new household" flow) — see HouseholdFacade
+            // .TryJoinFromLinkedIdentityInvitationAsync — then signs the new
+            // user in. Not CSRF-protected, same reasoning as login/complete:
+            // the WebAuthn assertion's own origin binding is what defeats
+            // forgery here, and there's no session to forge into yet anyway.
+            app.MapPost("/api/auth/passkeys/register-new-user/complete", async (
+                PasskeyRegistrationService registration,
+                HouseholdFacade householdFacade,
+                PasskeyRegistrationCompleteRequest request,
+                HttpContext context,
+                ILogger<Program> logger,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var (user, identityInvitationId) = await registration.CompleteForNewUserAsync(request.CeremonyId, request.AttestationResponse, ct);
+
+                    var membership = await householdFacade.TryJoinFromLinkedIdentityInvitationAsync(user.Id, identityInvitationId, ct);
+                    if (membership is null)
+                    {
+                        await householdFacade.CreateHouseholdAsync(user.Id, $"{user.DisplayName}'s Household", ct);
+                    }
+
+                    var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) };
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                    return Results.Ok(new { userId = user.Id });
+                }
+                catch (Exception ex) when (ex is Fido2VerificationException or InvalidOperationException)
+                {
+                    logger.LogWarning(ex, "New-user passkey registration failed.");
+                    return Results.BadRequest(new { error = "Registration could not be completed." });
+                }
+            }).RequireRateLimiting("passkey-ceremony").AllowAnonymous();
+
+            app.MapPost("/api/households", async (
+                ICurrentUserAccessor currentUser,
+                HouseholdFacade householdFacade,
+                CreateHouseholdRequest request,
+                CancellationToken ct) =>
+            {
+                var household = await householdFacade.CreateHouseholdAsync(currentUser.UserId!.Value, request.Name, ct);
+                return Results.Ok(new { household.Id, household.Name });
+            }).RequireAntiforgeryValidation();
+
+            // Owner-only (enforced inside HouseholdFacade). Looks up whether the
+            // invited email already belongs to a User (IAmFara.Web is the one
+            // layer allowed to know about both Identity and Finance) — an
+            // existing user only needs a finance.HouseholdInvitations row; a new
+            // one also needs an identity.Invitations row, linked, so the new-user
+            // passkey ceremony above can auto-join this household on completion.
+            app.MapPost("/api/households/{householdId:guid}/invitations", async (
+                Guid householdId,
+                ICurrentUserAccessor currentUser,
+                HouseholdFacade householdFacade,
+                IUserRepository userRepository,
+                InvitationService invitationService,
+                CreateHouseholdInvitationRequest request,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var existingUser = await userRepository.GetByEmailAsync(request.Email, ct);
+                    Guid? identityInvitationId = null;
+                    string? identityRawToken = null;
+                    if (existingUser is null)
+                    {
+                        var (identityInvitation, rawToken) = await invitationService.CreateAsync(request.Email, currentUser.UserId, ct);
+                        identityInvitationId = identityInvitation.Id;
+                        identityRawToken = rawToken;
+                    }
+
+                    var (_, householdRawToken) = await householdFacade.CreateInvitationAsync(
+                        currentUser.UserId!.Value, householdId, request.Role, identityInvitationId, ct);
+
+                    // The recipient only ever needs one link: the identity token
+                    // (which starts account creation and auto-joins this household
+                    // on completion) for a new user, or the household token
+                    // directly for an existing one.
+                    return Results.Ok(new { token = identityRawToken ?? householdRawToken });
+                }
+                catch (NotHouseholdOwnerException)
+                {
+                    return Results.Forbid();
+                }
+            }).RequireAntiforgeryValidation();
+
+            // An existing, already-signed-in user redeeming a household
+            // invitation they received.
+            app.MapPost("/api/households/invitations/consume", async (
+                ICurrentUserAccessor currentUser,
+                HouseholdFacade householdFacade,
+                ConsumeHouseholdInvitationRequest request,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var membership = await householdFacade.ConsumeInvitationAsync(currentUser.UserId!.Value, request.Token, ct);
+                    return Results.Ok(new { membership.HouseholdId, membership.Role });
+                }
+                catch (InvitationInvalidException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapDelete("/api/households/{householdId:guid}/members/{membershipId:guid}", async (
+                Guid householdId,
+                Guid membershipId,
+                ICurrentUserAccessor currentUser,
+                HouseholdFacade householdFacade,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    await householdFacade.RemoveMemberAsync(currentUser.UserId!.Value, householdId, membershipId, ct);
+                    return Results.Ok();
+                }
+                catch (NotHouseholdOwnerException)
+                {
+                    return Results.Forbid();
+                }
+                catch (CannotRemoveLastOwnerException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+                catch (KeyNotFoundException)
+                {
+                    return Results.NotFound();
                 }
             }).RequireAntiforgeryValidation();
 

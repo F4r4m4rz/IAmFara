@@ -3,6 +3,8 @@ namespace IAmFara.Data.Abstractions.Finance;
 public interface IHouseholdInvitationRepository
 {
     Task<HouseholdInvitation?> GetByTokenHashAsync(byte[] tokenHash, CancellationToken cancellationToken = default);
+    /// <summary>The finance invitation linked to an identity.Invitations row, for the "existing household, new user" flow — null if none is linked.</summary>
+    Task<HouseholdInvitation?> GetByIdentityInvitationIdAsync(Guid identityInvitationId, CancellationToken cancellationToken = default);
     Task AddAsync(HouseholdInvitation invitation, CancellationToken cancellationToken = default);
 
     /// <summary>
