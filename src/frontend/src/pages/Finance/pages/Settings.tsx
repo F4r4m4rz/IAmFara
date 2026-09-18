@@ -1,5 +1,6 @@
-import { LucideIcon, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { LucideIcon, Repeat, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { dirFor, T, useLocale } from "../../../i18n";
 import DemoModeBadge from "../components/DemoModeBadge";
 import { currentPeriodId, formatPeriodRange } from "../domain/financialPeriod";
@@ -123,6 +124,19 @@ export default function Settings({ showToast }: { showToast: (message: string) =
       <DemoModeBadge />
 
       <FinancialPeriodSetting />
+
+      <section className="mt-6">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
+          <T k="finance.settings.fixedExpensesSection" />
+        </h2>
+        <Link
+          to="/expenses/demo/fixed-expenses"
+          className="flex w-full items-center gap-3 rounded-xl border border-finance-border bg-finance-surface px-4 py-3 text-start text-sm text-finance-text"
+        >
+          <Repeat size={17} />
+          <T k="finance.settings.manageFixedExpenses" />
+        </Link>
+      </section>
 
       <section className="mt-6">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
