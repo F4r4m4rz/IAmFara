@@ -60,7 +60,12 @@ export default function FinanceApp() {
       <RepositoryProvider repository={repository}>
         <div
           dir={dirFor(locale)}
-          className="relative flex h-screen w-screen flex-col bg-finance-bg font-sans text-finance-text"
+          // h-dvh (dynamic viewport height) rather than h-screen (a static
+          // 100vh) — it tracks the mobile browser's actual visible area as
+          // the on-screen keyboard/toolbar show and hide, instead of a
+          // fixed value computed once, which is one of the things that can
+          // leave the layout looking wrong after the keyboard closes.
+          className="relative flex h-dvh w-screen flex-col bg-finance-bg font-sans text-finance-text"
         >
           <div className="flex-1 overflow-y-auto">
             <Routes>

@@ -16,7 +16,15 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
-    <nav className="relative flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+    // `max(comfortable, safe-area)` used to collapse to *just* the safe
+    // area on notched iPhones (its own inset already exceeds 0.5rem),
+    // leaving nav content sitting flush against the home indicator with no
+    // breathing room. Adding the comfortable padding to the inset instead
+    // of taking the larger of the two keeps that breathing room on top of
+    // the safe area everywhere it's non-zero, while still degrading to
+    // plain 0.75rem on Android/desktop/regular browser tabs where the
+    // inset is 0.
+    <nav className="relative flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2">
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}

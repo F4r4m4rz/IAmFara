@@ -5,6 +5,7 @@ import { minorToMajor, parseAmountInput } from "../domain/money";
 import { DateRange, FixedMonthlyExpense } from "../domain/types";
 import { useMarkFixedExpensePaid } from "../queries/useMarkFixedExpensePaid";
 import AmountInput from "./AmountInput";
+import { useSheetClose } from "./useSheetClose";
 
 export interface MarkAsPaidTarget {
   fixedExpense: FixedMonthlyExpense;
@@ -30,31 +31,26 @@ export default function MarkAsPaidSheet({ target, period, onClose, onPaid }: Mar
 
   const [amountInput, setAmountInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
   const amountRef = useRef<HTMLInputElement>(null);
+
+  const { visible, requestClose } = useSheetClose(Boolean(target), onClose);
 
   useEffect(() => {
     if (!target) return;
     setAmountInput(String(minorToMajor(target.expectedAmountMinor)));
     setError(null);
-    const raf = requestAnimationFrame(() => {
-      setVisible(true);
-      amountRef.current?.focus();
-    });
-    return () => {
-      cancelAnimationFrame(raf);
-      setVisible(false);
-    };
+    const raf = requestAnimationFrame(() => amountRef.current?.focus());
+    return () => cancelAnimationFrame(raf);
   }, [target]);
 
   useEffect(() => {
     if (!target) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") requestClose();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [target, onClose]);
+  }, [target, requestClose]);
 
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
@@ -82,7 +78,7 @@ export default function MarkAsPaidSheet({ target, period, onClose, onPaid }: Mar
         date: todayLocalDate(),
       });
       onPaid();
-      onClose();
+      requestClose();
     } catch {
       setError(t("finance.quickAdd.error.saveFailed"));
     }
@@ -92,7 +88,7 @@ export default function MarkAsPaidSheet({ target, period, onClose, onPaid }: Mar
     <div className="fixed inset-0 z-20 flex items-end justify-center">
       <div
         className={`absolute inset-0 bg-black/50 transition-opacity motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
-        onClick={onClose}
+        onClick={requestClose}
         aria-hidden="true"
       />
       <div

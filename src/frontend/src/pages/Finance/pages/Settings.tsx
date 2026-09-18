@@ -38,6 +38,44 @@ function SettingsButton({
   );
 }
 
+function LanguageSetting() {
+  const { locale, setLocale, t } = useLocale();
+
+  return (
+    <section className="mt-6">
+      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
+        <T k="finance.settings.language.heading" />
+      </h2>
+      <div
+        role="group"
+        aria-label={t("finance.settings.language.heading")}
+        className="flex rounded-xl bg-finance-surface p-1"
+      >
+        <button
+          type="button"
+          aria-pressed={locale === "en"}
+          onClick={() => setLocale("en")}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            locale === "en" ? "bg-finance-accent text-white" : "text-finance-muted"
+          }`}
+        >
+          English
+        </button>
+        <button
+          type="button"
+          aria-pressed={locale === "fa"}
+          onClick={() => setLocale("fa")}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            locale === "fa" ? "bg-finance-accent text-white" : "text-finance-muted"
+          }`}
+        >
+          فارسی
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function FinancialPeriodSetting() {
   const { locale } = useLocale();
   const { data: settings } = useSettings();
@@ -122,6 +160,8 @@ export default function Settings({ showToast }: { showToast: (message: string) =
       </h1>
 
       <DemoModeBadge />
+
+      <LanguageSetting />
 
       <FinancialPeriodSetting />
 

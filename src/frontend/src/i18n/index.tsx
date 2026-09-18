@@ -186,6 +186,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.confirmDelete": "Delete this category? This can't be undone.",
     "finance.categories.error.inUse": "Used by {count} transaction(s) — can't be deleted.",
 
+    "finance.settings.language.heading": "Language",
+
     "finance.settings.financialPeriod.heading": "Financial period",
     "finance.settings.financialPeriod.startsOn": "Financial month starts on",
     "finance.settings.financialPeriod.dayOfMonth": "day of the month",
@@ -398,6 +400,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.namePlaceholder": "نام دسته‌بندی",
     "finance.categories.confirmDelete": "این دسته‌بندی حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.categories.error.inUse": "توسط {count} تراکنش استفاده شده — قابل حذف نیست.",
+
+    "finance.settings.language.heading": "زبان",
 
     "finance.settings.financialPeriod.heading": "دوره مالی",
     "finance.settings.financialPeriod.startsOn": "ماه مالی از این روز شروع می‌شه",

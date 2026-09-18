@@ -49,3 +49,23 @@ body {
     animation: none !important;
   }
 }
+
+/*
+ * iOS Safari (including installed PWAs) auto-zooms the whole page when a
+ * focused form control's font-size is under 16px, so the text is legible
+ * once the keyboard covers part of the screen. Several of this app's
+ * compact fields (text-xs/text-sm inputs and selects) sat under that
+ * threshold — the resulting zoomed-in scale isn't always reliably reset
+ * once the field blurs, which is what caused the app to occasionally stay
+ * visually "zoomed" after closing the keyboard. Forcing a 16px floor only
+ * below the breakpoint touch devices actually use prevents the zoom from
+ * ever triggering in the first place, without changing how any control
+ * looks at desktop sizes or disabling user zoom.
+ */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

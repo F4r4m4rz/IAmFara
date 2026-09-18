@@ -11,6 +11,7 @@ import { useDeleteTransaction } from "../queries/useDeleteTransaction";
 import { useUpdateTransaction } from "../queries/useUpdateTransaction";
 import AmountInput from "./AmountInput";
 import CategoryPicker from "./CategoryPicker";
+import { useSheetClose } from "./useSheetClose";
 
 interface QuickAddSheetProps {
   open: boolean;
@@ -34,11 +35,12 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
   const [date, setDate] = useState(todayLocalDate());
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
 
   const amountRef = useRef<HTMLInputElement>(null);
   const errorId = useId();
   const isSaving = addTransaction.isPending || updateTransaction.isPending;
+
+  const { visible, requestClose } = useSheetClose(open, onClose);
 
   // Reset (or pre-fill, for edit) every time the sheet opens, and auto-focus
   // the amount field — the whole point of "quick add" is that amount entry
@@ -59,24 +61,18 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
       setNote("");
     }
     setError(null);
-    const raf = requestAnimationFrame(() => {
-      setVisible(true);
-      amountRef.current?.focus();
-    });
-    return () => {
-      cancelAnimationFrame(raf);
-      setVisible(false);
-    };
+    const raf = requestAnimationFrame(() => amountRef.current?.focus());
+    return () => cancelAnimationFrame(raf);
   }, [open, editingTransaction]);
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") requestClose();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+  }, [open, requestClose]);
 
   // Same lightweight pattern as Layout.tsx's mobile nav menu: no hard
   // Tab-cycling focus trap, just capture whatever had focus before this
@@ -117,7 +113,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
       }
       recordCategoryUsed(categoryId);
       onSaved();
-      onClose();
+      requestClose();
     } catch {
       // A failure here must be visible, not a silently-unresponsive Save
       // button — surface it the same way as a validation error.
@@ -131,7 +127,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
     try {
       await deleteTransaction.mutateAsync(editingTransaction.id);
       onDeleted();
-      onClose();
+      requestClose();
     } catch {
       setError(t("finance.quickAdd.error.saveFailed"));
     }
@@ -141,7 +137,7 @@ export default function QuickAddSheet({ open, editingTransaction, onClose, onSav
     <div className="fixed inset-0 z-20 flex items-end justify-center">
       <div
         className={`absolute inset-0 bg-black/50 transition-opacity motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
-        onClick={onClose}
+        onClick={requestClose}
         aria-hidden="true"
       />
       <div
