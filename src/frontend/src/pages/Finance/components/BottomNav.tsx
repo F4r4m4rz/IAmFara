@@ -16,15 +16,13 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
-    // `max(comfortable, safe-area)` used to collapse to *just* the safe
-    // area on notched iPhones, leaving nav content sitting flush against
-    // the home indicator with no breathing room. Adding a small comfortable
-    // padding on top of the inset (rather than only taking the larger of
-    // the two) restores that breathing room everywhere the inset is
-    // non-zero, while still degrading to plain 0.375rem on Android/desktop/
-    // regular browser tabs where the inset is 0. The inset itself is left
-    // untouched — that's dictated by the device, not a size to tune.
-    <nav className="relative flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2">
+    // Its own `fixed; bottom: 0` element — not a flex child inside another
+    // `fixed` ancestor (see FinanceApp.tsx) — so its background is what
+    // extends all the way to the true screen edge, with
+    // env(safe-area-inset-bottom) applied exactly once, right here, inside
+    // that background via padding (not as a gap left for something above
+    // it to account for separately).
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2">
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}

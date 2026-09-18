@@ -61,22 +61,29 @@ export default function FinanceApp() {
       <RepositoryProvider repository={repository}>
         <div
           dir={dirFor(locale)}
-          // `fixed inset-0` rather than a normal-flow `h-dvh` block: pinning
-          // directly to the viewport's edges removes this shell from
-          // document flow entirely, so its size can never drift out of sync
-          // with html/body's own height (the previous h-dvh div depended on
-          // 100dvh exactly matching the document's rendered height — any
-          // mismatch there, which iOS standalone PWAs are prone to around
-          // cold launch, let the *page* itself scroll/rubber-band
-          // independently of this shell's own scroll container below,
-          // which is what let the header/nav drift out of position). See
+          // A plain, non-positioned wrapper — just carries dir/colors/font
+          // for everything inside. Both real children below are their own
+          // independent `fixed` elements (see the content div and
+          // BottomNav.tsx) rather than this being a `fixed` flex container
+          // with BottomNav as a flex child relying on its parent's box edge
+          // for its position: nesting a "flush with the bottom" flex item
+          // inside an already-`fixed` ancestor is exactly the pattern where
+          // iOS can apply its own safe-area adjustment to the *fixed*
+          // element on top of an explicit env(safe-area-inset-bottom)
+          // already in that element's own padding, double-counting it. A
+          // bottom nav that's directly `fixed; bottom: 0` itself — not a
+          // flex child of another fixed box — is the standard, unambiguous
+          // way every production app-shell avoids that. See
           // usePwaRegistration.ts for the matching html/body overflow lock.
-          className="fixed inset-0 flex flex-col bg-finance-bg font-sans text-finance-text"
+          className="bg-finance-bg font-sans text-finance-text"
         >
-          {/* pt-safe-area-inset-top: this shell renders edge-to-edge under
-              the status bar (index.html's viewport-fit=cover) — without
-              this, headers/badges on every page render underneath it. */}
-          <div className="flex-1 overflow-y-auto pt-[env(safe-area-inset-top)]">
+          {/* pt: clears the status bar (index.html's viewport-fit=cover
+              makes this render edge-to-edge under it). pb: generously
+              clears BottomNav's own height (padding + icon/label row +
+              the FAB protruding above it) plus the home-indicator safe
+              area, so the last card's content — including a "Mark as
+              paid" button — can always scroll fully clear of the nav. */}
+          <div className="fixed inset-0 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[calc(6rem+env(safe-area-inset-bottom))]">
             <Routes>
               <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
