@@ -1,11 +1,14 @@
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using Fido2NetLib;
 using IAmFara.Data.Abstractions.Common;
 using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.Abstractions.Identity;
 using IAmFara.Data.SqlServer.Finance;
 using IAmFara.Data.SqlServer.Identity;
+using IAmFara.Identity.Passkeys;
 using IAmFara.Web.Contracts;
 using IAmFara.Web.Data;
 using IAmFara.Web.Options;
@@ -118,6 +121,25 @@ namespace IAmFara.Web
                 options.HeaderName = "X-CSRF-TOKEN";
             });
 
+            // WebAuthnServerDomain is set the same way as DbConnectionString/
+            // Email_ApiKey above (a flat App Pool environment variable) once
+            // deployed; "localhost" is the WebAuthn spec's own secure-context
+            // exception, used here as the local-dev default so both launch
+            // profiles' origins work without any config.
+            var webAuthnServerDomain = builder.Configuration["WebAuthnServerDomain"] ?? "localhost";
+            builder.Services.AddFido2(options =>
+            {
+                options.ServerDomain = webAuthnServerDomain;
+                options.ServerName = "IAmFara";
+                options.Origins = webAuthnServerDomain == "localhost"
+                    ? new HashSet<string> { "http://localhost:5020", "https://localhost:7142" }
+                    : new HashSet<string> { $"https://{webAuthnServerDomain}" };
+            });
+            builder.Services.AddMemoryCache();
+            builder.Services.AddScoped<PasskeyRegistrationService>();
+            builder.Services.AddScoped<PasskeyAuthenticationService>();
+            builder.Services.AddScoped<PasskeyManagementService>();
+
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
             // App Pool environment variables in the SmarterASP.NET panel.
@@ -168,6 +190,19 @@ namespace IAmFara.Web
                         {
                             PermitLimit = 60,
                             Window = TimeSpan.FromMinutes(5),
+                            QueueLimit = 0,
+                        }));
+
+                // Blunts brute-force/enumeration attempts against the passkey
+                // ceremony endpoints — a legitimate user rarely retries a
+                // ceremony more than a handful of times in a row.
+                options.AddPolicy("passkey-ceremony", httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 20,
+                            Window = TimeSpan.FromMinutes(10),
                             QueueLimit = 0,
                         }));
 
@@ -410,6 +445,95 @@ namespace IAmFara.Web
             {
                 await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 return Results.Ok();
+            }).RequireAntiforgeryValidation();
+
+            // Passkey registration: adding a credential to the caller's own,
+            // already-authenticated account. There is no anonymous "register a
+            // new user" path here — that's an invitation-gated flow added in a
+            // later phase, reusing this same ceremony machinery.
+            app.MapPost("/api/auth/passkeys/register/begin", async (
+                ICurrentUserAccessor currentUser,
+                PasskeyRegistrationService registration,
+                HttpContext context,
+                CancellationToken ct) =>
+            {
+                var (ceremonyId, options) = await registration.BeginAsync(currentUser.UserId!.Value, ct);
+                context.Response.Headers["X-Ceremony-Id"] = ceremonyId;
+                return Results.Ok(options);
+            }).RequireRateLimiting("passkey-ceremony");
+
+            app.MapPost("/api/auth/passkeys/register/complete", async (
+                ICurrentUserAccessor currentUser,
+                PasskeyRegistrationService registration,
+                PasskeyRegistrationCompleteRequest request,
+                ILogger<Program> logger,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    await registration.CompleteAsync(currentUser.UserId!.Value, request.CeremonyId, request.AttestationResponse, ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is Fido2VerificationException or InvalidOperationException)
+                {
+                    logger.LogWarning(ex, "Passkey registration failed.");
+                    return Results.BadRequest(new { error = "Registration could not be completed." });
+                }
+            }).RequireRateLimiting("passkey-ceremony").RequireAntiforgeryValidation();
+
+            // Usernameless/discoverable-credential login — no anonymous state is
+            // mutated by beginning a ceremony, so this (unlike /complete below)
+            // doesn't need CSRF protection; a WebAuthn assertion is itself
+            // cryptographically bound to this origin and the user's own
+            // authenticator, which is what actually defeats forgery here, not a
+            // separate CSRF token.
+            app.MapPost("/api/auth/passkeys/login/begin", (PasskeyAuthenticationService authentication, HttpContext context) =>
+            {
+                var (ceremonyId, options) = authentication.Begin();
+                context.Response.Headers["X-Ceremony-Id"] = ceremonyId;
+                return Results.Ok(options);
+            }).RequireRateLimiting("passkey-ceremony").AllowAnonymous();
+
+            app.MapPost("/api/auth/passkeys/login/complete", async (
+                PasskeyAuthenticationService authentication,
+                PasskeyLoginCompleteRequest request,
+                HttpContext context,
+                CancellationToken ct) =>
+            {
+                var userId = await authentication.CompleteAsync(request.CeremonyId, request.AssertionResponse, ct);
+                if (userId is null)
+                {
+                    // Deliberately generic: never reveal *why* the assertion failed.
+                    return Results.Unauthorized();
+                }
+
+                var claims = new[] { new Claim(ClaimTypes.NameIdentifier, userId.Value.ToString()) };
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                return Results.Ok(new { userId = userId.Value });
+            }).RequireRateLimiting("passkey-ceremony").AllowAnonymous();
+
+            app.MapGet("/api/auth/passkeys", async (ICurrentUserAccessor currentUser, PasskeyManagementService management, CancellationToken ct) =>
+            {
+                var credentials = await management.ListAsync(currentUser.UserId!.Value, ct);
+                return Results.Ok(credentials.Select(c => new PasskeySummary(c.Id, c.CreatedAt)));
+            });
+
+            app.MapDelete("/api/auth/passkeys/{id:guid}", async (
+                Guid id,
+                ICurrentUserAccessor currentUser,
+                PasskeyManagementService management,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    await management.RemoveAsync(currentUser.UserId!.Value, id, ct);
+                    return Results.Ok();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
             }).RequireAntiforgeryValidation();
 
             // The finance app (/expenses/demo) needs iOS's apple-mobile-web-app-*

@@ -4,4 +4,9 @@
     <ProjectReference Include="..\IAmFara.Data.Abstractions\IAmFara.Data.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Fido2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+  </ItemGroup>
+
 </Project>

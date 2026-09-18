@@ -1,10 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
+using IAmFara.Data.Abstractions.Identity;
+using IAmFara.Data.SqlServer.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace IAmFara.Web.Tests;
 
@@ -12,12 +17,26 @@ namespace IAmFara.Web.Tests;
 /// Exercises the authentication foundation (deny-by-default FallbackPolicy,
 /// AllowAnonymous exemptions, ICurrentUserAccessor, antiforgery validation)
 /// against a real in-process TestServer, with the real cookie scheme swapped
-/// for TestAuthHandler so tests don't depend on a real passkey ceremony.
+/// for TestAuthHandler so tests don't depend on a real passkey ceremony, and
+/// IdentityDbContext swapped to SQLite so endpoints that look up a User (the
+/// passkey ceremony endpoints) don't need a real SQL Server.
 /// </summary>
 public class AuthenticationTestFactory : WebApplicationFactory<Program>
 {
+    private readonly SqliteConnection _identityConnection = new("DataSource=:memory:");
+
+    /// <summary>Seeds a User row matching a TestAuthHandler-authenticated id, for endpoints that look the current user up.</summary>
+    public async Task SeedUserAsync(Guid userId, string email = "test@example.com")
+    {
+        using var scope = Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        await users.AddAsync(new User { Id = userId, DisplayName = "Test User", Email = email, CreatedAt = DateTimeOffset.UtcNow });
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        _identityConnection.Open();
+
         builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
@@ -34,7 +53,33 @@ public class AuthenticationTestFactory : WebApplicationFactory<Program>
         {
             services.AddAuthentication(TestAuthHandler.SchemeName)
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+
+            // Same "remove every descriptor closing over the context type"
+            // approach as AnalyticsEndpointsTests — RemoveAll<DbContextOptions<T>>
+            // alone no longer isolates a swapped-in provider from the app's own
+            // SqlServer registration (EF Core composes same-context AddDbContext
+            // calls rather than replacing them).
+            var identityContextServiceTypes = services
+                .Where(d => d.ServiceType.IsGenericType && d.ServiceType.GetGenericArguments().Contains(typeof(IdentityDbContext)))
+                .Select(d => d.ServiceType)
+                .Distinct()
+                .ToList();
+            foreach (var serviceType in identityContextServiceTypes)
+            {
+                services.RemoveAll(serviceType);
+            }
+            services.AddDbContext<IdentityDbContext>(options => options.UseSqlite(_identityConnection));
+
+            var provider = services.BuildServiceProvider();
+            using var scope = provider.CreateScope();
+            scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.EnsureCreated();
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing) _identityConnection.Dispose();
     }
 }
 

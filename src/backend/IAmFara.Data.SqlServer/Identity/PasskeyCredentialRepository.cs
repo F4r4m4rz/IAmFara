@@ -23,4 +23,11 @@ public class PasskeyCredentialRepository(IdentityDbContext db) : IPasskeyCredent
             .Where(p => p.Id == id)
             .ExecuteUpdateAsync(s => s.SetProperty(p => p.SignCount, newSignCount), cancellationToken);
     }
+
+    public async Task DeleteAsync(Guid userId, Guid id, CancellationToken cancellationToken = default)
+    {
+        await db.PasskeyCredentials
+            .Where(p => p.Id == id && p.UserId == userId)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
 }
