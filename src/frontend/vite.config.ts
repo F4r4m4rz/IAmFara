@@ -20,7 +20,14 @@ export default defineConfig({
     // instead registered manually, only while the finance app is mounted,
     // pinned to manifest.scope below.
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' rather than 'autoUpdate': the generated register helper
+      // (virtual:pwa-register/react, used in usePwaRegistration.ts) only
+      // calls onNeedRefresh and waits for the app to call
+      // updateServiceWorker() itself — with 'autoUpdate' it reloads the
+      // page automatically as soon as a new version is found, which would
+      // yank the page out from under whatever the user is doing instead of
+      // the "tap to refresh" prompt this is meant to show.
+      registerType: 'prompt',
       injectRegister: false,
       filename: 'finance-sw.js',
       manifestFilename: 'finance-manifest.webmanifest',

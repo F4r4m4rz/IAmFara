@@ -119,6 +119,8 @@ const translations: Record<Locale, Dictionary> = {
 
     "finance.demoMode.badge": "Demo Mode — data is stored only on this device.",
 
+    "finance.update.available": "Update available — tap to refresh",
+
     "finance.category.groceries": "Groceries",
     "finance.category.house": "House",
     "finance.category.mortgage": "Mortgage",
@@ -333,6 +335,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.nav.addTransaction": "افزودن تراکنش",
 
     "finance.demoMode.badge": "حالت دمو — اطلاعات فقط روی همین دستگاه ذخیره می‌شه.",
+
+    "finance.update.available": "نسخه جدید موجوده — برای به‌روزرسانی ضربه بزن",
 
     "finance.category.groceries": "مواد غذایی",
     "finance.category.house": "خانه",

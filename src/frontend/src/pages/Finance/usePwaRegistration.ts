@@ -1,14 +1,14 @@
 import { useEffect } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 
-const SW_URL = "/finance-sw.js";
-const SCOPE = "/expenses/demo/";
 const THEME_COLOR = "#0b0f14";
 const APPLE_TOUCH_ICON_HREF = "/finance-icons/apple-touch-icon.png";
+const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // matches vite-plugin-pwa's own documented pattern
 
 /**
- * Wires up PWA installability/offline support only while the finance app
- * is mounted. This is one shared SPA bundle serving both the portfolio and
- * the finance app, so a couple of notes on scoping:
+ * Wires up PWA installability/offline support, and update detection, only
+ * while the finance app is mounted. This is one shared SPA bundle serving
+ * both the portfolio and the finance app, so a couple of notes on scoping:
  *
  * - The manifest `<link>` itself is injected sitewide by vite-plugin-pwa
  *   at build time (its `injectRegister: false` option only suppresses the
@@ -24,8 +24,36 @@ const APPLE_TOUCH_ICON_HREF = "/finance-icons/apple-touch-icon.png";
  *   iOS-specific tags) has no such spec-level scoping, so all of it is
  *   added/removed here manually, only for the lifetime of this component,
  *   so none of it leaks onto the portfolio's own pages.
+ *
+ * The service worker itself is registered via vite-plugin-pwa's
+ * virtual:pwa-register/react helper rather than a raw
+ * navigator.serviceWorker.register() call — that's what surfaces
+ * `needRefresh` when a new version has installed in the background, so
+ * FinanceApp can show a "tap to refresh" prompt instead of the previous
+ * silent-until-the-next-full-relaunch behavior.
  */
 export function usePwaRegistration() {
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_swUrl, registration) {
+      // The browser only checks the service worker script for changes on
+      // navigation/registration by default (at most once every ~24h in
+      // most browsers) — polling registration.update() periodically means
+      // a session left open for a long time still finds out about a new
+      // deploy without needing a full close-and-reopen.
+      if (!registration) return;
+      setInterval(() => registration.update(), UPDATE_CHECK_INTERVAL_MS);
+    },
+    onRegisterError() {
+      // Offline support/update-checking is a progressive enhancement (also
+      // simply absent in `npm run dev`, since finance-sw.js only exists in
+      // a production build) — a failed registration must never block the
+      // app itself.
+    },
+  });
+
   useEffect(() => {
     const themeColorMeta = document.createElement("meta");
     themeColorMeta.name = "theme-color";
@@ -50,15 +78,6 @@ export function usePwaRegistration() {
     appleStatusBarMeta.content = "black-translucent";
     document.head.appendChild(appleStatusBarMeta);
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register(SW_URL, { scope: SCOPE }).catch(() => {
-        // Offline support is a progressive enhancement (also simply absent
-        // in `npm run dev`, since finance-sw.js only exists in a
-        // production build) — a failed registration must never block the
-        // app itself.
-      });
-    }
-
     return () => {
       themeColorMeta.remove();
       appleTouchIcon.remove();
@@ -66,4 +85,6 @@ export function usePwaRegistration() {
       appleStatusBarMeta.remove();
     };
   }, []);
+
+  return { needRefresh, applyUpdate: () => updateServiceWorker() };
 }

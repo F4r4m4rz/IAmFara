@@ -5,6 +5,7 @@ import { dirFor, useLocale } from "../../i18n";
 import BottomNav from "./components/BottomNav";
 import QuickAddSheet from "./components/QuickAddSheet";
 import Toast from "./components/Toast";
+import UpdateAvailableBanner from "./components/UpdateAvailableBanner";
 import { IndexedDbFinanceRepository } from "./data/IndexedDbFinanceRepository";
 import { Transaction } from "./domain/types";
 import Categories from "./pages/Categories";
@@ -23,7 +24,7 @@ import { usePwaRegistration } from "./usePwaRegistration";
  */
 export default function FinanceApp() {
   const { locale, t } = useLocale();
-  usePwaRegistration();
+  const { needRefresh, applyUpdate } = usePwaRegistration();
   // Created once per mount, not at module scope — avoids holding a Dexie
   // connection open for the lifetime of the whole site when the user has
   // never visited the finance app.
@@ -86,6 +87,7 @@ export default function FinanceApp() {
             onDeleted={() => showToast(t("finance.quickAdd.deleted"))}
           />
           {toastMessage && <Toast message={toastMessage} />}
+          {needRefresh && <UpdateAvailableBanner onRefresh={applyUpdate} />}
         </div>
       </RepositoryProvider>
     </QueryClientProvider>
