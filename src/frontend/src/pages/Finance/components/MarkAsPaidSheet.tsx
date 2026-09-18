@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { dirFor, useLocale } from "../../../i18n";
 import { todayLocalDate } from "../domain/dates";
 import { minorToMajor, parseAmountInput } from "../domain/money";
@@ -84,7 +85,19 @@ export default function MarkAsPaidSheet({ target, period, onClose, onPaid }: Mar
     }
   };
 
-  return (
+  // Rendered via a portal straight onto document.body rather than in
+  // place: unlike QuickAddSheet (mounted once at FinanceApp's top level),
+  // this component is invoked from inside Dashboard — several levels deep
+  // inside the app's own scrollable content container. `position: fixed`
+  // is supposed to ignore all of that and pin to the true viewport
+  // regardless of DOM nesting, but a portal removes any dependency on that
+  // holding true across every ancestor (any transform/filter/etc. added
+  // to something in between later would otherwise silently change this
+  // sheet's containing block) — the standard, robust way to keep a modal
+  // overlay's positioning independent of wherever it happens to be
+  // invoked in the tree, rather than re-litigating every ancestor's CSS
+  // each time this is touched.
+  return createPortal(
     <div className="fixed inset-0 z-20 flex items-end justify-center">
       <div
         className={`absolute inset-0 bg-black/50 transition-opacity motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
@@ -125,6 +138,7 @@ export default function MarkAsPaidSheet({ target, period, onClose, onPaid }: Mar
           {t("finance.fixedExpenses.confirmPaid")}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
