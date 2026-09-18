@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using IAmFara.Data.Abstractions.Common;
 using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.Abstractions.Identity;
 using IAmFara.Data.SqlServer.Finance;
@@ -8,7 +9,12 @@ using IAmFara.Data.SqlServer.Identity;
 using IAmFara.Web.Contracts;
 using IAmFara.Web.Data;
 using IAmFara.Web.Options;
+using IAmFara.Web.Security;
 using IAmFara.Web.Services;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -68,6 +74,49 @@ namespace IAmFara.Web
             builder.Services.AddScoped<IFixedMonthlyExpenseRepository, FixedMonthlyExpenseRepository>();
             builder.Services.AddScoped<IFixedExpensePeriodOverrideRepository, FixedExpensePeriodOverrideRepository>();
             builder.Services.AddScoped<IFinancialPeriodSettingsRepository, FinancialPeriodSettingsRepository>();
+
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "IAmFara.Auth";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
+                    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                    options.SlidingExpiration = true;
+                    // This is a JSON API, not an MVC app with a login page — a
+                    // request that fails auth should get a plain status code,
+                    // never a redirect to a page that doesn't exist.
+                    options.Events.OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    };
+                    options.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    };
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                // Deny-by-default: an endpoint added without an explicit
+                // .AllowAnonymous() call fails closed, not open.
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
+
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.Cookie.Name = "IAmFara.Csrf";
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.HeaderName = "X-CSRF-TOKEN";
+            });
 
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
@@ -156,7 +205,9 @@ namespace IAmFara.Web
 
             app.UseRateLimiter();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseAntiforgery();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -205,7 +256,7 @@ namespace IAmFara.Web
                         "Something went wrong sending your message. Please try again in a bit.",
                         statusCode: StatusCodes.Status500InternalServerError);
                 }
-            }).RequireRateLimiting("contact");
+            }).RequireRateLimiting("contact").AllowAnonymous();
 
             app.MapPost("/api/analytics/visit", async (
                 AnalyticsVisitRequest request,
@@ -254,7 +305,7 @@ namespace IAmFara.Web
                 }
 
                 return Results.Ok(new { ok = true });
-            }).RequireRateLimiting("analytics-visit");
+            }).RequireRateLimiting("analytics-visit").AllowAnonymous();
 
             // Temporary diagnostic: lets us confirm what IP SmarterASP.NET's shared
             // hosting actually presents to the app (in case a proxy/load balancer
@@ -262,7 +313,8 @@ namespace IAmFara.Web
             // once that's verified after a test deploy.
             app.MapGet("/api/analytics/ip-check", (HttpContext httpContext) =>
                 Results.Ok(new { remoteIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown" }))
-                .RequireRateLimiting("analytics-visit");
+                .RequireRateLimiting("analytics-visit")
+                .AllowAnonymous();
 
             // Temporary diagnostic: reports whether each App Pool environment
             // variable / config key the app depends on is actually reaching the
@@ -283,7 +335,8 @@ namespace IAmFara.Web
                     analyticsReportSecretSet = !string.IsNullOrEmpty(analyticsOptions.Value.ReportSecret),
                     analyticsReportToEmailSet = !string.IsNullOrEmpty(analyticsOptions.Value.ReportToEmail),
                 }))
-                .RequireRateLimiting("analytics-visit");
+                .RequireRateLimiting("analytics-visit")
+                .AllowAnonymous();
 
             app.MapPost("/api/analytics/report/run", async (
                 HttpContext httpContext,
@@ -334,7 +387,30 @@ namespace IAmFara.Web
                         "The report run failed. Check server logs for details.",
                         statusCode: StatusCodes.Status500InternalServerError);
                 }
-            }).RequireRateLimiting("analytics-report");
+            }).RequireRateLimiting("analytics-report").AllowAnonymous();
+
+            // Deliberately minimal — the frontend's own auth UI is built in a
+            // later phase, but any SPA needs a "who am I" check on load, and it
+            // exercises the full cookie-auth + FallbackPolicy + ICurrentUserAccessor
+            // pipeline as real production surface rather than a test-only stub.
+            app.MapGet("/api/auth/me", (ICurrentUserAccessor currentUser) =>
+                Results.Ok(new { userId = currentUser.UserId }));
+
+            // Obtains a CSRF token to echo back via the X-CSRF-TOKEN header on
+            // state-changing requests (see AntiforgeryEndpointFilter). Anonymous
+            // because the invitation/registration endpoints of later phases need
+            // one before a session exists.
+            app.MapGet("/api/auth/csrf-token", (IAntiforgery antiforgery, HttpContext context) =>
+            {
+                var tokens = antiforgery.GetAndStoreTokens(context);
+                return Results.Ok(new { token = tokens.RequestToken });
+            }).AllowAnonymous();
+
+            app.MapPost("/api/auth/sign-out", async (HttpContext context) =>
+            {
+                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return Results.Ok();
+            }).RequireAntiforgeryValidation();
 
             // The finance app (/expenses/demo) needs iOS's apple-mobile-web-app-*
             // meta tags present before React runs, which the shared index.html
@@ -344,9 +420,9 @@ namespace IAmFara.Web
             // offline navigateFallback so online/offline launches match. More
             // specific fallback patterns take precedence over the general one
             // below, regardless of registration order.
-            app.MapFallbackToFile("/expenses/demo", "expenses-demo.html");
-            app.MapFallbackToFile("/expenses/demo/{**path}", "expenses-demo.html");
-            app.MapFallbackToFile("index.html");
+            app.MapFallbackToFile("/expenses/demo", "expenses-demo.html").AllowAnonymous();
+            app.MapFallbackToFile("/expenses/demo/{**path}", "expenses-demo.html").AllowAnonymous();
+            app.MapFallbackToFile("index.html").AllowAnonymous();
 
             app.Run();
         }
