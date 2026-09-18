@@ -46,8 +46,13 @@ function LanguageSetting() {
       <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
         <T k="finance.settings.language.heading" />
       </h2>
+      {/* dir="ltr" pinned regardless of locale: this is the control that
+          picks the direction, so its own two options should stay in a
+          fixed physical order rather than swapping sides the moment
+          you've just tapped one of them. */}
       <div
         role="group"
+        dir="ltr"
         aria-label={t("finance.settings.language.heading")}
         className="flex rounded-xl bg-finance-surface p-1"
       >

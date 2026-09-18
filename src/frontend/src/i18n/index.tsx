@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 
 export type Locale = "en" | "fa";
 
@@ -484,12 +485,39 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }, [locale]);
 
+  // Switching locale flips every block's dir (LTR<->RTL, mirroring flex
+  // layouts) and swaps the font family — neither is something CSS can
+  // meaningfully transition (direction/font-family aren't interpolatable),
+  // so a straight setState makes the whole page mirror instantly, which
+  // reads as a jarring jump rather than a language change. The View
+  // Transitions API is built for exactly this: it snapshots the page
+  // before and after the update and cross-fades between them, without
+  // needing to animate the underlying layout properties at all. flushSync
+  // is required here — the callback given to startViewTransition must
+  // apply its DOM changes synchronously for the "after" snapshot to be
+  // taken at the right moment; a plain setState (batched, async) would
+  // let the transition capture stale content. Skipped under prefers-
+  // reduced-motion, and falls back to a plain update in browsers that
+  // don't support the API (Firefox, older Safari) — either way the
+  // language still switches, just without the crossfade.
+  const applyLocaleChange = (next: Locale) => {
+    const update = () => setLocaleState(next);
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (typeof document !== "undefined" && document.startViewTransition && !prefersReducedMotion) {
+      document.startViewTransition(() => flushSync(update));
+    } else {
+      update();
+    }
+  };
+
   const value = useMemo<LocaleContextValue>(
     () => ({
       locale,
-      setLocale: setLocaleState,
-      toggleLocale: () =>
-        setLocaleState((prev) => (prev === "en" ? "fa" : "en")),
+      setLocale: applyLocaleChange,
+      toggleLocale: () => applyLocaleChange(locale === "en" ? "fa" : "en"),
       t: (key: string, params?: Record<string, string | number>) => {
         const template = translations[locale][key] ?? key;
         if (!params) return template;
