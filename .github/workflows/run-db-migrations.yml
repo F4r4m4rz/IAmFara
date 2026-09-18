@@ -86,3 +86,23 @@ jobs:
           dotnet ef database update --context IdentityDbContext
           --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
           --connection "$CONNECTION_STRING"
+
+      # Same physical database again ("finance" schema), but its migrations
+      # live in IAmFara.Data.SqlServer, not IAmFara.Web.
+      - name: Show pending migrations (Finance)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: >
+          dotnet ef migrations list --context FinanceDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
+
+      - name: Apply migrations to ${{ inputs.target }} (Finance)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ inputs.target == 'prod' && secrets.DB_CONNECTION_STRING_PROD || secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: >
+          dotnet ef database update --context FinanceDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"

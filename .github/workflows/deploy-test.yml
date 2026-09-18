@@ -49,6 +49,16 @@ jobs:
           --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
           --connection "$CONNECTION_STRING"
 
+      # Same physical database again ("finance" schema).
+      - name: Apply pending migrations (Finance)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_DEVTEST }}
+        run: >
+          dotnet ef database update --context FinanceDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
+
   deploy:
     needs: migrate
     runs-on: windows-latest

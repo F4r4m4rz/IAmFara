@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.Abstractions.Identity;
+using IAmFara.Data.SqlServer.Finance;
 using IAmFara.Data.SqlServer.Identity;
 using IAmFara.Web.Contracts;
 using IAmFara.Web.Data;
@@ -54,6 +56,18 @@ namespace IAmFara.Web
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IPasskeyCredentialRepository, PasskeyCredentialRepository>();
             builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
+
+            // Same physical database again, "finance" schema.
+            builder.Services.AddDbContext<FinanceDbContext>(options =>
+                options.UseSqlServer(builder.Configuration["DbConnectionString"]));
+            builder.Services.AddScoped<IHouseholdRepository, HouseholdRepository>();
+            builder.Services.AddScoped<IHouseholdMembershipRepository, HouseholdMembershipRepository>();
+            builder.Services.AddScoped<IHouseholdInvitationRepository, HouseholdInvitationRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+            builder.Services.AddScoped<IFixedMonthlyExpenseRepository, FixedMonthlyExpenseRepository>();
+            builder.Services.AddScoped<IFixedExpensePeriodOverrideRepository, FixedExpensePeriodOverrideRepository>();
+            builder.Services.AddScoped<IFinancialPeriodSettingsRepository, FinancialPeriodSettingsRepository>();
 
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
