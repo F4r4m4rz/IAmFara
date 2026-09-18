@@ -16,25 +16,25 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
-    // Its own `fixed` element — not a flex child inside another `fixed`
-    // ancestor (see FinanceApp.tsx) — so its background is what extends to
+    // Its own `fixed; bottom: 0` element — not a flex child inside another
+    // `fixed` ancestor (see FinanceApp.tsx) — so its background extends to
     // the true screen edge, with env(safe-area-inset-bottom) applied
-    // exactly once, inside that background via padding.
+    // exactly once, inside that background via padding. (A prior attempt
+    // shifted `bottom` to a negative env() offset instead, on the theory
+    // that standalone mode pre-reserves the home-indicator strip on its
+    // own — that's backwards: an installed iOS PWA's content genuinely
+    // covers the full physical screen, and env(safe-area-inset-bottom) is
+    // the *only* signal reserving room for the indicator, confirmed
+    // against a real shipping PWA that hit and fixed this same bug. `bottom:
+    // 0` is correct.)
     //
-    // `bottom` is a *negative* env(safe-area-inset-bottom) rather than 0:
-    // in an installed iOS standalone PWA, `bottom: 0` on a fixed element
-    // appears to already resolve above the home-indicator safe area (iOS
-    // reserving that strip for itself the way it does for the swipe-up
-    // gesture zone), not at the true bottom edge — on top of this
-    // padding-bottom already reserving the same distance for the nav's
-    // own content to clear it, that left an empty gap between the nav and
-    // the screen's actual bottom equal to roughly the inset. Shifting the
-    // box down by that same amount closes it, so the background — not a
-    // gap — is what actually touches the true edge. Unlike padding, this
-    // shift does not need to hold content clear of anything, so it isn't
-    // needed at all where env() is 0 (Android/desktop/regular Safari
-    // tabs), and is inert there.
-    <nav className="fixed inset-x-0 bottom-[calc(-1*env(safe-area-inset-bottom))] z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2">
+    // env(safe-area-inset-bottom) is wrapped in min(34px, …): a
+    // documented WebKit quirk lets this value read inflated on an
+    // installed PWA's cold launch, before settling to the device's real
+    // inset shortly after — 34px is the actual inset on every current
+    // Face-ID iPhone in portrait, so capping there discards only the
+    // erroneous inflated reading, never the real one.
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+min(34px,env(safe-area-inset-bottom)))] pt-2">
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}

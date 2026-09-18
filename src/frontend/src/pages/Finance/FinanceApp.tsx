@@ -83,7 +83,7 @@ export default function FinanceApp() {
               the FAB protruding above it) plus the home-indicator safe
               area, so the last card's content — including a "Mark as
               paid" button — can always scroll fully clear of the nav. */}
-          <div className="fixed inset-0 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[calc(6rem+env(safe-area-inset-bottom))]">
+          <div className="fixed inset-0 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[calc(6rem+min(34px,env(safe-area-inset-bottom)))]">
             <Routes>
               <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
