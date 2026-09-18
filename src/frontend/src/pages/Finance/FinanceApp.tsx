@@ -64,7 +64,7 @@ export default function FinanceApp() {
         >
           <div className="flex-1 overflow-y-auto">
             <Routes>
-              <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} />} />
+              <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
               <Route path="categories" element={<Categories />} />
               <Route path="fixed-expenses" element={<FixedExpenses showToast={showToast} />} />
