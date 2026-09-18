@@ -16,13 +16,25 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   const { t } = useLocale();
 
   return (
-    // Its own `fixed; bottom: 0` element — not a flex child inside another
-    // `fixed` ancestor (see FinanceApp.tsx) — so its background is what
-    // extends all the way to the true screen edge, with
-    // env(safe-area-inset-bottom) applied exactly once, right here, inside
-    // that background via padding (not as a gap left for something above
-    // it to account for separately).
-    <nav className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2">
+    // Its own `fixed` element — not a flex child inside another `fixed`
+    // ancestor (see FinanceApp.tsx) — so its background is what extends to
+    // the true screen edge, with env(safe-area-inset-bottom) applied
+    // exactly once, inside that background via padding.
+    //
+    // `bottom` is a *negative* env(safe-area-inset-bottom) rather than 0:
+    // in an installed iOS standalone PWA, `bottom: 0` on a fixed element
+    // appears to already resolve above the home-indicator safe area (iOS
+    // reserving that strip for itself the way it does for the swipe-up
+    // gesture zone), not at the true bottom edge — on top of this
+    // padding-bottom already reserving the same distance for the nav's
+    // own content to clear it, that left an empty gap between the nav and
+    // the screen's actual bottom equal to roughly the inset. Shifting the
+    // box down by that same amount closes it, so the background — not a
+    // gap — is what actually touches the true edge. Unlike padding, this
+    // shift does not need to hold content clear of anything, so it isn't
+    // needed at all where env() is 0 (Android/desktop/regular Safari
+    // tabs), and is inert there.
+    <nav className="fixed inset-x-0 bottom-[calc(-1*env(safe-area-inset-bottom))] z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2">
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}
