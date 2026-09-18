@@ -234,6 +234,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.settings.sampleDataLoaded": "Sample data loaded",
     "finance.settings.resetDone": "Demo reset",
     "finance.settings.categoriesRestored": "Default categories restored",
+    "finance.settings.build": "Build",
   },
   fa: {
     "hero.tagline": "توسعه‌دهنده full-stack که برای وب چیز می‌سازه",
@@ -451,6 +452,7 @@ const translations: Record<Locale, Dictionary> = {
     "finance.settings.sampleDataLoaded": "داده نمونه بارگذاری شد",
     "finance.settings.resetDone": "دمو بازنشانی شد",
     "finance.settings.categoriesRestored": "دسته‌بندی‌های پیش‌فرض بازیابی شدن",
+    "finance.settings.build": "بیلد",
   },
 };
 

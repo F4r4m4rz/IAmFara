@@ -207,6 +207,14 @@ export default function Settings({ showToast }: { showToast: (message: string) =
           <T k="finance.settings.demoDataHint" />
         </p>
       </section>
+
+      {/* Short (7-char) build SHA — lets you confirm the installed PWA is
+          actually running what was just deployed, without needing
+          ?debugLayout=1. __COMMIT_SHA__ is injected at build time (see
+          vite.config.ts's resolveCommitSha()). */}
+      <p className="mt-8 text-center text-[11px] text-finance-muted">
+        <T k="finance.settings.build" /> <span dir="ltr">{__COMMIT_SHA__.slice(0, 7)}</span>
+      </p>
     </div>
   );
 }

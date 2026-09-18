@@ -46,6 +46,8 @@ export interface ServiceWorkerSnapshot {
 export interface LayoutDiagnosticsSnapshot {
   timestamp: string;
   buildSha: string;
+  /** Service workers (and so the update-available banner) require a secure context — false here on an HTTP-only host (e.g. devtest) fully explains an absent/never-updating service worker without guessing. */
+  isSecureContext: boolean;
   navigatorStandalone: boolean | null;
   displayModeStandalone: boolean;
   windowInnerHeight: number;
@@ -111,6 +113,7 @@ export function gatherLayoutDiagnostics(): Omit<LayoutDiagnosticsSnapshot, "serv
   return {
     timestamp: new Date().toISOString(),
     buildSha: __COMMIT_SHA__,
+    isSecureContext: window.isSecureContext,
     navigatorStandalone: typeof navigator.standalone === "boolean" ? navigator.standalone : null,
     displayModeStandalone: window.matchMedia("(display-mode: standalone)").matches,
     windowInnerHeight: window.innerHeight,
@@ -141,6 +144,7 @@ export function formatDiagnosticsText(snapshot: LayoutDiagnosticsSnapshot): stri
   const lines: string[] = [
     `timestamp: ${snapshot.timestamp}`,
     `buildSha: ${snapshot.buildSha}`,
+    `isSecureContext: ${snapshot.isSecureContext}`,
     `navigator.standalone: ${snapshot.navigatorStandalone}`,
     `display-mode standalone: ${snapshot.displayModeStandalone}`,
     `window.innerHeight: ${snapshot.windowInnerHeight}`,

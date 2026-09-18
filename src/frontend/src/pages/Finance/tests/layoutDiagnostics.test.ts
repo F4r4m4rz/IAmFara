@@ -5,6 +5,7 @@ function makeSnapshot(overrides: Partial<LayoutDiagnosticsSnapshot> = {}): Layou
   return {
     timestamp: "2026-09-18T00:00:00.000Z",
     buildSha: "abc1234",
+    isSecureContext: true,
     navigatorStandalone: true,
     displayModeStandalone: true,
     windowInnerHeight: 844,
@@ -29,6 +30,7 @@ describe("formatDiagnosticsText", () => {
   it("includes every top-level field's value", () => {
     const text = formatDiagnosticsText(makeSnapshot());
     expect(text).toContain("buildSha: abc1234");
+    expect(text).toContain("isSecureContext: true");
     expect(text).toContain("navigator.standalone: true");
     expect(text).toContain("display-mode standalone: true");
     expect(text).toContain("window.innerHeight: 844");
@@ -58,6 +60,17 @@ describe("formatDiagnosticsText", () => {
     );
     expect(text).toContain("viewport: width=device-width");
     expect(text).toContain("apple-mobile-web-app-capable: yes");
+  });
+
+  it("surfaces an insecure context — the actual reason no service worker registers on an HTTP-only host like devtest", () => {
+    const text = formatDiagnosticsText(
+      makeSnapshot({
+        isSecureContext: false,
+        serviceWorker: { activeScriptUrl: null, waitingScriptUrl: null },
+      }),
+    );
+    expect(text).toContain("isSecureContext: false");
+    expect(text).toContain("service worker active: none");
   });
 
   it("handles a missing bottom nav element without throwing", () => {
