@@ -8,6 +8,7 @@ using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.Abstractions.Identity;
 using IAmFara.Data.SqlServer.Finance;
 using IAmFara.Data.SqlServer.Identity;
+using IAmFara.Finance;
 using IAmFara.Finance.Households;
 using IAmFara.Identity.Invitations;
 using IAmFara.Identity.Passkeys;
@@ -23,6 +24,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using static IAmFara.Web.Contracts.FinanceDtoConversions;
 
 namespace IAmFara.Web
 {
@@ -143,6 +145,7 @@ namespace IAmFara.Web
             builder.Services.AddScoped<PasskeyAuthenticationService>();
             builder.Services.AddScoped<PasskeyManagementService>();
             builder.Services.AddScoped<HouseholdFacade>();
+            builder.Services.AddScoped<FinanceFacade>();
 
             // AnalyticsVisitorHmacKey / AnalyticsReportSecret are set the same
             // way as "DbConnectionString" and "Email_ApiKey" above: flat-key
@@ -698,6 +701,334 @@ namespace IAmFara.Web
                 }
             }).RequireAntiforgeryValidation();
 
+            // ---- Finance HTTP API ----
+            // Household-scoped: every route carries {householdId}, and every
+            // handler re-derives the acting user from ICurrentUserAccessor —
+            // FinanceFacade itself re-checks HouseholdMembership before doing
+            // anything, so this is defense in depth, not the only check.
+
+            app.MapGet("/api/households/{householdId:guid}/transactions", async (
+                Guid householdId,
+                ICurrentUserAccessor currentUser,
+                FinanceFacade finance,
+                DateOnly? fromDate,
+                DateOnly? toDate,
+                Guid? categoryId,
+                string? type,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var filter = new TransactionFilter(fromDate, toDate, categoryId, type is null ? null : TypeFromString(type));
+                    var results = await finance.GetTransactionsAsync(currentUser.UserId!.Value, householdId, filter, ct);
+                    return Results.Ok(results.Select(TransactionDto.From));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or ArgumentException)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapGet("/api/households/{householdId:guid}/transactions/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    var transaction = await finance.GetTransactionAsync(currentUser.UserId!.Value, householdId, id, ct);
+                    return transaction is null ? Results.NotFound() : Results.Ok(TransactionDto.From(transaction));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapPost("/api/households/{householdId:guid}/transactions", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, CreateTransactionRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var transaction = await finance.AddTransactionAsync(
+                        currentUser.UserId!.Value, householdId, TypeFromString(request.Type), request.AmountMinor, DateFromString(request.Date),
+                        Guid.Parse(request.CategoryId), request.Note, request.FixedExpenseId is null ? null : Guid.Parse(request.FixedExpenseId), ct);
+                    return Results.Ok(TransactionDto.From(transaction));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or ArgumentException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPatch("/api/households/{householdId:guid}/transactions/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, UpdateTransactionRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var transaction = await finance.UpdateTransactionAsync(currentUser.UserId!.Value, householdId, id, t =>
+                    {
+                        if (request.Type is not null) t.Type = TypeFromString(request.Type);
+                        if (request.AmountMinor is not null) t.AmountMinor = request.AmountMinor.Value;
+                        if (request.Date is not null) t.Date = DateFromString(request.Date);
+                        if (request.CategoryId is not null) t.CategoryId = Guid.Parse(request.CategoryId);
+                        if (request.Note is not null) t.Note = request.Note;
+                    }, ct);
+                    return Results.Ok(TransactionDto.From(transaction));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException or ArgumentException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapDelete("/api/households/{householdId:guid}/transactions/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.DeleteTransactionAsync(currentUser.UserId!.Value, householdId, id, ct);
+                    return Results.Ok();
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapGet("/api/households/{householdId:guid}/categories", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    var results = await finance.GetCategoriesAsync(currentUser.UserId!.Value, householdId, ct);
+                    return Results.Ok(results.Select(CategoryDto.From));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapPost("/api/households/{householdId:guid}/categories", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, CreateCategoryRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var category = await finance.AddCategoryAsync(currentUser.UserId!.Value, householdId, TypeFromString(request.Type), request.Name ?? "", ct);
+                    return Results.Ok(CategoryDto.From(category));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or ArgumentException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPatch("/api/households/{householdId:guid}/categories/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, UpdateCategoryRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var category = await finance.UpdateCategoryAsync(currentUser.UserId!.Value, householdId, id, request.Name ?? "", ct);
+                    return Results.Ok(CategoryDto.From(category));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapDelete("/api/households/{householdId:guid}/categories/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.DeleteCategoryAsync(currentUser.UserId!.Value, householdId, id, ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or CategoryInUseException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapGet("/api/households/{householdId:guid}/fixed-expenses", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, bool includeInactive, CancellationToken ct) =>
+            {
+                try
+                {
+                    var results = await finance.GetFixedExpensesAsync(currentUser.UserId!.Value, householdId, includeInactive, ct);
+                    return Results.Ok(results.Select(FixedMonthlyExpenseDto.From));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapPost("/api/households/{householdId:guid}/fixed-expenses", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, CreateFixedExpenseRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var expense = await finance.AddFixedExpenseAsync(
+                        currentUser.UserId!.Value, householdId, request.Name, Guid.Parse(request.CategoryId), request.DefaultAmountMinor, request.DueDay, ct);
+                    return Results.Ok(FixedMonthlyExpenseDto.From(expense));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPatch("/api/households/{householdId:guid}/fixed-expenses/{id:guid}", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, UpdateFixedExpenseRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var expense = await finance.UpdateFixedExpenseAsync(currentUser.UserId!.Value, householdId, id, e =>
+                    {
+                        if (request.Name is not null) e.Name = request.Name;
+                        if (request.CategoryId is not null) e.CategoryId = Guid.Parse(request.CategoryId);
+                        if (request.DefaultAmountMinor is not null) e.DefaultAmountMinor = request.DefaultAmountMinor.Value;
+                        if (request.DueDay is not null) e.DueDay = request.DueDay;
+                    }, ct);
+                    return Results.Ok(FixedMonthlyExpenseDto.From(expense));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPost("/api/households/{householdId:guid}/fixed-expenses/{id:guid}/archive", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.SetFixedExpenseActiveAsync(currentUser.UserId!.Value, householdId, id, isActive: false, ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPost("/api/households/{householdId:guid}/fixed-expenses/{id:guid}/restore", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.SetFixedExpenseActiveAsync(currentUser.UserId!.Value, householdId, id, isActive: true, ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPost("/api/households/{householdId:guid}/fixed-expenses/{id:guid}/mark-paid", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, MarkFixedExpensePaidRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var transaction = await finance.MarkFixedExpensePaidAsync(
+                        currentUser.UserId!.Value, householdId, id, DateFromString(request.FromDate), DateFromString(request.ToDate),
+                        request.AmountMinor, DateFromString(request.Date), ct);
+                    return Results.Ok(TransactionDto.From(transaction));
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapPost("/api/households/{householdId:guid}/fixed-expenses/{id:guid}/mark-unpaid", async (
+                Guid householdId, Guid id, ICurrentUserAccessor currentUser, FinanceFacade finance, MarkFixedExpenseUnpaidRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.MarkFixedExpenseUnpaidAsync(currentUser.UserId!.Value, householdId, id, DateFromString(request.FromDate), DateFromString(request.ToDate), ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or FormatException)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapGet("/api/households/{householdId:guid}/period-overrides", async (
+                Guid householdId, string periodId, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    var results = await finance.GetPeriodOverridesAsync(currentUser.UserId!.Value, householdId, periodId, ct);
+                    return Results.Ok(results.Select(FixedExpensePeriodOverrideDto.From));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapPut("/api/households/{householdId:guid}/fixed-expenses/{fixedExpenseId:guid}/period-overrides/{periodId}", async (
+                Guid householdId, Guid fixedExpenseId, string periodId, ICurrentUserAccessor currentUser, FinanceFacade finance, SetPeriodOverrideRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.SetPeriodOverrideAsync(currentUser.UserId!.Value, householdId, fixedExpenseId, periodId, request.AmountMinor, ct);
+                    return Results.Ok();
+                }
+                catch (Exception ex) when (ex is NotHouseholdMemberException or InvalidOperationException)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapDelete("/api/households/{householdId:guid}/fixed-expenses/{fixedExpenseId:guid}/period-overrides/{periodId}", async (
+                Guid householdId, Guid fixedExpenseId, string periodId, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    await finance.ClearPeriodOverrideAsync(currentUser.UserId!.Value, householdId, fixedExpenseId, periodId, ct);
+                    return Results.Ok();
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
+            app.MapGet("/api/households/{householdId:guid}/settings", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, CancellationToken ct) =>
+            {
+                try
+                {
+                    var settings = await finance.GetSettingsAsync(currentUser.UserId!.Value, householdId, ct);
+                    return Results.Ok(FinanceSettingsDto.From(settings));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            });
+
+            app.MapPatch("/api/households/{householdId:guid}/settings", async (
+                Guid householdId, ICurrentUserAccessor currentUser, FinanceFacade finance, UpdateFinanceSettingsRequest request, CancellationToken ct) =>
+            {
+                try
+                {
+                    var current = await finance.GetSettingsAsync(currentUser.UserId!.Value, householdId, ct);
+                    var settings = await finance.UpdateSettingsAsync(
+                        currentUser.UserId!.Value, householdId, request.FinancialPeriodStartDay ?? current.FinancialPeriodStartDay, ct);
+                    return Results.Ok(FinanceSettingsDto.From(settings));
+                }
+                catch (NotHouseholdMemberException ex)
+                {
+                    return MapFinanceException(ex);
+                }
+            }).RequireAntiforgeryValidation();
+
             // The finance app (/expenses/demo) needs iOS's apple-mobile-web-app-*
             // meta tags present before React runs, which the shared index.html
             // can't carry unconditionally — see vite.config.ts's financeAppHtml
@@ -725,5 +1056,15 @@ namespace IAmFara.Web
             var providedHash = SHA256.HashData(Encoding.UTF8.GetBytes(provided));
             return CryptographicOperations.FixedTimeEquals(expectedHash, providedHash);
         }
+
+        /// <summary>Shared error mapping for the household-scoped Finance endpoints below.</summary>
+        private static IResult MapFinanceException(Exception ex) => ex switch
+        {
+            NotHouseholdMemberException => Results.Forbid(),
+            KeyNotFoundException => Results.NotFound(),
+            CategoryInUseException cie => Results.Conflict(new { error = cie.Message, categoryId = cie.CategoryId, transactionCount = cie.TransactionCount }),
+            ArgumentException or FormatException => Results.BadRequest(new { error = ex.Message }),
+            _ => throw ex,
+        };
     }
 }

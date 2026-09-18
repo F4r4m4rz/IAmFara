@@ -18,6 +18,7 @@ public class TransactionRepository(FinanceDbContext db) : ITransactionRepository
             if (filter.ToDate is { } toDate) query = query.Where(t => t.Date <= toDate);
             if (filter.CategoryId is { } categoryId) query = query.Where(t => t.CategoryId == categoryId);
             if (filter.Type is { } type) query = query.Where(t => t.Type == type);
+            if (filter.FixedExpenseId is { } fixedExpenseId) query = query.Where(t => t.FixedExpenseId == fixedExpenseId);
         }
 
         return await query.ToListAsync(cancellationToken);

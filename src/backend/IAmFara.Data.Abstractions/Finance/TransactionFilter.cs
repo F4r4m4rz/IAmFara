@@ -5,4 +5,5 @@ public record TransactionFilter(
     DateOnly? FromDate = null,
     DateOnly? ToDate = null,
     Guid? CategoryId = null,
-    TransactionType? Type = null);
+    TransactionType? Type = null,
+    Guid? FixedExpenseId = null);
