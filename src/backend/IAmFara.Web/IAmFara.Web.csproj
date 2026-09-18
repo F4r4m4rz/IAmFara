@@ -34,6 +34,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IAmFara.Identity\IAmFara.Identity.csproj" />
+    <ProjectReference Include="..\IAmFara.Finance\IAmFara.Finance.csproj" />
+    <ProjectReference Include="..\IAmFara.Data.SqlServer\IAmFara.Data.SqlServer.csproj" />
+  </ItemGroup>
+
   <!--
     Contact-form config (other than the Resend API key, see below) is
     injected into the published web.config via the SDK's own
