@@ -55,6 +55,19 @@ export function usePwaRegistration() {
   });
 
   useEffect(() => {
+    // The finance app's own shell is a `fixed inset-0` element with its own
+    // single scroll container (see FinanceApp.tsx) — html/body must not be
+    // independently scrollable while it's mounted, or an iOS rubber-band
+    // bounce on the *document* (not the app's own scroll container) can
+    // drag the whole fixed shell along with it, which is what let the
+    // header/bottom-nav drift out of position. Scoped to this component's
+    // lifetime and restored on unmount so the portfolio's own pages (which
+    // rely on normal document scrolling) are unaffected.
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
     const themeColorMeta = document.createElement("meta");
     themeColorMeta.name = "theme-color";
     themeColorMeta.content = THEME_COLOR;
@@ -79,6 +92,8 @@ export function usePwaRegistration() {
     document.head.appendChild(appleStatusBarMeta);
 
     return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
       themeColorMeta.remove();
       appleTouchIcon.remove();
       appleCapableMeta.remove();

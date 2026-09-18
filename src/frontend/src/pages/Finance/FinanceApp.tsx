@@ -61,14 +61,22 @@ export default function FinanceApp() {
       <RepositoryProvider repository={repository}>
         <div
           dir={dirFor(locale)}
-          // h-dvh (dynamic viewport height) rather than h-screen (a static
-          // 100vh) — it tracks the mobile browser's actual visible area as
-          // the on-screen keyboard/toolbar show and hide, instead of a
-          // fixed value computed once, which is one of the things that can
-          // leave the layout looking wrong after the keyboard closes.
-          className="relative flex h-dvh w-screen flex-col bg-finance-bg font-sans text-finance-text"
+          // `fixed inset-0` rather than a normal-flow `h-dvh` block: pinning
+          // directly to the viewport's edges removes this shell from
+          // document flow entirely, so its size can never drift out of sync
+          // with html/body's own height (the previous h-dvh div depended on
+          // 100dvh exactly matching the document's rendered height — any
+          // mismatch there, which iOS standalone PWAs are prone to around
+          // cold launch, let the *page* itself scroll/rubber-band
+          // independently of this shell's own scroll container below,
+          // which is what let the header/nav drift out of position). See
+          // usePwaRegistration.ts for the matching html/body overflow lock.
+          className="fixed inset-0 flex flex-col bg-finance-bg font-sans text-finance-text"
         >
-          <div className="flex-1 overflow-y-auto">
+          {/* pt-safe-area-inset-top: this shell renders edge-to-edge under
+              the status bar (index.html's viewport-fit=cover) — without
+              this, headers/badges on every page render underneath it. */}
+          <div className="flex-1 overflow-y-auto pt-[env(safe-area-inset-top)]">
             <Routes>
               <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
