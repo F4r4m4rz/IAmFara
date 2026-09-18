@@ -20,10 +20,16 @@ const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // matches vite-plugin-pwa's ow
  *   portfolio's other pages stay non-installable via this manifest despite
  *   the tag being present. Not worth fighting the plugin's HTML injection
  *   to remove a tag that's already functionally inert elsewhere.
- * - Everything below (theme-color, the service worker registration, the
- *   iOS-specific tags) has no such spec-level scoping, so all of it is
- *   added/removed here manually, only for the lifetime of this component,
- *   so none of it leaks onto the portfolio's own pages.
+ * - theme-color and the apple-touch-icon link have no such spec-level
+ *   scoping, so they're added/removed here manually, only for the
+ *   lifetime of this component, so neither leaks onto the portfolio's own
+ *   pages. The apple-mobile-web-app-capable / status-bar-style meta tags
+ *   used to be injected the same way here, but iOS needs those present in
+ *   the *initial* HTML (before this effect ever runs) to reliably honor
+ *   them when the page is added to the home screen — they're now baked
+ *   into a dedicated expenses-demo.html at build time instead (see
+ *   vite.config.ts's financeAppHtml plugin and Program.cs's route-scoped
+ *   fallback), so adding them here too would just be a duplicate.
  *
  * The service worker itself is registered via vite-plugin-pwa's
  * virtual:pwa-register/react helper rather than a raw
@@ -81,23 +87,11 @@ export function usePwaRegistration() {
     appleTouchIcon.href = APPLE_TOUCH_ICON_HREF;
     document.head.appendChild(appleTouchIcon);
 
-    const appleCapableMeta = document.createElement("meta");
-    appleCapableMeta.name = "apple-mobile-web-app-capable";
-    appleCapableMeta.content = "yes";
-    document.head.appendChild(appleCapableMeta);
-
-    const appleStatusBarMeta = document.createElement("meta");
-    appleStatusBarMeta.name = "apple-mobile-web-app-status-bar-style";
-    appleStatusBarMeta.content = "black-translucent";
-    document.head.appendChild(appleStatusBarMeta);
-
     return () => {
       document.documentElement.style.overflow = previousHtmlOverflow;
       document.body.style.overflow = previousBodyOverflow;
       themeColorMeta.remove();
       appleTouchIcon.remove();
-      appleCapableMeta.remove();
-      appleStatusBarMeta.remove();
     };
   }, []);
 

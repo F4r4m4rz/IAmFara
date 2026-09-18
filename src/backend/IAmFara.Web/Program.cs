@@ -312,6 +312,16 @@ namespace IAmFara.Web
                 }
             }).RequireRateLimiting("analytics-report");
 
+            // The finance app (/expenses/demo) needs iOS's apple-mobile-web-app-*
+            // meta tags present before React runs, which the shared index.html
+            // can't carry unconditionally — see vite.config.ts's financeAppHtml
+            // plugin, which builds expenses-demo.html (index.html plus those
+            // tags) as its own artifact, also used by the service worker's own
+            // offline navigateFallback so online/offline launches match. More
+            // specific fallback patterns take precedence over the general one
+            // below, regardless of registration order.
+            app.MapFallbackToFile("/expenses/demo", "expenses-demo.html");
+            app.MapFallbackToFile("/expenses/demo/{**path}", "expenses-demo.html");
             app.MapFallbackToFile("index.html");
 
             app.Run();

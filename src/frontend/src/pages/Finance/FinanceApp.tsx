@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useSearchParams } from "react-router-dom";
 import { dirFor, useLocale } from "../../i18n";
 import BottomNav from "./components/BottomNav";
+import DebugLayoutPanel from "./components/DebugLayoutPanel";
 import QuickAddSheet from "./components/QuickAddSheet";
 import Toast from "./components/Toast";
 import UpdateAvailableBanner from "./components/UpdateAvailableBanner";
@@ -25,6 +26,8 @@ import { usePwaRegistration } from "./usePwaRegistration";
 export default function FinanceApp() {
   const { locale, t } = useLocale();
   const { needRefresh, applyUpdate } = usePwaRegistration();
+  const [searchParams] = useSearchParams();
+  const debugLayout = searchParams.get("debugLayout") === "1";
   // Created once per mount, not at module scope — avoids holding a Dexie
   // connection open for the lifetime of the whole site when the user has
   // never visited the finance app.
@@ -83,7 +86,7 @@ export default function FinanceApp() {
               the FAB protruding above it) plus the home-indicator safe
               area, so the last card's content — including a "Mark as
               paid" button — can always scroll fully clear of the nav. */}
-          <div className="fixed inset-0 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[calc(6rem+min(34px,env(safe-area-inset-bottom)))]">
+          <div className="fixed inset-0 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[calc(6rem+env(safe-area-inset-bottom))]">
             <Routes>
               <Route index element={<Dashboard onAddTransaction={openAdd} onEditTransaction={openEdit} showToast={showToast} />} />
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
@@ -103,6 +106,7 @@ export default function FinanceApp() {
           />
           {toastMessage && <Toast message={toastMessage} />}
           {needRefresh && <UpdateAvailableBanner onRefresh={applyUpdate} />}
+          {debugLayout && <DebugLayoutPanel />}
         </div>
       </RepositoryProvider>
     </QueryClientProvider>

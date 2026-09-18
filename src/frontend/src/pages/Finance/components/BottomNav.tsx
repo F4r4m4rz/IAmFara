@@ -1,6 +1,7 @@
 import { LayoutDashboard, List, Plus, Settings as SettingsIcon, Tag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { T, useLocale } from "../../../i18n";
+import { BOTTOM_NAV_ID } from "../domain/layoutDiagnostics";
 
 const BASE = "/expenses/demo";
 
@@ -28,13 +29,16 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
     // against a real shipping PWA that hit and fixed this same bug. `bottom:
     // 0` is correct.)
     //
-    // env(safe-area-inset-bottom) is wrapped in min(34px, …): a
-    // documented WebKit quirk lets this value read inflated on an
-    // installed PWA's cold launch, before settling to the device's real
-    // inset shortly after — 34px is the actual inset on every current
-    // Face-ID iPhone in portrait, so capping there discards only the
-    // erroneous inflated reading, never the real one.
-    <nav className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+min(34px,env(safe-area-inset-bottom)))] pt-2">
+    // A subsequent attempt wrapped env(safe-area-inset-bottom) in
+    // min(34px, …), on a theory about it reading inflated on cold launch —
+    // reverted without device evidence it was ever needed (see
+    // ?debugLayout=1, components/DebugLayoutPanel.tsx, which measures the
+    // real value instead of guessing at it). id is that panel's hook into
+    // this element's live rect/computed styles.
+    <nav
+      id={BOTTOM_NAV_ID}
+      className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-around border-t border-finance-border bg-finance-surface px-2 pb-[calc(0.375rem+env(safe-area-inset-bottom))] pt-2"
+    >
       {TABS.slice(0, 2).map((tab) => (
         <NavTab key={tab.to} {...tab} />
       ))}
