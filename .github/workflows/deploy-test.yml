@@ -27,10 +27,10 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install EF Core CLI tool
-        run: dotnet tool install --global dotnet-ef --version 8.*
+        run: dotnet tool install --global dotnet-ef --version 10.*
 
       - name: Apply pending migrations
         working-directory: src/backend/IAmFara.Web
@@ -66,7 +66,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Publish and deploy backend via Web Deploy
         working-directory: src/backend/IAmFara.Web
