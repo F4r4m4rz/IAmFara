@@ -7,11 +7,15 @@ import {
   Category,
   CreateCategoryInput,
   CreateTransactionInput,
+  FinanceSettings,
   Transaction,
   TransactionFilter,
   UpdateCategoryInput,
   UpdateTransactionInput,
 } from "../domain/types";
+
+const SETTINGS_ID = "settings";
+const DEFAULT_SETTINGS: FinanceSettings = { financialPeriodStartDay: 1 };
 
 export class IndexedDbFinanceRepository implements FinanceRepository {
   private readonly seeded: Promise<void>;
@@ -31,9 +35,13 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
     await this.seeded;
     let transactions = await this.db.transactions.toArray();
 
-    if (filter?.month) {
-      const month = filter.month;
-      transactions = transactions.filter((t) => t.date.startsWith(month));
+    if (filter?.fromDate) {
+      const fromDate = filter.fromDate;
+      transactions = transactions.filter((t) => t.date >= fromDate);
+    }
+    if (filter?.toDate) {
+      const toDate = filter.toDate;
+      transactions = transactions.filter((t) => t.date <= toDate);
     }
     if (filter?.categoryId) {
       transactions = transactions.filter((t) => t.categoryId === filter.categoryId);
@@ -136,5 +144,17 @@ export class IndexedDbFinanceRepository implements FinanceRepository {
       updatedAt: now,
     }));
     await this.db.transactions.bulkAdd(transactions);
+  }
+
+  async getSettings(): Promise<FinanceSettings> {
+    const record = await this.db.settings.get(SETTINGS_ID);
+    return record ? { financialPeriodStartDay: record.financialPeriodStartDay } : DEFAULT_SETTINGS;
+  }
+
+  async updateSettings(input: Partial<FinanceSettings>): Promise<FinanceSettings> {
+    const current = await this.getSettings();
+    const updated: FinanceSettings = { ...current, ...input };
+    await this.db.settings.put({ id: SETTINGS_ID, ...updated });
+    return updated;
   }
 }

@@ -138,9 +138,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.dashboard.income": "Income",
     "finance.dashboard.expenses": "Expenses",
     "finance.dashboard.remaining": "Remaining",
-    "finance.dashboard.month.previous": "Previous month",
-    "finance.dashboard.month.next": "Next month",
-    "finance.dashboard.month.today": "This month",
+    "finance.dashboard.period.previous": "Previous period",
+    "finance.dashboard.period.next": "Next period",
 
     "finance.transactions.heading": "Transactions",
     "finance.categories.heading": "Categories",
@@ -181,6 +180,10 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.namePlaceholder": "Category name",
     "finance.categories.confirmDelete": "Delete this category? This can't be undone.",
     "finance.categories.error.inUse": "Used by {count} transaction(s) — can't be deleted.",
+
+    "finance.settings.financialPeriod.heading": "Financial period",
+    "finance.settings.financialPeriod.startsOn": "Financial month starts on",
+    "finance.settings.financialPeriod.dayOfMonth": "day of the month",
 
     "finance.settings.demoData": "Demo & Data",
     "finance.settings.loadSampleData": "Load sample data",
@@ -312,9 +315,8 @@ const translations: Record<Locale, Dictionary> = {
     "finance.dashboard.income": "درآمد",
     "finance.dashboard.expenses": "هزینه‌ها",
     "finance.dashboard.remaining": "باقی‌مانده",
-    "finance.dashboard.month.previous": "ماه قبل",
-    "finance.dashboard.month.next": "ماه بعد",
-    "finance.dashboard.month.today": "این ماه",
+    "finance.dashboard.period.previous": "دوره قبل",
+    "finance.dashboard.period.next": "دوره بعد",
 
     "finance.transactions.heading": "تراکنش‌ها",
     "finance.categories.heading": "دسته‌بندی‌ها",
@@ -355,6 +357,10 @@ const translations: Record<Locale, Dictionary> = {
     "finance.categories.namePlaceholder": "نام دسته‌بندی",
     "finance.categories.confirmDelete": "این دسته‌بندی حذف بشه؟ این کار قابل برگشت نیست.",
     "finance.categories.error.inUse": "توسط {count} تراکنش استفاده شده — قابل حذف نیست.",
+
+    "finance.settings.financialPeriod.heading": "دوره مالی",
+    "finance.settings.financialPeriod.startsOn": "ماه مالی از این روز شروع می‌شه",
+    "finance.settings.financialPeriod.dayOfMonth": "روز از ماه",
 
     "finance.settings.demoData": "دمو و داده‌ها",
     "finance.settings.loadSampleData": "بارگذاری داده نمونه",

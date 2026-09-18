@@ -2,6 +2,7 @@ import {
   Category,
   CreateCategoryInput,
   CreateTransactionInput,
+  FinanceSettings,
   Transaction,
   TransactionFilter,
   UpdateCategoryInput,
@@ -35,4 +36,8 @@ export interface FinanceRepository {
   restoreDefaultCategories(): Promise<void>;
   /** Bulk-persists generated sample transactions (see domain/sampleData.ts). */
   importTransactions(inputs: CreateTransactionInput[]): Promise<void>;
+
+  /** Currently just the financial-period start day — see domain/types.ts. Returns defaults if never set. */
+  getSettings(): Promise<FinanceSettings>;
+  updateSettings(input: Partial<FinanceSettings>): Promise<FinanceSettings>;
 }

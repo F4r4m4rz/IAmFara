@@ -6,13 +6,14 @@ import CategoryBreakdownChart from "../components/CategoryBreakdownChart";
 import DemoModeBadge from "../components/DemoModeBadge";
 import EmptyState from "../components/EmptyState";
 import IncomeExpenseBar from "../components/IncomeExpenseBar";
-import MonthSelector from "../components/MonthSelector";
+import PeriodSelector from "../components/PeriodSelector";
 import TransactionRow from "../components/TransactionRow";
-import { categoryBreakdown, monthlyTotals } from "../domain/calculations";
-import { currentMonthKey } from "../domain/dates";
+import { categoryBreakdown, periodTotals } from "../domain/calculations";
+import { currentPeriodId, periodDateRange } from "../domain/financialPeriod";
 import { formatMoney } from "../domain/money";
 import { Transaction } from "../domain/types";
 import { useCategories } from "../queries/useCategories";
+import { useSettings } from "../queries/useSettings";
 import { useTransactions } from "../queries/useTransactions";
 
 const RECENT_COUNT = 5;
@@ -25,13 +26,20 @@ export default function Dashboard({
   onEditTransaction: (transaction: Transaction) => void;
 }) {
   const { locale, t } = useLocale();
-  const [month, setMonth] = useState(currentMonthKey());
+  const { data: settings } = useSettings();
+  const startDay = settings?.financialPeriodStartDay ?? 1;
+  // null = "follow the current period" (recomputed every render, so it
+  // corrects itself once the real startDay loads); a string = the user
+  // explicitly navigated away from "now".
+  const [periodOverride, setPeriodOverride] = useState<string | null>(null);
+  const period = periodOverride ?? currentPeriodId(startDay);
+  const { fromDate, toDate } = periodDateRange(period, startDay);
 
-  const { data: transactions = [] } = useTransactions({ month });
+  const { data: transactions = [] } = useTransactions({ fromDate, toDate });
   const { data: categories = [] } = useCategories();
 
-  const totals = monthlyTotals(transactions, month);
-  const breakdown = categoryBreakdown(transactions, month);
+  const totals = periodTotals(transactions, fromDate, toDate);
+  const breakdown = categoryBreakdown(transactions, fromDate, toDate);
   const categoryById = new Map(categories.map((c) => [c.id, c]));
   const hasTransactions = transactions.length > 0;
 
@@ -45,7 +53,7 @@ export default function Dashboard({
       </div>
 
       <div className="mb-6">
-        <MonthSelector month={month} onChange={setMonth} />
+        <PeriodSelector period={period} startDay={startDay} onChange={setPeriodOverride} />
       </div>
 
       <div className="mb-4 rounded-2xl border border-finance-border bg-finance-surfaceElevated p-5">

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { dirFor, T, useLocale } from "../../../i18n";
-import MonthSelector from "../components/MonthSelector";
+import PeriodSelector from "../components/PeriodSelector";
 import TransactionRow from "../components/TransactionRow";
-import { currentMonthKey } from "../domain/dates";
+import { currentPeriodId, periodDateRange } from "../domain/financialPeriod";
 import { Transaction, TransactionType } from "../domain/types";
 import { useCategories } from "../queries/useCategories";
+import { useSettings } from "../queries/useSettings";
 import { useTransactions } from "../queries/useTransactions";
 
 const TYPE_FILTERS = ["all", "expense", "income"] as const;
@@ -16,13 +17,18 @@ export default function TransactionHistory({
   onEditTransaction: (transaction: Transaction) => void;
 }) {
   const { locale, t } = useLocale();
-  const [month, setMonth] = useState(currentMonthKey());
+  const { data: settings } = useSettings();
+  const startDay = settings?.financialPeriodStartDay ?? 1;
+  const [periodOverride, setPeriodOverride] = useState<string | null>(null);
+  const period = periodOverride ?? currentPeriodId(startDay);
+  const { fromDate, toDate } = periodDateRange(period, startDay);
   const [type, setType] = useState<TypeFilter>("all");
   const [categoryId, setCategoryId] = useState<string>("all");
 
   const { data: categories = [] } = useCategories();
   const { data: transactions = [] } = useTransactions({
-    month,
+    fromDate,
+    toDate,
     ...(type !== "all" && { type: type as TransactionType }),
     ...(categoryId !== "all" && { categoryId }),
   });
@@ -37,7 +43,7 @@ export default function TransactionHistory({
       </h1>
 
       <div className="mb-3">
-        <MonthSelector month={month} onChange={setMonth} />
+        <PeriodSelector period={period} startDay={startDay} onChange={setPeriodOverride} />
       </div>
 
       <div className="mb-4 flex gap-2">

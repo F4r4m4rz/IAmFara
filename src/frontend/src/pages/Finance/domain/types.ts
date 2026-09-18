@@ -26,10 +26,17 @@ export interface Category {
 }
 
 export interface TransactionFilter {
-  /** "YYYY-MM" */
-  month?: string;
+  /** "YYYY-MM-DD", inclusive. Period boundaries are computed by domain/financialPeriod.ts — this filter itself is period-agnostic. */
+  fromDate?: string;
+  /** "YYYY-MM-DD", inclusive. */
+  toDate?: string;
   categoryId?: string;
   type?: TransactionType;
+}
+
+export interface FinanceSettings {
+  /** Day of month (1-31) a financial period starts on — see domain/financialPeriod.ts. Defaults to 1 (plain calendar months). */
+  financialPeriodStartDay: number;
 }
 
 export type CreateTransactionInput = Omit<Transaction, "id" | "createdAt" | "updatedAt">;

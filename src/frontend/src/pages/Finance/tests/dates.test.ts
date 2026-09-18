@@ -1,15 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { addMonths, formatMonthLabel, monthKey, todayLocalDate } from "../domain/dates";
+import { addMonths, formatMonthLabel, todayLocalDate } from "../domain/dates";
 
 describe("todayLocalDate", () => {
   it("returns a YYYY-MM-DD string", () => {
     expect(todayLocalDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  });
-});
-
-describe("monthKey", () => {
-  it("extracts the YYYY-MM prefix from a date", () => {
-    expect(monthKey("2026-09-17")).toBe("2026-09");
   });
 });
 

@@ -18,16 +18,6 @@ export function todayLocalDate(): string {
   return `${year}-${month}-${day}`;
 }
 
-/** The "YYYY-MM" month a "YYYY-MM-DD" date belongs to. */
-export function monthKey(date: string): string {
-  return date.slice(0, 7);
-}
-
-/** The current month as "YYYY-MM". */
-export function currentMonthKey(): string {
-  return monthKey(todayLocalDate());
-}
-
 /** Shifts a "YYYY-MM" month key by `delta` months (negative goes back). */
 export function addMonths(month: string, delta: number): string {
   const [year, monthNum] = month.split("-").map(Number);

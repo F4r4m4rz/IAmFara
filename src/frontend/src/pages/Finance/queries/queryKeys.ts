@@ -12,4 +12,5 @@ export const financeKeys = {
   allTransactions: () => ["finance", "transactions"] as const,
   transactions: (filter?: TransactionFilter) => ["finance", "transactions", filter ?? {}] as const,
   categories: () => ["finance", "categories"] as const,
+  settings: () => ["finance", "settings"] as const,
 };

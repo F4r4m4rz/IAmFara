@@ -125,15 +125,39 @@ describe("IndexedDbFinanceRepository — transactions", () => {
     expect(await repo.getTransaction(created.id)).toBeNull();
   });
 
-  it("filters transactions by month, category, and type", async () => {
+  it("filters transactions by date range, category, and type", async () => {
     const repo = createRepository();
     await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-09-01", categoryId: "groceries" });
     await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-10-01", categoryId: "groceries" });
     await repo.addTransaction({ type: "income", amountMinor: 500000, date: "2026-09-05", categoryId: "salary" });
 
-    expect(await repo.getTransactions({ month: "2026-09" })).toHaveLength(2);
+    expect(await repo.getTransactions({ fromDate: "2026-09-01", toDate: "2026-09-30" })).toHaveLength(2);
     expect(await repo.getTransactions({ categoryId: "salary" })).toHaveLength(1);
     expect(await repo.getTransactions({ type: "income" })).toHaveLength(1);
+  });
+
+  it("filters transactions by a date range spanning two calendar months", async () => {
+    const repo = createRepository();
+    await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-09-10", categoryId: "groceries" });
+    await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-09-11", categoryId: "groceries" });
+    await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-10-10", categoryId: "groceries" });
+    await repo.addTransaction({ type: "expense", amountMinor: 1000, date: "2026-10-11", categoryId: "groceries" });
+
+    expect(await repo.getTransactions({ fromDate: "2026-09-11", toDate: "2026-10-10" })).toHaveLength(2);
+  });
+});
+
+describe("IndexedDbFinanceRepository — settings", () => {
+  it("returns a default financialPeriodStartDay of 1 when never set", async () => {
+    const repo = createRepository();
+    expect(await repo.getSettings()).toEqual({ financialPeriodStartDay: 1 });
+  });
+
+  it("persists an updated setting and returns it from subsequent reads", async () => {
+    const repo = createRepository();
+    const updated = await repo.updateSettings({ financialPeriodStartDay: 11 });
+    expect(updated).toEqual({ financialPeriodStartDay: 11 });
+    expect(await repo.getSettings()).toEqual({ financialPeriodStartDay: 11 });
   });
 });
 
