@@ -238,21 +238,24 @@ public class FinancePersistenceTests : IDisposable
     }
 
     [Fact]
-    public async Task Transaction_FixedExpenseId_SetsNullWhenTheFixedExpenseIsDeleted()
+    public async Task FixedMonthlyExpense_Deletion_IsRestrictedWhileReferencedByATransaction()
     {
+        // Restrict, not the originally-intended SetNull — SQL Server refuses a
+        // schema where Households reaches Transactions via two different
+        // cascading paths (directly, and via FixedMonthlyExpenses), which
+        // SQLite has no equivalent check for and would never have caught. Has
+        // no practical difference today since FixedMonthlyExpenses rows are
+        // never hard-deleted by the app anyway (only archived via IsActive).
         var household = NewHousehold();
         await _households.AddAsync(household);
         var category = await AddCategory(household.Id);
         var expense = await AddFixedExpense(household.Id, category.Id);
-        var transaction = await AddTransaction(household.Id, category.Id, expense.Id);
+        await AddTransaction(household.Id, category.Id, expense.Id);
         _db.ChangeTracker.Clear();
 
         _db.FixedMonthlyExpenses.Remove((await _fixedExpenses.GetByIdAsync(household.Id, expense.Id))!);
-        await _db.SaveChangesAsync();
-        _db.ChangeTracker.Clear();
 
-        var reloaded = await _transactions.GetByIdAsync(household.Id, transaction.Id);
-        Assert.Null(reloaded!.FixedExpenseId);
+        await Assert.ThrowsAsync<DbUpdateException>(() => _db.SaveChangesAsync());
     }
 
     [Fact]

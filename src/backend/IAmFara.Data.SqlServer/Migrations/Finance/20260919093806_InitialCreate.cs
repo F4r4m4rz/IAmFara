@@ -210,7 +210,7 @@ namespace IAmFara.Data.SqlServer.Migrations.Finance
                         principalSchema: "finance",
                         principalTable: "FixedMonthlyExpenses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Transactions_Households_HouseholdId",
                         column: x => x.HouseholdId,

@@ -214,6 +214,19 @@ namespace IAmFara.Web
                             QueueLimit = 0,
                         }));
 
+                // Blunts brute-force/enumeration attempts against invitation
+                // tokens — per the corrections doc's §16, the same reuse of
+                // existing rate-limit infrastructure as passkey ceremonies.
+                options.AddPolicy("invitation", httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 20,
+                            Window = TimeSpan.FromMinutes(10),
+                            QueueLimit = 0,
+                        }));
+
                 // The report endpoint is already protected by a bearer secret; this
                 // just blunts brute-force guessing attempts against it.
                 options.AddPolicy("analytics-report", httpContext =>
@@ -689,7 +702,7 @@ namespace IAmFara.Web
                     if (ex is NotHouseholdOwnerException) return Results.Forbid();
                     return Results.BadRequest(new { error = ex.Message });
                 }
-            }).RequireAntiforgeryValidation();
+            }).RequireRateLimiting("invitation").RequireAntiforgeryValidation();
 
             // An existing, already-signed-in user redeeming a household
             // invitation they received.
@@ -708,7 +721,7 @@ namespace IAmFara.Web
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
-            }).RequireAntiforgeryValidation();
+            }).RequireRateLimiting("invitation").RequireAntiforgeryValidation();
 
             app.MapDelete("/api/households/{householdId:guid}/members/{membershipId:guid}", async (
                 Guid householdId,

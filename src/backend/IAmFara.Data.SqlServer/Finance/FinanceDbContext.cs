@@ -91,12 +91,21 @@ public class FinanceDbContext(DbContextOptions<FinanceDbContext> options) : DbCo
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // A transaction shouldn't be deleted just because its originating fixed
-            // expense was removed — the link is informational ("mark as paid"), not load-bearing.
+            // SetNull (the originally intended behavior — a transaction shouldn't
+            // be deleted just because its fixed expense was removed) is not
+            // possible here: SQL Server refuses a schema where Households reaches
+            // Transactions via two different cascading paths at once (directly,
+            // Cascade, and via FixedMonthlyExpenses, which is also Cascade from
+            // Households) — "may cause cycles or multiple cascade paths",
+            // verified against a real SQL Server, not just SQLite, which enforces
+            // no such restriction and would never have caught this. Restrict has
+            // no practical difference today: FixedMonthlyExpenses rows are never
+            // hard-deleted by the app (only archived via IsActive), so this path
+            // is unreachable in current usage regardless.
             entity.HasOne<FixedMonthlyExpense>()
                 .WithMany()
                 .HasForeignKey(t => t.FixedExpenseId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<FixedMonthlyExpense>(entity =>

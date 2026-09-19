@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IAmFara.Data.SqlServer.Migrations.Finance
 {
     [DbContext(typeof(FinanceDbContext))]
-    [Migration("20260918203437_InitialCreate")]
+    [Migration("20260919093806_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -342,7 +342,7 @@ namespace IAmFara.Data.SqlServer.Migrations.Finance
                     b.HasOne("IAmFara.Data.Abstractions.Finance.FixedMonthlyExpense", null)
                         .WithMany()
                         .HasForeignKey("FixedExpenseId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("IAmFara.Data.Abstractions.Finance.Household", null)
                         .WithMany()

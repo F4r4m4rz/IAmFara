@@ -339,7 +339,7 @@ namespace IAmFara.Data.SqlServer.Migrations.Finance
                     b.HasOne("IAmFara.Data.Abstractions.Finance.FixedMonthlyExpense", null)
                         .WithMany()
                         .HasForeignKey("FixedExpenseId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("IAmFara.Data.Abstractions.Finance.Household", null)
                         .WithMany()
