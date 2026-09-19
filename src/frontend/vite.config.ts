@@ -130,6 +130,22 @@ export default defineConfig({
     outDir: resolve(__dirname, '../backend/IAmFara.Web/wwwroot'),
     emptyOutDir: true,
   },
+  server: {
+    // Dev-only: production serves the built SPA and the API from the same
+    // ASP.NET Core origin (see build.outDir above), so this has no bearing
+    // on prod. Lets `npm run dev` talk to a locally running backend as if
+    // they were same-origin. Targets the "https" launch profile (7142), not
+    // "http" (5020) — the auth/antiforgery cookies are Secure-only, so they
+    // simply aren't set at all over a plain-HTTP backend. secure: false
+    // accepts the backend's self-signed local dev cert.
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7142',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],

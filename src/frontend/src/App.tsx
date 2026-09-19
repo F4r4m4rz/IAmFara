@@ -4,6 +4,7 @@ import Layout from "./components/layout/Layout";
 import Blogs from "./pages/Blogs/Blogs";
 import Contact from "./pages/Contact/Contact";
 import FinanceApp from "./pages/Finance/FinanceApp";
+import RealFinanceApp from "./pages/Finance/RealFinanceApp";
 import Home from "./pages/Home/Home";
 import Projects from "./pages/Projects/Projects";
 import SlidingPuzzle from "./pages/SlidingPuzzle/SlidingPuzzle";
@@ -26,6 +27,7 @@ function App() {
         <Route path="/sliding-puzzle" element={<SlidingPuzzle />} />
       </Route>
       <Route path="/expenses/demo/*" element={<FinanceApp />} />
+      <Route path="/expenses/app/*" element={<RealFinanceApp />} />
     </Routes>
   );
 }

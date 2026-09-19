@@ -3,18 +3,26 @@ import { NavLink } from "react-router-dom";
 import { T, useLocale } from "../../../i18n";
 import { BOTTOM_NAV_ID } from "../domain/layoutDiagnostics";
 
-const BASE = "/expenses/demo";
+interface NavTabDef {
+  to: string;
+  end: boolean;
+  icon: typeof LayoutDashboard;
+  labelKey: string;
+}
 
-const TABS = [
-  { to: BASE, end: true, icon: LayoutDashboard, labelKey: "finance.nav.dashboard" },
-  { to: `${BASE}/transactions`, end: false, icon: List, labelKey: "finance.nav.transactions" },
-  // The "+" tab sits visually between these two — see the central button below.
-  { to: `${BASE}/categories`, end: false, icon: Tag, labelKey: "finance.nav.categories" },
-  { to: `${BASE}/settings`, end: false, icon: SettingsIcon, labelKey: "finance.nav.settings" },
-];
+function tabsFor(basePath: string): NavTabDef[] {
+  return [
+    { to: basePath, end: true, icon: LayoutDashboard, labelKey: "finance.nav.dashboard" },
+    { to: `${basePath}/transactions`, end: false, icon: List, labelKey: "finance.nav.transactions" },
+    // The "+" tab sits visually between these two — see the central button below.
+    { to: `${basePath}/categories`, end: false, icon: Tag, labelKey: "finance.nav.categories" },
+    { to: `${basePath}/settings`, end: false, icon: SettingsIcon, labelKey: "finance.nav.settings" },
+  ];
+}
 
-export default function BottomNav({ onAdd }: { onAdd: () => void }) {
+export default function BottomNav({ onAdd, basePath = "/expenses/demo" }: { onAdd: () => void; basePath?: string }) {
   const { t } = useLocale();
+  const TABS = tabsFor(basePath);
 
   return (
     // Its own `fixed; bottom: 0` element — not a flex child inside another
@@ -59,7 +67,7 @@ export default function BottomNav({ onAdd }: { onAdd: () => void }) {
   );
 }
 
-function NavTab({ to, end, icon: Icon, labelKey }: (typeof TABS)[number]) {
+function NavTab({ to, end, icon: Icon, labelKey }: NavTabDef) {
   return (
     <NavLink
       to={to}
