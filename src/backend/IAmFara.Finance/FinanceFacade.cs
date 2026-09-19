@@ -35,6 +35,8 @@ public class FinanceFacade(
     public async Task<Transaction> AddTransactionAsync(Guid currentUserId, Guid householdId, TransactionType type, long amountMinor, DateOnly date, Guid categoryId, string? note, Guid? fixedExpenseId, CancellationToken cancellationToken = default)
     {
         await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
+        await EnsureCategoryInHouseholdAsync(householdId, categoryId, cancellationToken);
+        if (fixedExpenseId is { } fxId) await EnsureFixedExpenseInHouseholdAsync(householdId, fxId, cancellationToken);
 
         var transaction = new Transaction
         {
@@ -54,13 +56,29 @@ public class FinanceFacade(
         return transaction;
     }
 
-    public async Task<Transaction> UpdateTransactionAsync(Guid currentUserId, Guid householdId, Guid id, Action<Transaction> apply, CancellationToken cancellationToken = default)
+    public async Task<Transaction> UpdateTransactionAsync(
+        Guid currentUserId, Guid householdId, Guid id,
+        TransactionType? type, long? amountMinor, DateOnly? date, Guid? categoryId, string? note,
+        CancellationToken cancellationToken = default)
     {
         await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
         var transaction = await transactions.GetByIdAsync(householdId, id, cancellationToken)
             ?? throw new KeyNotFoundException();
 
-        apply(transaction);
+        // A caller who is a genuine member of householdId could otherwise
+        // point a transaction at a categoryId belonging to a household they
+        // have no access to — the database FK only checks the category
+        // exists somewhere, not that it belongs to this household.
+        if (categoryId is { } newCategoryId)
+        {
+            await EnsureCategoryInHouseholdAsync(householdId, newCategoryId, cancellationToken);
+            transaction.CategoryId = newCategoryId;
+        }
+        if (type is { } newType) transaction.Type = newType;
+        if (amountMinor is { } newAmountMinor) transaction.AmountMinor = newAmountMinor;
+        if (date is { } newDate) transaction.Date = newDate;
+        if (note is not null) transaction.Note = note;
+
         transaction.UpdatedAt = DateTimeOffset.UtcNow;
         await transactions.UpdateAsync(transaction, cancellationToken);
         return transaction;
@@ -132,6 +150,7 @@ public class FinanceFacade(
     public async Task<FixedMonthlyExpense> AddFixedExpenseAsync(Guid currentUserId, Guid householdId, string name, Guid categoryId, long defaultAmountMinor, int? dueDay, CancellationToken cancellationToken = default)
     {
         await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
+        await EnsureCategoryInHouseholdAsync(householdId, categoryId, cancellationToken);
 
         var expense = new FixedMonthlyExpense
         {
@@ -149,21 +168,40 @@ public class FinanceFacade(
         return expense;
     }
 
-    public async Task<FixedMonthlyExpense> UpdateFixedExpenseAsync(Guid currentUserId, Guid householdId, Guid id, Action<FixedMonthlyExpense> apply, CancellationToken cancellationToken = default)
+    public async Task<FixedMonthlyExpense> UpdateFixedExpenseAsync(
+        Guid currentUserId, Guid householdId, Guid id,
+        string? name, Guid? categoryId, long? defaultAmountMinor, int? dueDay,
+        CancellationToken cancellationToken = default)
     {
         await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
         var expense = await fixedExpenses.GetByIdAsync(householdId, id, cancellationToken)
             ?? throw new KeyNotFoundException();
 
-        apply(expense);
+        if (categoryId is { } newCategoryId)
+        {
+            await EnsureCategoryInHouseholdAsync(householdId, newCategoryId, cancellationToken);
+            expense.CategoryId = newCategoryId;
+        }
+        if (name is not null) expense.Name = name;
+        if (defaultAmountMinor is { } newDefaultAmountMinor) expense.DefaultAmountMinor = newDefaultAmountMinor;
+        if (dueDay is not null) expense.DueDay = dueDay;
+
         expense.UpdatedAt = DateTimeOffset.UtcNow;
         await fixedExpenses.UpdateAsync(expense, cancellationToken);
         return expense;
     }
 
     /// <summary>Archived (false) expenses are excluded from active listings by default but kept forever — never hard-deleted.</summary>
-    public Task SetFixedExpenseActiveAsync(Guid currentUserId, Guid householdId, Guid id, bool isActive, CancellationToken cancellationToken = default) =>
-        UpdateFixedExpenseAsync(currentUserId, householdId, id, e => e.IsActive = isActive, cancellationToken);
+    public async Task SetFixedExpenseActiveAsync(Guid currentUserId, Guid householdId, Guid id, bool isActive, CancellationToken cancellationToken = default)
+    {
+        await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
+        var expense = await fixedExpenses.GetByIdAsync(householdId, id, cancellationToken)
+            ?? throw new KeyNotFoundException();
+
+        expense.IsActive = isActive;
+        expense.UpdatedAt = DateTimeOffset.UtcNow;
+        await fixedExpenses.UpdateAsync(expense, cancellationToken);
+    }
 
     // ---- Fixed expense period overrides ----
 
@@ -252,6 +290,29 @@ public class FinanceFacade(
         if (membership is null)
         {
             throw new NotHouseholdMemberException();
+        }
+    }
+
+    /// <summary>
+    /// Guards against a caller referencing another household's category — the
+    /// database foreign key only checks the category exists somewhere, not
+    /// that it belongs to the household the caller is actually a member of.
+    /// </summary>
+    private async Task EnsureCategoryInHouseholdAsync(Guid householdId, Guid categoryId, CancellationToken cancellationToken)
+    {
+        var category = await categories.GetByIdAsync(householdId, categoryId, cancellationToken);
+        if (category is null)
+        {
+            throw new KeyNotFoundException($"Category {categoryId} does not belong to this household.");
+        }
+    }
+
+    private async Task EnsureFixedExpenseInHouseholdAsync(Guid householdId, Guid fixedExpenseId, CancellationToken cancellationToken)
+    {
+        var expense = await fixedExpenses.GetByIdAsync(householdId, fixedExpenseId, cancellationToken);
+        if (expense is null)
+        {
+            throw new KeyNotFoundException($"Fixed expense {fixedExpenseId} does not belong to this household.");
         }
     }
 }

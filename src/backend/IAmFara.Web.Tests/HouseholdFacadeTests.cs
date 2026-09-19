@@ -254,4 +254,25 @@ public class HouseholdFacadeTests : IDisposable
         var reloaded = await _invitations.GetByTokenHashAsync(linkedInvitation.TokenHash);
         Assert.NotNull(reloaded!.UsedAt);
     }
+
+    [Fact]
+    public async Task TryJoinFromLinkedIdentityInvitationAsync_WithAnExpiredLinkedInvitation_ReturnsNull()
+    {
+        // This method has no separate expiry check of its own before calling
+        // TryConsumeAsync (unlike ConsumeInvitationAsync) — this proves the
+        // atomic consume condition itself is what rejects an expired
+        // invitation, which is the only thing protecting this specific path.
+        var owner = Guid.NewGuid();
+        var household = await _facade.CreateHouseholdAsync(owner, "Test");
+        var identityInvitationId = Guid.NewGuid();
+        var (linkedInvitation, _) = await _facade.CreateInvitationAsync(owner, household.Id, HouseholdRole.Member, identityInvitationId);
+        await _db.HouseholdInvitations
+            .Where(i => i.Id == linkedInvitation.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(i => i.ExpiresAt, DateTimeOffset.UtcNow.AddDays(-1)));
+        _db.ChangeTracker.Clear();
+
+        var membership = await _facade.TryJoinFromLinkedIdentityInvitationAsync(Guid.NewGuid(), identityInvitationId);
+
+        Assert.Null(membership);
+    }
 }

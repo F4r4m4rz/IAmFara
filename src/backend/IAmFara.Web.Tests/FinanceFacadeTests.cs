@@ -71,6 +71,80 @@ public class FinanceFacadeTests : IDisposable
     }
 
     [Fact]
+    public async Task AddTransactionAsync_WithACategoryFromAnotherHousehold_ThrowsKeyNotFound()
+    {
+        var userId = Guid.NewGuid();
+        var householdId = await SeedHouseholdWithMemberAsync(userId);
+        var otherOwner = Guid.NewGuid();
+        var otherHouseholdId = await SeedHouseholdWithMemberAsync(otherOwner);
+        var foreignCategory = await _finance.AddCategoryAsync(otherOwner, otherHouseholdId, TransactionType.Expense, "Not yours");
+
+        // A genuine member of householdId must not be able to point a new
+        // transaction at a category belonging to a household they aren't a
+        // member of — the database FK alone doesn't enforce this.
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _finance.AddTransactionAsync(userId, householdId, TransactionType.Expense, 100, new DateOnly(2026, 1, 1), foreignCategory.Id, null, null));
+    }
+
+    [Fact]
+    public async Task AddTransactionAsync_WithAFixedExpenseFromAnotherHousehold_ThrowsKeyNotFound()
+    {
+        var userId = Guid.NewGuid();
+        var householdId = await SeedHouseholdWithMemberAsync(userId);
+        var otherOwner = Guid.NewGuid();
+        var otherHouseholdId = await SeedHouseholdWithMemberAsync(otherOwner);
+        var foreignCategory = await _finance.AddCategoryAsync(otherOwner, otherHouseholdId, TransactionType.Expense, "Rent");
+        var foreignExpense = await _finance.AddFixedExpenseAsync(otherOwner, otherHouseholdId, "Rent", foreignCategory.Id, 100, null);
+        var ownCategory = await _finance.AddCategoryAsync(userId, householdId, TransactionType.Expense, "Rent");
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _finance.AddTransactionAsync(userId, householdId, TransactionType.Expense, 100, new DateOnly(2026, 1, 1), ownCategory.Id, null, foreignExpense.Id));
+    }
+
+    [Fact]
+    public async Task UpdateTransactionAsync_ToACategoryFromAnotherHousehold_ThrowsKeyNotFound()
+    {
+        var userId = Guid.NewGuid();
+        var householdId = await SeedHouseholdWithMemberAsync(userId);
+        var ownCategory = await _finance.AddCategoryAsync(userId, householdId, TransactionType.Expense, "Groceries");
+        var transaction = await _finance.AddTransactionAsync(userId, householdId, TransactionType.Expense, 100, new DateOnly(2026, 1, 1), ownCategory.Id, null, null);
+        var otherOwner = Guid.NewGuid();
+        var otherHouseholdId = await SeedHouseholdWithMemberAsync(otherOwner);
+        var foreignCategory = await _finance.AddCategoryAsync(otherOwner, otherHouseholdId, TransactionType.Expense, "Not yours");
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _finance.UpdateTransactionAsync(userId, householdId, transaction.Id, null, null, null, foreignCategory.Id, null));
+    }
+
+    [Fact]
+    public async Task AddFixedExpenseAsync_WithACategoryFromAnotherHousehold_ThrowsKeyNotFound()
+    {
+        var userId = Guid.NewGuid();
+        var householdId = await SeedHouseholdWithMemberAsync(userId);
+        var otherOwner = Guid.NewGuid();
+        var otherHouseholdId = await SeedHouseholdWithMemberAsync(otherOwner);
+        var foreignCategory = await _finance.AddCategoryAsync(otherOwner, otherHouseholdId, TransactionType.Expense, "Not yours");
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _finance.AddFixedExpenseAsync(userId, householdId, "Rent", foreignCategory.Id, 100, null));
+    }
+
+    [Fact]
+    public async Task UpdateFixedExpenseAsync_ToACategoryFromAnotherHousehold_ThrowsKeyNotFound()
+    {
+        var userId = Guid.NewGuid();
+        var householdId = await SeedHouseholdWithMemberAsync(userId);
+        var ownCategory = await _finance.AddCategoryAsync(userId, householdId, TransactionType.Expense, "Rent");
+        var expense = await _finance.AddFixedExpenseAsync(userId, householdId, "Rent", ownCategory.Id, 100, null);
+        var otherOwner = Guid.NewGuid();
+        var otherHouseholdId = await SeedHouseholdWithMemberAsync(otherOwner);
+        var foreignCategory = await _finance.AddCategoryAsync(otherOwner, otherHouseholdId, TransactionType.Expense, "Not yours");
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _finance.UpdateFixedExpenseAsync(userId, householdId, expense.Id, null, foreignCategory.Id, null, null));
+    }
+
+    [Fact]
     public async Task DeleteCategoryAsync_WhenReferencedByATransaction_ThrowsCategoryInUseWithTheCorrectCount()
     {
         var userId = Guid.NewGuid();

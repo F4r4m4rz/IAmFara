@@ -812,14 +812,14 @@ namespace IAmFara.Web
             {
                 try
                 {
-                    var transaction = await finance.UpdateTransactionAsync(currentUser.UserId!.Value, householdId, id, t =>
-                    {
-                        if (request.Type is not null) t.Type = TypeFromString(request.Type);
-                        if (request.AmountMinor is not null) t.AmountMinor = request.AmountMinor.Value;
-                        if (request.Date is not null) t.Date = DateFromString(request.Date);
-                        if (request.CategoryId is not null) t.CategoryId = Guid.Parse(request.CategoryId);
-                        if (request.Note is not null) t.Note = request.Note;
-                    }, ct);
+                    var transaction = await finance.UpdateTransactionAsync(
+                        currentUser.UserId!.Value, householdId, id,
+                        request.Type is null ? null : TypeFromString(request.Type),
+                        request.AmountMinor,
+                        request.Date is null ? null : DateFromString(request.Date),
+                        request.CategoryId is null ? null : Guid.Parse(request.CategoryId),
+                        request.Note,
+                        ct);
                     return Results.Ok(TransactionDto.From(transaction));
                 }
                 catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException or ArgumentException or FormatException)
@@ -932,13 +932,13 @@ namespace IAmFara.Web
             {
                 try
                 {
-                    var expense = await finance.UpdateFixedExpenseAsync(currentUser.UserId!.Value, householdId, id, e =>
-                    {
-                        if (request.Name is not null) e.Name = request.Name;
-                        if (request.CategoryId is not null) e.CategoryId = Guid.Parse(request.CategoryId);
-                        if (request.DefaultAmountMinor is not null) e.DefaultAmountMinor = request.DefaultAmountMinor.Value;
-                        if (request.DueDay is not null) e.DueDay = request.DueDay;
-                    }, ct);
+                    var expense = await finance.UpdateFixedExpenseAsync(
+                        currentUser.UserId!.Value, householdId, id,
+                        request.Name,
+                        request.CategoryId is null ? null : Guid.Parse(request.CategoryId),
+                        request.DefaultAmountMinor,
+                        request.DueDay,
+                        ct);
                     return Results.Ok(FixedMonthlyExpenseDto.From(expense));
                 }
                 catch (Exception ex) when (ex is NotHouseholdMemberException or KeyNotFoundException or FormatException)

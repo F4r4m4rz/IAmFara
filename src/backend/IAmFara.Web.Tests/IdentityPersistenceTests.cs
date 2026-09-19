@@ -203,6 +203,28 @@ public class IdentityPersistenceTests : IDisposable
     }
 
     [Fact]
+    public async Task Invitation_TryConsumeAsync_AfterExpiry_ReturnsFalseEvenThoughStillUnused()
+    {
+        // The atomic consume condition must include expiry, not just UsedAt
+        // == null — otherwise a registration ceremony that runs long enough
+        // (up to the challenge TTL) could consume an invitation that expired
+        // in the meantime, since a separate, earlier expiry check (at
+        // ceremony begin) can't close that window on its own.
+        var invitation = new Invitation
+        {
+            Id = Guid.NewGuid(),
+            TokenHash = [4, 5, 6],
+            ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(-1),
+            CreatedAt = DateTimeOffset.UtcNow.AddMinutes(-10),
+        };
+        await _invitations.AddAsync(invitation);
+
+        var result = await _invitations.TryConsumeAsync(invitation.Id, DateTimeOffset.UtcNow);
+
+        Assert.False(result);
+    }
+
+    [Fact]
     public async Task PasskeyCredential_UserDeletion_IsRestrictedWhileCredentialExists()
     {
         var user = NewUser();
