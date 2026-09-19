@@ -71,7 +71,7 @@ public class HouseholdEndpointTests : IClassFixture<AuthenticationTestFactory>
     {
         var client = CreateClient();
 
-        var response = await client.PostAsJsonAsync($"/api/households/{Guid.NewGuid()}/invitations", new { email = "x@example.com", role = 0 });
+        var response = await client.PostAsJsonAsync($"/api/households/{Guid.NewGuid()}/invitations", new { email = "x@example.com", role = "member" });
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -109,7 +109,7 @@ public class HouseholdEndpointTests : IClassFixture<AuthenticationTestFactory>
 
         // This user has no membership at all in the given household.
         var response = await SendAuthenticatedAsync(client, userId, HttpMethod.Post,
-            $"/api/households/{Guid.NewGuid()}/invitations", new { email = "invitee@example.com", role = 0 });
+            $"/api/households/{Guid.NewGuid()}/invitations", new { email = "invitee@example.com", role = "member" });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }

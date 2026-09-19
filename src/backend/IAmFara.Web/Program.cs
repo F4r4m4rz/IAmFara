@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static IAmFara.Web.Contracts.FinanceDtoConversions;
+using static IAmFara.Web.Contracts.HouseholdRoleConversions;
 
 namespace IAmFara.Web
 {
@@ -617,7 +618,7 @@ namespace IAmFara.Web
             app.MapGet("/api/households/mine", async (ICurrentUserAccessor currentUser, HouseholdFacade householdFacade, CancellationToken ct) =>
             {
                 var results = await householdFacade.GetMyHouseholdsAsync(currentUser.UserId!.Value, ct);
-                return Results.Ok(results.Select(r => new MyHouseholdDto(r.Household.Id, r.Household.Name, r.Role)));
+                return Results.Ok(results.Select(r => MyHouseholdDto.From(r.Household, r.Role)));
             });
 
             // Combines Finance's membership rows with each member's Identity
@@ -637,7 +638,7 @@ namespace IAmFara.Web
                     foreach (var member in members)
                     {
                         var user = await userRepository.GetByIdAsync(member.UserId, ct);
-                        if (user is not null) result.Add(new HouseholdMemberDto(member.UserId, user.DisplayName, user.Email, member.Role));
+                        if (user is not null) result.Add(HouseholdMemberDto.From(member.UserId, user.DisplayName, user.Email, member.Role));
                     }
                     return Results.Ok(result);
                 }
@@ -675,7 +676,7 @@ namespace IAmFara.Web
                     }
 
                     var (_, householdRawToken) = await householdFacade.CreateInvitationAsync(
-                        currentUser.UserId!.Value, householdId, request.Role, identityInvitationId, ct);
+                        currentUser.UserId!.Value, householdId, RoleFromString(request.Role), identityInvitationId, ct);
 
                     // The recipient only ever needs one link: the identity token
                     // (which starts account creation and auto-joins this household
@@ -683,9 +684,10 @@ namespace IAmFara.Web
                     // directly for an existing one.
                     return Results.Ok(new { token = identityRawToken ?? householdRawToken });
                 }
-                catch (NotHouseholdOwnerException)
+                catch (Exception ex) when (ex is NotHouseholdOwnerException or ArgumentException)
                 {
-                    return Results.Forbid();
+                    if (ex is NotHouseholdOwnerException) return Results.Forbid();
+                    return Results.BadRequest(new { error = ex.Message });
                 }
             }).RequireAntiforgeryValidation();
 
