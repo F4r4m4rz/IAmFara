@@ -614,6 +614,39 @@ namespace IAmFara.Web
                 return Results.Ok(new { household.Id, household.Name });
             }).RequireAntiforgeryValidation();
 
+            app.MapGet("/api/households/mine", async (ICurrentUserAccessor currentUser, HouseholdFacade householdFacade, CancellationToken ct) =>
+            {
+                var results = await householdFacade.GetMyHouseholdsAsync(currentUser.UserId!.Value, ct);
+                return Results.Ok(results.Select(r => new MyHouseholdDto(r.Household.Id, r.Household.Name, r.Role)));
+            });
+
+            // Combines Finance's membership rows with each member's Identity
+            // display name/email — Web is the one layer allowed to know about
+            // both.
+            app.MapGet("/api/households/{householdId:guid}/members", async (
+                Guid householdId,
+                ICurrentUserAccessor currentUser,
+                HouseholdFacade householdFacade,
+                IUserRepository userRepository,
+                CancellationToken ct) =>
+            {
+                try
+                {
+                    var members = await householdFacade.GetMembersAsync(currentUser.UserId!.Value, householdId, ct);
+                    var result = new List<HouseholdMemberDto>();
+                    foreach (var member in members)
+                    {
+                        var user = await userRepository.GetByIdAsync(member.UserId, ct);
+                        if (user is not null) result.Add(new HouseholdMemberDto(member.UserId, user.DisplayName, user.Email, member.Role));
+                    }
+                    return Results.Ok(result);
+                }
+                catch (NotHouseholdMemberException)
+                {
+                    return Results.Forbid();
+                }
+            });
+
             // Owner-only (enforced inside HouseholdFacade). Looks up whether the
             // invited email already belongs to a User (IAmFara.Web is the one
             // layer allowed to know about both Identity and Finance) — an

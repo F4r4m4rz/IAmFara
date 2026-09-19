@@ -1,5 +1,6 @@
 using IAmFara.Data.Abstractions.Finance;
 using IAmFara.Data.SqlServer.Finance;
+using IAmFara.Finance;
 using IAmFara.Finance.Households;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,41 @@ public class HouseholdFacadeTests : IDisposable
     {
         _db.Dispose();
         _connection.Dispose();
+    }
+
+    [Fact]
+    public async Task GetMyHouseholdsAsync_ReturnsOnlyHouseholdsTheUserBelongsTo()
+    {
+        var userId = Guid.NewGuid();
+        var householdA = await _facade.CreateHouseholdAsync(userId, "A");
+        await _facade.CreateHouseholdAsync(Guid.NewGuid(), "B"); // someone else's household
+
+        var results = await _facade.GetMyHouseholdsAsync(userId);
+
+        Assert.Single(results);
+        Assert.Equal(householdA.Id, results[0].Household.Id);
+        Assert.Equal(HouseholdRole.Owner, results[0].Role);
+    }
+
+    [Fact]
+    public async Task GetMembersAsync_ByANonMember_ThrowsNotHouseholdMember()
+    {
+        var household = await _facade.CreateHouseholdAsync(Guid.NewGuid(), "Test");
+
+        await Assert.ThrowsAsync<NotHouseholdMemberException>(() => _facade.GetMembersAsync(Guid.NewGuid(), household.Id));
+    }
+
+    [Fact]
+    public async Task GetMembersAsync_ReturnsEveryMemberOfTheHousehold()
+    {
+        var owner = Guid.NewGuid();
+        var household = await _facade.CreateHouseholdAsync(owner, "Test");
+        var member = Guid.NewGuid();
+        await _memberships.AddAsync(new HouseholdMembership { Id = Guid.NewGuid(), UserId = member, HouseholdId = household.Id, Role = HouseholdRole.Member, CreatedAt = DateTimeOffset.UtcNow });
+
+        var results = await _facade.GetMembersAsync(owner, household.Id);
+
+        Assert.Equal(2, results.Count);
     }
 
     [Fact]

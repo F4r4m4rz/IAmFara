@@ -16,6 +16,25 @@ public class HouseholdFacade(
 {
     private static readonly TimeSpan InvitationTtl = TimeSpan.FromDays(7);
 
+    /// <summary>Every household the current user belongs to, with their role in each.</summary>
+    public async Task<IReadOnlyList<(Household Household, HouseholdRole Role)>> GetMyHouseholdsAsync(Guid currentUserId, CancellationToken cancellationToken = default)
+    {
+        var myMemberships = await memberships.GetByUserIdAsync(currentUserId, cancellationToken);
+        var result = new List<(Household, HouseholdRole)>();
+        foreach (var membership in myMemberships)
+        {
+            var household = await households.GetByIdAsync(membership.HouseholdId, cancellationToken);
+            if (household is not null) result.Add((household, membership.Role));
+        }
+        return result;
+    }
+
+    public async Task<IReadOnlyList<HouseholdMembership>> GetMembersAsync(Guid currentUserId, Guid householdId, CancellationToken cancellationToken = default)
+    {
+        await RequireMembershipAsync(currentUserId, householdId, cancellationToken);
+        return await memberships.GetByHouseholdIdAsync(householdId, cancellationToken);
+    }
+
     public async Task<Household> CreateHouseholdAsync(Guid creatorUserId, string name, CancellationToken cancellationToken = default)
     {
         var household = new Household { Id = Guid.NewGuid(), Name = name, CreatedAt = DateTimeOffset.UtcNow };
@@ -124,6 +143,15 @@ public class HouseholdFacade(
         if (membership is null || membership.Role != HouseholdRole.Owner)
         {
             throw new NotHouseholdOwnerException();
+        }
+    }
+
+    private async Task RequireMembershipAsync(Guid userId, Guid householdId, CancellationToken cancellationToken)
+    {
+        var membership = await memberships.GetAsync(userId, householdId, cancellationToken);
+        if (membership is null)
+        {
+            throw new NotHouseholdMemberException();
         }
     }
 }

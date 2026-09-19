@@ -22,6 +22,15 @@ public class PasskeyRegistrationService(
 {
     private static readonly TimeSpan ChallengeTtl = TimeSpan.FromMinutes(5);
 
+    // A passkey is the sole authentication factor here (no password) — the
+    // authenticator's own PIN/biometric check must run on every registration,
+    // not just be "discouraged" (Fido2NetLib's own default).
+    private static readonly AuthenticatorSelection RequiredUserVerification = new()
+    {
+        ResidentKey = ResidentKeyRequirement.Required,
+        UserVerification = UserVerificationRequirement.Required,
+    };
+
     public async Task<(string CeremonyId, CredentialCreateOptions Options)> BeginAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await users.GetByIdAsync(userId, cancellationToken)
@@ -43,7 +52,7 @@ public class PasskeyRegistrationService(
         {
             User = fido2User,
             ExcludeCredentials = excludeCredentials,
-            AuthenticatorSelection = AuthenticatorSelection.Default,
+            AuthenticatorSelection = RequiredUserVerification,
             AttestationPreference = AttestationConveyancePreference.None,
         });
 
@@ -112,7 +121,7 @@ public class PasskeyRegistrationService(
         {
             User = fido2User,
             ExcludeCredentials = [],
-            AuthenticatorSelection = AuthenticatorSelection.Default,
+            AuthenticatorSelection = RequiredUserVerification,
             AttestationPreference = AttestationConveyancePreference.None,
         });
 

@@ -20,7 +20,9 @@ public class PasskeyAuthenticationService(IFido2 fido2, IMemoryCache cache, IUse
         var options = fido2.GetAssertionOptions(new GetAssertionOptionsParams
         {
             AllowedCredentials = [],
-            UserVerification = Fido2NetLib.Objects.UserVerificationRequirement.Preferred,
+            // A passkey is the sole authentication factor here — require the
+            // authenticator's own PIN/biometric check, not just "preferred".
+            UserVerification = Fido2NetLib.Objects.UserVerificationRequirement.Required,
         });
 
         var ceremonyId = Guid.NewGuid().ToString("N");
