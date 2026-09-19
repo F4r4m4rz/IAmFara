@@ -1,5 +1,5 @@
 import { LucideIcon, Repeat, RotateCcw, Sparkles, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { dirFor, T, useLocale } from "../../../i18n";
 import DemoModeBadge from "../components/DemoModeBadge";
@@ -136,7 +136,17 @@ function FinancialPeriodSetting() {
   );
 }
 
-export default function Settings({ showToast }: { showToast: (message: string) => void }) {
+export default function Settings({
+  showToast,
+  basePath = "/expenses/demo",
+  showDemoTools = true,
+  extraSection,
+}: {
+  showToast: (message: string) => void;
+  basePath?: string;
+  showDemoTools?: boolean;
+  extraSection?: ReactNode;
+}) {
   const { locale, t } = useLocale();
   const loadSampleData = useLoadSampleData();
   const resetAll = useResetAll();
@@ -164,7 +174,7 @@ export default function Settings({ showToast }: { showToast: (message: string) =
         <T k="finance.settings.heading" />
       </h1>
 
-      <DemoModeBadge />
+      {showDemoTools && <DemoModeBadge />}
 
       <LanguageSetting />
 
@@ -175,7 +185,7 @@ export default function Settings({ showToast }: { showToast: (message: string) =
           <T k="finance.settings.fixedExpensesSection" />
         </h2>
         <Link
-          to="/expenses/demo/fixed-expenses"
+          to={`${basePath}/fixed-expenses`}
           className="flex w-full items-center gap-3 rounded-xl border border-finance-border bg-finance-surface px-4 py-3 text-start text-sm text-finance-text"
         >
           <Repeat size={17} />
@@ -183,35 +193,39 @@ export default function Settings({ showToast }: { showToast: (message: string) =
         </Link>
       </section>
 
-      <section className="mt-6">
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
-          <T k="finance.settings.demoData" />
-        </h2>
-        <div className="space-y-2">
-          <SettingsButton
-            icon={Sparkles}
-            label={t("finance.settings.loadSampleData")}
-            onClick={handleLoadSampleData}
-            pending={loadSampleData.isPending}
-          />
-          <SettingsButton
-            icon={RotateCcw}
-            label={t("finance.settings.restoreDefaultCategories")}
-            onClick={handleRestoreDefaults}
-            pending={restoreDefaultCategories.isPending}
-          />
-          <SettingsButton
-            icon={Trash2}
-            label={t("finance.settings.resetDemo")}
-            onClick={handleReset}
-            pending={resetAll.isPending}
-            danger
-          />
-        </div>
-        <p className="mt-3 text-xs text-finance-muted">
-          <T k="finance.settings.demoDataHint" />
-        </p>
-      </section>
+      {extraSection}
+
+      {showDemoTools && (
+        <section className="mt-6">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-finance-muted">
+            <T k="finance.settings.demoData" />
+          </h2>
+          <div className="space-y-2">
+            <SettingsButton
+              icon={Sparkles}
+              label={t("finance.settings.loadSampleData")}
+              onClick={handleLoadSampleData}
+              pending={loadSampleData.isPending}
+            />
+            <SettingsButton
+              icon={RotateCcw}
+              label={t("finance.settings.restoreDefaultCategories")}
+              onClick={handleRestoreDefaults}
+              pending={restoreDefaultCategories.isPending}
+            />
+            <SettingsButton
+              icon={Trash2}
+              label={t("finance.settings.resetDemo")}
+              onClick={handleReset}
+              pending={resetAll.isPending}
+              danger
+            />
+          </div>
+          <p className="mt-3 text-xs text-finance-muted">
+            <T k="finance.settings.demoDataHint" />
+          </p>
+        </section>
+      )}
 
       {/* Short (7-char) build SHA — lets you confirm the installed PWA is
           actually running what was just deployed, without needing

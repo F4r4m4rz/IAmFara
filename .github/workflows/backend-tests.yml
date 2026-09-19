@@ -1,0 +1,25 @@
+name: Backend Tests
+
+# Runs on every push (any branch) and every PR, so a broken test is visible
+# during development — not just at the point deploy-prod.yml's own test job
+# gates production. No deploy or secrets access here.
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Run backend tests
+        working-directory: src/backend
+        run: dotnet test IAmFara.sln --configuration Release

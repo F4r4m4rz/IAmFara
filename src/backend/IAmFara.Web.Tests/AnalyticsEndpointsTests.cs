@@ -39,7 +39,20 @@ public class AnalyticsEndpointsFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            services.RemoveAll<DbContextOptions<AnalyticsDbContext>>();
+            // Remove every descriptor AddDbContext<AnalyticsDbContext> registered for the app's
+            // SqlServer configuration (EF Core composes same-context AddDbContext calls rather
+            // than replacing, so removing only DbContextOptions<T> leaves both providers active
+            // and isolated internal service providers don't help) before adding the SQLite one.
+            var analyticsContextServiceTypes = services
+                .Where(d => d.ServiceType.IsGenericType
+                    && d.ServiceType.GetGenericArguments().Contains(typeof(AnalyticsDbContext)))
+                .Select(d => d.ServiceType)
+                .Distinct()
+                .ToList();
+            foreach (var serviceType in analyticsContextServiceTypes)
+            {
+                services.RemoveAll(serviceType);
+            }
             services.AddDbContext<AnalyticsDbContext>(options => options.UseSqlite(_connection));
 
             var provider = services.BuildServiceProvider();

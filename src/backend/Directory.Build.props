@@ -1,0 +1,17 @@
+<Project>
+
+  <!--
+    MSBuild properties shared by every project in this solution — see also
+    Directory.Packages.props, which centralizes package *versions* the
+    same way. A project-specific property (UserSecretsId, IsTestProject,
+    ...) stays in that project's own .csproj; only what's genuinely
+    common lives here.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

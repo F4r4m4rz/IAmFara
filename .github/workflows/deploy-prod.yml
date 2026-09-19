@@ -5,13 +5,11 @@ on:
     branches: ["main"]
 
 jobs:
-  # Runs before `deploy` so schema changes are always in place before the new
-  # app code that depends on them goes live — merging (and thus approving)
-  # the PR is the explicit approval for this; there's no separate manual gate.
-  # `dotnet ef database update` only applies migrations not already recorded
-  # in `__EFMigrationsHistory`, so this is a safe no-op when there's nothing
-  # pending.
-  migrate:
+  # A hard gate: broken tests block migrate/deploy outright, rather than only
+  # being visible on whatever ran them earlier. backend-tests.yml runs the
+  # same suite on every push/PR for fast feedback before merge; this is the
+  # one that actually stands between a broken build and production.
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,16 +19,60 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
+
+      - name: Run backend tests
+        working-directory: src/backend
+        run: dotnet test IAmFara.sln --configuration Release
+
+  # Runs before `deploy` so schema changes are always in place before the new
+  # app code that depends on them goes live — merging (and thus approving)
+  # the PR is the explicit approval for this; there's no separate manual gate.
+  # `dotnet ef database update` only applies migrations not already recorded
+  # in `__EFMigrationsHistory`, so this is a safe no-op when there's nothing
+  # pending.
+  migrate:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
 
       - name: Install EF Core CLI tool
-        run: dotnet tool install --global dotnet-ef --version 8.*
+        run: dotnet tool install --global dotnet-ef --version 10.*
 
-      - name: Apply pending migrations
+      - name: Apply pending migrations (Analytics)
         working-directory: src/backend/IAmFara.Web
         env:
           CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
         run: dotnet ef database update --context AnalyticsDbContext --connection "$CONNECTION_STRING"
+
+      # Same physical database as AnalyticsDbContext above (schema-separated),
+      # but its migrations live in IAmFara.Data.SqlServer, not IAmFara.Web.
+      - name: Apply pending migrations (Identity)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
+        run: >
+          dotnet ef database update --context IdentityDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
+
+      # Same physical database again ("finance" schema).
+      - name: Apply pending migrations (Finance)
+        working-directory: src/backend/IAmFara.Web
+        env:
+          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_PROD }}
+        run: >
+          dotnet ef database update --context FinanceDbContext
+          --project ../IAmFara.Data.SqlServer/IAmFara.Data.SqlServer.csproj
+          --connection "$CONNECTION_STRING"
 
   deploy:
     needs: migrate
@@ -58,7 +100,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Publish and deploy backend via Web Deploy
         working-directory: src/backend/IAmFara.Web
