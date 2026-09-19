@@ -704,6 +704,26 @@ namespace IAmFara.Web
                 }
             }).RequireRateLimiting("invitation").RequireAntiforgeryValidation();
 
+            // Any authenticated user — Owner or plain Member of any household —
+            // may send this. Deliberately not household-scoped: it creates a
+            // bare identity invitation with no household link at all, so the
+            // recipient always ends up with their own brand-new household on
+            // completion (register-new-user/complete's own fallback above,
+            // when TryJoinFromLinkedIdentityInvitationAsync finds nothing
+            // linked) — never access to the inviter's household. This is the
+            // one-way door: only an Owner can grant access to their own
+            // household (the endpoint above); anyone can hand someone else a
+            // fresh start.
+            app.MapPost("/api/invitations", async (
+                ICurrentUserAccessor currentUser,
+                InvitationService invitationService,
+                CreateStandaloneInvitationRequest request,
+                CancellationToken ct) =>
+            {
+                var (_, rawToken) = await invitationService.CreateAsync(request.Email, currentUser.UserId, ct);
+                return Results.Ok(new { token = rawToken });
+            }).RequireRateLimiting("invitation").RequireAntiforgeryValidation();
+
             // An existing, already-signed-in user redeeming a household
             // invitation they received.
             app.MapPost("/api/households/invitations/consume", async (

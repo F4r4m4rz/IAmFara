@@ -77,6 +77,34 @@ public class HouseholdEndpointTests : IClassFixture<AuthenticationTestFactory>
     }
 
     [Fact]
+    public async Task CreateStandaloneInvitation_WithoutAuthentication_ReturnsUnauthorized()
+    {
+        var client = CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/invitations", new { email = "x@example.com" });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateStandaloneInvitation_ByAnyAuthenticatedUser_Succeeds()
+    {
+        // Deliberately not scoped to any household or role — a plain Member
+        // (not an Owner, not even a member of any specific household this
+        // test cares about) can send this, unlike the household-scoped
+        // invitation endpoint above.
+        var userId = Guid.NewGuid();
+        await _factory.SeedUserAsync(userId);
+        var client = CreateClient();
+
+        var response = await SendAuthenticatedAsync(client, userId, HttpMethod.Post, "/api/invitations", new { email = "newperson@example.com" });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.False(string.IsNullOrEmpty(body.GetProperty("token").GetString()));
+    }
+
+    [Fact]
     public async Task RemoveMember_WithoutAuthentication_ReturnsUnauthorized()
     {
         var client = CreateClient();

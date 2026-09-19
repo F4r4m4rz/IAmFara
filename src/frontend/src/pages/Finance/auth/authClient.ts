@@ -85,6 +85,15 @@ export async function createHouseholdInvitation(householdId: string, email: stri
   return body.token;
 }
 
+/** Any authenticated user (Owner or Member) can send this — the recipient always ends up with their own brand-new household, never access to the sender's. */
+export async function createStandaloneInvitation(email: string): Promise<string> {
+  const body = await apiJson<{ token: string }>("/api/invitations", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+  return body.token;
+}
+
 export function consumeHouseholdInvitation(token: string): Promise<{ householdId: string; role: "member" | "owner" }> {
   return apiJson("/api/households/invitations/consume", {
     method: "POST",

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 import { dirFor, useLocale } from "../../i18n";
 import BottomNav from "./components/BottomNav";
@@ -25,7 +25,19 @@ import { usePwaRegistration } from "./usePwaRegistration";
  * differ only in which FinanceRepository they construct and where they're
  * mounted, not in any of this behavior.
  */
-export default function FinanceAppShell({ repository, basePath }: { repository: FinanceRepository; basePath: string }) {
+export default function FinanceAppShell({
+  repository,
+  basePath,
+  showDemoTools = true,
+  settingsExtraSection,
+}: {
+  repository: FinanceRepository;
+  basePath: string;
+  /** Demo-only badge + sample-data/reset buttons — those call repository methods Real Mode's ApiFinanceRepository deliberately doesn't support. */
+  showDemoTools?: boolean;
+  /** Real Mode's household/invite UI — rendered inside Settings, nowhere near Demo Mode. */
+  settingsExtraSection?: ReactNode;
+}) {
   const { locale, t } = useLocale();
   const { needRefresh, applyUpdate } = usePwaRegistration();
   const [searchParams] = useSearchParams();
@@ -93,7 +105,12 @@ export default function FinanceAppShell({ repository, basePath }: { repository: 
               <Route path="transactions" element={<TransactionHistory onEditTransaction={openEdit} />} />
               <Route path="categories" element={<Categories />} />
               <Route path="fixed-expenses" element={<FixedExpenses showToast={showToast} />} />
-              <Route path="settings" element={<Settings showToast={showToast} />} />
+              <Route
+                path="settings"
+                element={
+                  <Settings showToast={showToast} basePath={basePath} showDemoTools={showDemoTools} extraSection={settingsExtraSection} />
+                }
+              />
             </Routes>
           </div>
           <BottomNav onAdd={openAdd} basePath={basePath} />

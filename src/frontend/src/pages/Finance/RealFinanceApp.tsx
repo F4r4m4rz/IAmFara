@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { ApiFinanceRepository } from "./data/ApiFinanceRepository";
 import FinanceAppShell from "./FinanceAppShell";
+import InviteSection from "./InviteSection";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import SignIn from "./pages/SignIn";
 
@@ -49,5 +50,12 @@ function AuthenticatedApp() {
 
 function HouseholdShell({ householdId }: { householdId: string }) {
   const [repository] = useState(() => new ApiFinanceRepository(householdId));
-  return <FinanceAppShell repository={repository} basePath={BASE_PATH} />;
+  return (
+    <FinanceAppShell
+      repository={repository}
+      basePath={BASE_PATH}
+      showDemoTools={false}
+      settingsExtraSection={<InviteSection />}
+    />
+  );
 }
